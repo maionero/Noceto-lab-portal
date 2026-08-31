@@ -206,6 +206,36 @@ hr {
   margin: 20px 0;
 }
 
+@media print {
+  body * { visibility: hidden !important; }
+  #printSheet, #printSheet * { visibility: visible !important; }
+  #printSheet { position: absolute; left: 0; top: 0; width: 100%; }
+  .no-print { display: none !important; }
+}
+
+.print-sheet { display: none; }
+
+.running-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+.running-table th,
+.running-table td {
+  border: 1px solid #ddd;
+  padding: 9px;
+  text-align: left;
+  vertical-align: top;
+}
+.running-table th { background: #f4f4f5; }
+
+.note-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
 @media(max-width:600px) {
 
   .container {
@@ -582,8 +612,63 @@ hr {
 
   </div>
 
-</section>
+  <!-- NOTE E COMUNICAZIONI -->
+  <div class="card">
+    <div class="section-title">
+      <h2>📝 Note e comunicazioni</h2>
+    </div>
 
+    <label>Titolo</label>
+    <input id="patientNoteTitle" placeholder="Es. Indicazioni per la prossima settimana">
+
+    <label>Nota</label>
+    <textarea id="patientNoteContent" placeholder="Scrivi una nota o una comunicazione per il paziente..."></textarea>
+
+    <br><br>
+    <button id="savePatientNoteButton" class="primary">＋ Salva nota</button>
+    <div id="patientNoteMessage" class="message hidden"></div>
+
+    <hr>
+    <div id="patientNotesList">Caricamento...</div>
+  </div>
+
+  <!-- ALLENAMENTO CORSA -->
+  <div class="card">
+    <div class="section-title">
+      <h2>🏃 Allenamenti di corsa</h2>
+      <button id="printExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
+    </div>
+
+    <label>Data</label>
+    <input id="runningDate" type="date">
+
+    <label>Titolo</label>
+    <input id="runningTitle" placeholder="Es. Ripetute 30" / 30"">
+
+    <label>Distanza (km)</label>
+    <input id="runningDistance" type="number" step="0.1" min="0" placeholder="8">
+
+    <label>Durata (min)</label>
+    <input id="runningDuration" type="number" min="0" placeholder="45">
+
+    <label>Ritmo</label>
+    <input id="runningPace" placeholder="Es. 5:00/km">
+
+    <label>Allenamento</label>
+    <textarea id="runningWorkout" placeholder="Es. 10' riscaldamento + 8 x (1' veloce / 1' lento) + 10' defaticamento"></textarea>
+
+    <label>Note</label>
+    <textarea id="runningNotes" placeholder="Indicazioni, recuperi, sensazioni..."></textarea>
+
+    <br><br>
+    <button id="saveRunningButton" class="primary">＋ Aggiungi allenamento</button>
+    <div id="runningMessage" class="message hidden"></div>
+
+    <hr>
+    <div id="runningPlansList">Caricamento...</div>
+  </div>
+
+</section>
 
 <!-- =====================================
      NUOVO PAZIENTE
@@ -741,6 +826,19 @@ hr {
       Caricamento...
     </div>
 
+  </div>
+
+  <div class="card">
+    <h2>📝 Note e comunicazioni</h2>
+    <div id="patientPortalNotes">Caricamento...</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">
+      <h2>🏃 I tuoi allenamenti di corsa</h2>
+      <button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
+    </div>
+    <div id="patientPortalRunning">Caricamento...</div>
   </div>
 
 </section>
@@ -1480,6 +1578,8 @@ async function openPatient(patient) {
   await loadPatientExercises();
 
   await loadPatientDocuments();
+  await loadPatientNotes();
+  await loadRunningPlans();
 
 }
 
@@ -2056,7 +2156,6 @@ async function loadPatientExercises() {
         duration,
         rest,
         notes,
-        completed,
         exercises (
           id,
           name,
@@ -2109,14 +2208,6 @@ async function loadPatientExercises() {
       div.className =
         "exercise";
 
-
-      if(item.completed) {
-
-        div.classList.add(
-          "completed"
-        );
-
-      }
 
 
       const title =
@@ -2277,52 +2368,6 @@ async function loadPatientExercises() {
 
       }
 
-
-      const completionLabel =
-        document.createElement(
-          "label"
-        );
-
-
-      const completion =
-        document.createElement(
-          "input"
-        );
-
-
-      completion.type =
-        "checkbox";
-
-
-      completion.checked =
-        !!item.completed;
-
-
-      completion.addEventListener(
-        "change",
-        updateCompletion
-      );
-
-
-      completion.dataset.id =
-        item.id;
-
-
-      completionLabel.appendChild(
-        completion
-      );
-
-
-      completionLabel.appendChild(
-        document.createTextNode(
-          " Completato"
-        )
-      );
-
-
-      div.appendChild(
-        completionLabel
-      );
 
 
       const actions =
@@ -3040,7 +3085,7 @@ document
 
         showMessage(
           "patientMessage",
-          "Paziente creato correttamente. È stata inviata l'email di accesso.",
+          "Paziente creato correttamente. Password temporanea: Nocetolab222",
           "success"
         );
 
@@ -3699,8 +3744,9 @@ async function deleteDocument(documentItem) {
 async function loadPatientPortal() {
 
   await loadPatientPortalExercises();
-
   await loadPatientPortalDocuments();
+  await loadPatientPortalNotes();
+  await loadPatientPortalRunning();
 
 }
 
@@ -3731,7 +3777,6 @@ async function loadPatientPortalExercises() {
         duration,
         rest,
         notes,
-        completed,
         exercises (
           name,
           description,
@@ -3779,14 +3824,6 @@ async function loadPatientPortalExercises() {
       div.className =
         "exercise";
 
-
-      if(item.completed) {
-
-        div.classList.add(
-          "completed"
-        );
-
-      }
 
 
       const title =
@@ -3950,52 +3987,6 @@ async function loadPatientPortalExercises() {
       }
 
 
-      const completionLabel =
-        document.createElement(
-          "label"
-        );
-
-
-      const completion =
-        document.createElement(
-          "input"
-        );
-
-
-      completion.type =
-        "checkbox";
-
-
-      completion.checked =
-        !!item.completed;
-
-
-      completion.dataset.id =
-        item.id;
-
-
-      completion.addEventListener(
-        "change",
-        updateCompletion
-      );
-
-
-      completionLabel.appendChild(
-        completion
-      );
-
-
-      completionLabel.appendChild(
-        document.createTextNode(
-          " Ho completato questo esercizio"
-        )
-      );
-
-
-      div.appendChild(
-        completionLabel
-      );
-
 
       container.appendChild(
         div
@@ -4154,6 +4145,355 @@ async function loadPatientPortalDocuments() {
 
 }
 
+
+
+/* =====================================
+   NOTE PAZIENTE
+===================================== */
+
+document
+  .getElementById("savePatientNoteButton")
+  .addEventListener("click", savePatientNote);
+
+async function savePatientNote() {
+  if(!currentPatient) return;
+
+  const title = document.getElementById("patientNoteTitle").value.trim();
+  const content = document.getElementById("patientNoteContent").value.trim();
+
+  if(!content) {
+    showMessage("patientNoteMessage", "Scrivi una nota.", "error");
+    return;
+  }
+
+  const result = await db
+    .from("patient_notes")
+    .insert({
+      patient_id: currentPatient.id,
+      title: title || "Nota",
+      content
+    });
+
+  if(result.error) {
+    showMessage("patientNoteMessage", result.error.message, "error");
+    return;
+  }
+
+  document.getElementById("patientNoteTitle").value = "";
+  document.getElementById("patientNoteContent").value = "";
+  showMessage("patientNoteMessage", "Nota salvata.", "success");
+  await loadPatientNotes();
+}
+
+async function loadPatientNotes() {
+  const container = document.getElementById("patientNotesList");
+  if(!container || !currentPatient) return;
+
+  container.innerHTML = "Caricamento...";
+
+  const result = await db
+    .from("patient_notes")
+    .select("id, title, content, created_at")
+    .eq("patient_id", currentPatient.id)
+    .order("created_at", { ascending: false });
+
+  if(result.error) {
+    container.innerText = result.error.message;
+    return;
+  }
+
+  if(!result.data?.length) {
+    container.innerText = "Nessuna nota presente.";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  result.data.forEach(note => {
+    const div = document.createElement("div");
+    div.className = "note-card";
+
+    const title = document.createElement("h3");
+    title.innerText = note.title || "Nota";
+    div.appendChild(title);
+
+    const date = document.createElement("small");
+    date.innerText = formatDate(note.created_at);
+    div.appendChild(date);
+
+    const text = document.createElement("p");
+    text.innerText = note.content;
+    div.appendChild(text);
+
+    const del = document.createElement("button");
+    del.className = "danger";
+    del.innerText = "🗑️ Elimina";
+    del.addEventListener("click", async () => {
+      if(!confirm("Vuoi eliminare questa nota?")) return;
+      const r = await db.from("patient_notes").delete().eq("id", note.id);
+      if(r.error) alert(r.error.message);
+      else await loadPatientNotes();
+    });
+    div.appendChild(del);
+
+    container.appendChild(div);
+  });
+}
+
+/* =====================================
+   ALLENAMENTI CORSA
+===================================== */
+
+document
+  .getElementById("saveRunningButton")
+  .addEventListener("click", saveRunningPlan);
+
+async function saveRunningPlan() {
+  if(!currentPatient) return;
+
+  const date = document.getElementById("runningDate").value || null;
+  const title = document.getElementById("runningTitle").value.trim();
+  const distanceValue = document.getElementById("runningDistance").value;
+  const durationValue = document.getElementById("runningDuration").value;
+  const pace = document.getElementById("runningPace").value.trim();
+  const workout = document.getElementById("runningWorkout").value.trim();
+  const notes = document.getElementById("runningNotes").value.trim();
+
+  if(!title && !workout) {
+    showMessage("runningMessage", "Inserisci almeno il titolo o l'allenamento.", "error");
+    return;
+  }
+
+  const result = await db
+    .from("running_plans")
+    .insert({
+      patient_id: currentPatient.id,
+      date,
+      title: title || "Allenamento corsa",
+      distance_km: distanceValue ? Number(distanceValue) : null,
+      duration_min: durationValue ? Number(durationValue) : null,
+      pace: pace || null,
+      workout: workout || null,
+      notes: notes || null
+    });
+
+  if(result.error) {
+    showMessage("runningMessage", result.error.message, "error");
+    return;
+  }
+
+  ["runningDate","runningTitle","runningDistance","runningDuration","runningPace","runningWorkout","runningNotes"]
+    .forEach(id => document.getElementById(id).value = "");
+
+  showMessage("runningMessage", "Allenamento aggiunto.", "success");
+  await loadRunningPlans();
+}
+
+async function loadRunningPlans() {
+  const container = document.getElementById("runningPlansList");
+  if(!container || !currentPatient) return;
+
+  container.innerHTML = "Caricamento...";
+
+  const result = await db
+    .from("running_plans")
+    .select("id, date, title, distance_km, duration_min, pace, workout, notes, created_at")
+    .eq("patient_id", currentPatient.id)
+    .order("date", { ascending: false, nullsFirst: false });
+
+  if(result.error) {
+    container.innerText = result.error.message;
+    return;
+  }
+
+  if(!result.data?.length) {
+    container.innerText = "Nessun allenamento di corsa presente.";
+    return;
+  }
+
+  container.innerHTML = "";
+  const table = document.createElement("table");
+  table.className = "running-table";
+  table.innerHTML = `<thead><tr><th>Data</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Dettagli</th><th></th></tr></thead>`;
+  const tbody = document.createElement("tbody");
+
+  result.data.forEach(item => {
+    const tr = document.createElement("tr");
+    const values = [
+      item.date ? formatDate(item.date) : "—",
+      item.title || "—",
+      item.distance_km ?? "—",
+      item.duration_min ? item.duration_min + " min" : "—",
+      item.pace || "—",
+      [item.workout, item.notes].filter(Boolean).join("\n\n") || "—"
+    ];
+    values.forEach(value => {
+      const td = document.createElement("td");
+      td.innerText = value;
+      tr.appendChild(td);
+    });
+    const actionTd = document.createElement("td");
+    const del = document.createElement("button");
+    del.className = "danger";
+    del.innerText = "🗑️";
+    del.addEventListener("click", async () => {
+      if(!confirm("Vuoi eliminare questo allenamento?")) return;
+      const r = await db.from("running_plans").delete().eq("id", item.id);
+      if(r.error) alert(r.error.message);
+      else await loadRunningPlans();
+    });
+    actionTd.appendChild(del);
+    tr.appendChild(actionTd);
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+async function loadPatientPortalNotes() {
+  const container = document.getElementById("patientPortalNotes");
+  if(!container || !currentPatient) return;
+  container.innerHTML = "Caricamento...";
+
+  const result = await db
+    .from("patient_notes")
+    .select("id, title, content, created_at")
+    .eq("patient_id", currentPatient.id)
+    .order("created_at", { ascending: false });
+
+  if(result.error) { container.innerText = result.error.message; return; }
+  if(!result.data?.length) { container.innerText = "Nessuna nota o comunicazione."; return; }
+
+  container.innerHTML = "";
+  result.data.forEach(note => {
+    const div = document.createElement("div");
+    div.className = "note-card";
+    const h = document.createElement("h3");
+    h.innerText = note.title || "Nota";
+    div.appendChild(h);
+    const d = document.createElement("small");
+    d.innerText = formatDate(note.created_at);
+    div.appendChild(d);
+    const p = document.createElement("p");
+    p.innerText = note.content;
+    div.appendChild(p);
+    container.appendChild(div);
+  });
+}
+
+async function loadPatientPortalRunning() {
+  const container = document.getElementById("patientPortalRunning");
+  if(!container || !currentPatient) return;
+  container.innerHTML = "Caricamento...";
+
+  const result = await db
+    .from("running_plans")
+    .select("id, date, title, distance_km, duration_min, pace, workout, notes")
+    .eq("patient_id", currentPatient.id)
+    .order("date", { ascending: false, nullsFirst: false });
+
+  if(result.error) { container.innerText = result.error.message; return; }
+  if(!result.data?.length) { container.innerText = "Nessun allenamento di corsa presente."; return; }
+
+  container.innerHTML = "";
+  const table = document.createElement("table");
+  table.className = "running-table";
+  table.innerHTML = `<thead><tr><th>Data</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Dettagli</th></tr></thead>`;
+  const tbody = document.createElement("tbody");
+  result.data.forEach(item => {
+    const tr = document.createElement("tr");
+    [
+      item.date ? formatDate(item.date) : "—",
+      item.title || "—",
+      item.distance_km ?? "—",
+      item.duration_min ? item.duration_min + " min" : "—",
+      item.pace || "—",
+      [item.workout, item.notes].filter(Boolean).join("\n\n") || "—"
+    ].forEach(value => {
+      const td = document.createElement("td");
+      td.innerText = value;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+/* =====================================
+   STAMPA / SALVA SCHEDA
+===================================== */
+
+async function printExerciseSheet() {
+  if(!currentPatient) return;
+
+  const result = await db
+    .from("patient_exercises")
+    .select(`
+      sets, reps, duration, rest, notes,
+      exercises (name, description)
+    `)
+    .eq("patient_id", currentPatient.id);
+
+  if(result.error) {
+    alert(result.error.message);
+    return;
+  }
+
+  const sheet = document.getElementById("printSheet");
+  sheet.innerHTML = "";
+
+  const h1 = document.createElement("h1");
+  h1.innerText = "Noceto Lab";
+  sheet.appendChild(h1);
+
+  const h2 = document.createElement("h2");
+  h2.innerText = "Scheda esercizi — " + currentPatient.name;
+  sheet.appendChild(h2);
+
+  const date = document.createElement("p");
+  date.innerText = "Data: " + new Date().toLocaleDateString("it-IT");
+  sheet.appendChild(date);
+
+  result.data.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.style.marginBottom = "18px";
+    const title = document.createElement("h3");
+    title.innerText = (index + 1) + ". " + (item.exercises?.name || "Esercizio");
+    card.appendChild(title);
+    const info = [
+      item.sets != null ? item.sets + " serie" : null,
+      item.reps != null ? item.reps + " ripetizioni" : null,
+      item.duration != null ? item.duration + " secondi" : null,
+      item.rest != null ? "recupero " + item.rest + " sec" : null
+    ].filter(Boolean);
+    if(info.length) {
+      const p = document.createElement("p");
+      p.innerText = info.join(" · ");
+      card.appendChild(p);
+    }
+    if(item.exercises?.description) {
+      const p = document.createElement("p");
+      p.innerText = item.exercises.description;
+      card.appendChild(p);
+    }
+    if(item.notes) {
+      const p = document.createElement("p");
+      p.innerText = "Note: " + item.notes;
+      card.appendChild(p);
+    }
+    sheet.appendChild(card);
+  });
+
+  window.print();
+}
+
+document.getElementById("printExerciseSheetButton")
+  .addEventListener("click", printExerciseSheet);
+
+document.getElementById("patientPrintExerciseSheetButton")
+  .addEventListener("click", printExerciseSheet);
 
 /* =====================================
    DATA

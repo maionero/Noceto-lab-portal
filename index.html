@@ -57,17 +57,18 @@ input,
 textarea,
 select {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 9px;
-  margin-top: 6px;
-  font-size: 15px;
+  margin-top: 4px;
+  font-size: 14px;
 }
 
 label {
   display: block;
-  margin-top: 14px;
+  margin-top: 10px;
   font-weight: bold;
+  font-size: 13px;
 }
 
 button {
@@ -99,8 +100,7 @@ button {
 
 .grid {
   display: grid;
-  grid-template-columns:
-    repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
 }
 
@@ -206,29 +206,6 @@ hr {
   margin: 20px 0;
 }
 
-@media print {
-  body * { visibility: hidden !important; }
-  #printSheet, #printSheet * { visibility: visible !important; }
-  #printSheet { position: absolute; left: 0; top: 0; width: 100%; }
-  .no-print { display: none !important; }
-}
-
-.print-sheet { display: none; }
-
-.running-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 12px;
-}
-.running-table th,
-.running-table td {
-  border: 1px solid #ddd;
-  padding: 9px;
-  text-align: left;
-  vertical-align: top;
-}
-.running-table th { background: #f4f4f5; }
-
 .note-card {
   border: 1px solid #ddd;
   border-radius: 12px;
@@ -263,53 +240,86 @@ hr {
   display: none !important;
 }
 
+/* REGOLAZIONE STAMPA / PDF */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printSheet, #printSheet * {
+    visibility: visible;
+  }
+  #printSheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+    color: black;
+    padding: 20px;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+.print-sheet {
+  display: none;
+}
+
+/* STRUTTURA TABELLA CORSA */
 .running-planner {
   overflow-x: auto;
 }
 
-.planner-table {
+.running-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
+  margin-top: 12px;
+  min-width: 700px;
 }
 
-.planner-table th,
-.planner-table td {
+.running-table th,
+.running-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
+  text-align: left;
   vertical-align: top;
 }
 
-.planner-table th {
+.running-table th {
   background: #f4f4f5;
-  text-align: left;
 }
 
-.planner-table input,
-.planner-table textarea,
-.planner-table select {
-  margin-top: 0;
-  min-width: 90px;
+.session-box {
+  background: #fdfdfd;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
 }
 
-.print-only {
-  display: none;
+.session-box label {
+  margin-top: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #555;
 }
 
-@media print {
-  .print-only { display: block; }
+.interval-box {
+  background: #f0f4f8;
+  border-left: 3px solid #0056b3;
+  padding: 6px;
+  margin-top: 6px;
+  border-radius: 4px;
 }
 
 @media(max-width:600px) {
-
   .container {
     padding: 12px;
   }
-
   .card {
     padding: 16px;
   }
-
 }
 
 </style>
@@ -321,368 +331,124 @@ hr {
 
 
 <header>
-
   <h1>🏥 Noceto Lab</h1>
-
-  <button
-    id="logoutButton"
-    class="secondary hidden"
-  >
-    Esci
-  </button>
-
+  <button id="logoutButton" class="secondary hidden">Esci</button>
 </header>
 
 
 <div class="container">
 
-
-<!-- =====================================
-     LOGIN
-===================================== -->
-
-<section
-  id="loginPage"
-  class="login"
->
-
+<!-- LOGIN -->
+<section id="loginPage" class="login">
   <div class="card">
-
     <h2>Accedi</h2>
-
     <label>Email</label>
-
-    <input
-      id="email"
-      type="email"
-      placeholder="La tua email"
-    >
-
+    <input id="email" type="email" placeholder="La tua email">
     <label>Password</label>
-
-    <input
-      id="password"
-      type="password"
-      placeholder="Password"
-    >
-
+    <input id="password" type="password" placeholder="Password">
     <br><br>
-
-    <button
-      id="loginButton"
-      class="primary"
-    >
-      Accedi
-    </button>
-
-    <div
-      id="loginMessage"
-      class="message hidden"
-    ></div>
-
+    <button id="loginButton" class="primary">Accedi</button>
+    <div id="loginMessage" class="message hidden"></div>
   </div>
-
 </section>
 
-
-<!-- =====================================
-     IMPOSTAZIONE PASSWORD
-===================================== -->
-
-<section
-  id="setPasswordPage"
-  class="login hidden"
->
-
+<!-- IMPOSTAZIONE PASSWORD -->
+<section id="setPasswordPage" class="login hidden">
   <div class="card">
-
     <h2>🔐 Imposta la tua password</h2>
-
-    <p>
-      Scegli una password per accedere al tuo programma.
-    </p>
-
+    <p>Scegli una password per accedere al tuo programma.</p>
     <label>Nuova password</label>
-
-    <input
-      id="newPassword"
-      type="password"
-      placeholder="Nuova password"
-    >
-
+    <input id="newPassword" type="password" placeholder="Nuova password">
     <label>Conferma password</label>
-
-    <input
-      id="confirmPassword"
-      type="password"
-      placeholder="Ripeti la password"
-    >
-
+    <input id="confirmPassword" type="password" placeholder="Ripeti la password">
     <br><br>
-
-    <button
-      id="savePasswordButton"
-      class="primary"
-    >
-      Salva password
-    </button>
-
-    <div
-      id="passwordMessage"
-      class="message hidden"
-    ></div>
-
+    <button id="savePasswordButton" class="primary">Salva password</button>
+    <div id="passwordMessage" class="message hidden"></div>
   </div>
-
 </section>
 
-
-<!-- =====================================
-     DASHBOARD FISIOTERAPISTA
-===================================== -->
-
-<section
-  id="therapistPage"
-  class="hidden"
->
-
+<!-- DASHBOARD FISIOTERAPISTA -->
+<section id="therapistPage" class="hidden">
   <div class="card">
-
     <h2>👨‍⚕️ Dashboard</h2>
-
-    <p>
-      Gestisci pazienti e programmi di esercizio.
-    </p>
-
+    <p>Gestisci pazienti e programmi di esercizio.</p>
     <div class="actions">
-
-      <button
-        id="newPatientButton"
-        class="primary"
-      >
-        ＋ Nuovo paziente
-      </button>
-
-      <button
-        id="newExerciseButton"
-        class="secondary"
-      >
-        ＋ Nuovo esercizio
-      </button>
-
+      <button id="newPatientButton" class="primary">＋ Nuovo paziente</button>
+      <button id="newExerciseButton" class="secondary">＋ Nuovo esercizio</button>
     </div>
-
   </div>
 
-
-  <!-- PAZIENTI -->
-
   <div class="card">
-
     <h2>👥 Pazienti</h2>
-
-    <div
-      id="patientsList"
-      class="grid"
-    >
-      Caricamento...
-    </div>
-
+    <div id="patientsList" class="grid">Caricamento...</div>
   </div>
-
-
-  <!-- LIBRERIA ESERCIZI -->
 
   <div class="card">
-
     <div class="section-title">
-
       <h2>🏋️ Libreria esercizi</h2>
-
     </div>
-
-    <div id="exerciseLibrary">
-
-      Caricamento...
-
-    </div>
-
+    <div id="exerciseLibrary">Caricamento...</div>
   </div>
-
 </section>
 
-
-<!-- =====================================
-     SCHEDA PAZIENTE
-===================================== -->
-
-<section
-  id="patientPage"
-  class="hidden"
->
-
-  <button
-    id="backButton"
-    class="secondary back"
-  >
-    ← Pazienti
-  </button>
+<!-- SCHEDA PAZIENTE -->
+<section id="patientPage" class="hidden">
+  <button id="backButton" class="secondary back">← Pazienti</button>
 
   <div class="section-tabs" id="therapistPatientTabs">
-    <button class="section-tab active" data-target="therapistTabProgram">📋 Programma</button>
+    <button class="section-tab active" data-target="therapistTabProgram">📋 Programma Esercizi</button>
     <button class="section-tab" data-target="therapistTabDocuments">📄 Documenti</button>
     <button class="section-tab" data-target="therapistTabNotes">📝 Note</button>
-    <button class="section-tab" data-target="therapistTabRunning">🏃 Corsa</button>
+    <button class="section-tab" data-target="therapistTabRunning">🏃 Programma Corsa</button>
   </div>
 
   <div class="card">
-
-    <h2 id="patientTitle">
-      Paziente
-    </h2>
-
+    <h2 id="patientTitle">Paziente</h2>
   </div>
 
-
-  <!-- PROGRAMMA -->
-
+  <!-- PROGRAMMA ESERCIZI -->
   <div class="card tab-panel" id="therapistTabProgram">
-
     <div class="section-title">
-      <h2>📋 Programma</h2>
+      <h2>📋 Programma Esercizi</h2>
       <button id="printExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
     </div>
-
-    <div id="patientExercises">
-      Caricamento...
-    </div>
-
+    <div id="patientExercises">Caricamento...</div>
   </div>
-
 
   <!-- ASSEGNA ESERCIZIO -->
-
   <div class="card tab-panel" id="therapistTabProgramAssign">
-
     <h2>＋ Assegna esercizio</h2>
-
     <label>Esercizio</label>
-
     <select id="exerciseSelect">
-
-      <option value="">
-        Seleziona esercizio
-      </option>
-
+      <option value="">Seleziona esercizio</option>
     </select>
-
-
     <label>Serie</label>
-
-    <input
-      id="sets"
-      type="number"
-      min="0"
-      placeholder="3"
-    >
-
-
+    <input id="sets" type="number" min="0" placeholder="3">
     <label>Ripetizioni</label>
-
-    <input
-      id="reps"
-      type="number"
-      min="0"
-      placeholder="10"
-    >
-
-
+    <input id="reps" type="number" min="0" placeholder="10">
     <label>Durata (secondi)</label>
-
-    <input
-      id="duration"
-      type="number"
-      min="0"
-      placeholder="30"
-    >
-
-
+    <input id="duration" type="number" min="0" placeholder="30">
     <label>Recupero (secondi)</label>
-
-    <input
-      id="rest"
-      type="number"
-      min="0"
-      placeholder="60"
-    >
-
-
+    <input id="rest" type="number" min="0" placeholder="60">
     <label>Note</label>
-
-    <textarea
-      id="notes"
-      placeholder="Indicazioni per il paziente..."
-    ></textarea>
-
+    <textarea id="notes" placeholder="Indicazioni per il paziente..."></textarea>
     <br><br>
-
-    <button
-      id="assignButton"
-      class="primary"
-    >
-      Assegna esercizio
-    </button>
-
-    <div
-      id="assignMessage"
-      class="message hidden"
-    ></div>
-
+    <button id="assignButton" class="primary">Assegna esercizio</button>
+    <div id="assignMessage" class="message hidden"></div>
   </div>
 
-
   <!-- REPORT E DOCUMENTI -->
-
   <div class="card tab-panel" id="therapistTabDocuments">
-
     <div class="section-title">
-
       <h2>📄 Report e documenti</h2>
-
     </div>
-
-    <p>
-      Carica documenti PDF da rendere disponibili al paziente.
-    </p>
-
-    <input
-      id="documentFile"
-      type="file"
-      accept="application/pdf,.pdf"
-    >
-
+    <p>Carica documenti PDF da rendere disponibili al paziente.</p>
+    <input id="documentFile" type="file" accept="application/pdf,.pdf">
     <br><br>
-
-    <button
-      id="uploadDocumentButton"
-      class="primary"
-    >
-      📎 Carica PDF
-    </button>
-
-    <div
-      id="documentMessage"
-      class="message hidden"
-    ></div>
-
+    <button id="uploadDocumentButton" class="primary">📎 Carica PDF</button>
+    <div id="documentMessage" class="message hidden"></div>
     <hr>
-
-    <div id="patientDocuments">
-
-      Caricamento...
-
-    </div>
-
+    <div id="patientDocuments">Caricamento...</div>
   </div>
 
   <!-- NOTE E COMUNICAZIONI -->
@@ -690,17 +456,13 @@ hr {
     <div class="section-title">
       <h2>📝 Note e comunicazioni</h2>
     </div>
-
     <label>Titolo</label>
     <input id="patientNoteTitle" placeholder="Es. Indicazioni per la prossima settimana">
-
     <label>Nota</label>
     <textarea id="patientNoteContent" placeholder="Scrivi una nota o una comunicazione per il paziente..."></textarea>
-
     <br><br>
     <button id="savePatientNoteButton" class="primary">＋ Salva nota</button>
     <div id="patientNoteMessage" class="message hidden"></div>
-
     <hr>
     <div id="patientNotesList">Caricamento...</div>
   </div>
@@ -708,10 +470,10 @@ hr {
   <!-- ALLENAMENTO CORSA -->
   <div class="card tab-panel" id="therapistTabRunning">
     <div class="section-title">
-      <h2>🏃 Programma di corsa</h2>
+      <h2>🏃 Programma di Corsa Dettagliato</h2>
     </div>
 
-    <p>Costruisci una programmazione settimanale personalizzata. Scegli da 2 a 5 allenamenti a settimana e il numero di settimane. La settimana viene mostrata come intestazione, non ripetuta in ogni riga.</p>
+    <p>Seleziona la durata e la frequenza settimanale per generare la scheda dettagliata di allenamento.</p>
 
     <div class="grid">
       <div>
@@ -721,154 +483,64 @@ hr {
       <div>
         <label>Allenamenti a settimana</label>
         <select id="runningSessionsPerWeek">
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
+          <option value="2">2 allenamenti</option>
+          <option value="3" selected>3 allenamenti</option>
+          <option value="4">4 allenamenti</option>
+          <option value="5">5 allenamenti</option>
         </select>
       </div>
     </div>
 
     <br>
     <div class="actions">
-      <button id="generateRunningPlanButton" class="primary">＋ Genera tabella</button>
-      <button id="saveRunningProgramButton" class="primary hidden">💾 Salva programma</button>
-      <button id="deleteRunningProgramButton" class="danger">🗑️ Elimina programma attuale</button>
+      <button id="generateRunningPlanButton" class="primary">＋ Genera Tabella Corsa</button>
+      <button id="saveRunningProgramButton" class="primary hidden">💾 Salva Programma</button>
     </div>
 
     <div id="runningMessage" class="message hidden"></div>
     <hr>
     <div id="runningPlanner" class="running-planner"></div>
     <hr>
-    <h3>Programma salvato</h3>
+    <h3>Programma Attualmente Salvato</h3>
     <div id="runningPlansList">Caricamento...</div>
   </div>
 
 </section>
 
-<!-- =====================================
-     NUOVO PAZIENTE
-===================================== -->
-
-<section
-  id="newPatientPage"
-  class="hidden"
->
-
+<!-- NUOVO PAZIENTE -->
+<section id="newPatientPage" class="hidden">
   <div class="card">
-
     <h2>👤 Nuovo paziente</h2>
-
     <label>Nome</label>
-
-    <input
-      id="newPatientName"
-      placeholder="Nome paziente"
-    >
-
+    <input id="newPatientName" placeholder="Nome paziente">
     <label>Email account paziente</label>
-
-    <input
-      id="newPatientEmail"
-      type="email"
-      placeholder="email@esempio.it"
-    >
-
+    <input id="newPatientEmail" type="email" placeholder="email@esempio.it">
     <br><br>
-
-    <button
-      id="savePatient"
-      class="primary"
-    >
-      Salva
-    </button>
-
-    <button
-      id="cancelPatient"
-      class="secondary"
-    >
-      Annulla
-    </button>
-
-    <div
-      id="patientMessage"
-      class="message hidden"
-    ></div>
-
+    <button id="savePatient" class="primary">Salva</button>
+    <button id="cancelPatient" class="secondary">Annulla</button>
+    <div id="patientMessage" class="message hidden"></div>
   </div>
-
 </section>
 
-
-<!-- =====================================
-     NUOVO ESERCIZIO
-===================================== -->
-
-<section
-  id="newExercisePage"
-  class="hidden"
->
-
+<!-- NUOVO ESERCIZIO -->
+<section id="newExercisePage" class="hidden">
   <div class="card">
-
     <h2>🏋️ Nuovo esercizio</h2>
-
     <label>Nome</label>
-
-    <input
-      id="exerciseName"
-      placeholder="Es. Squat"
-    >
-
+    <input id="exerciseName" placeholder="Es. Squat">
     <label>Descrizione</label>
-
-    <textarea
-      id="exerciseDescription"
-      placeholder="Descrizione dell'esercizio..."
-    ></textarea>
-
+    <textarea id="exerciseDescription" placeholder="Descrizione dell'esercizio..."></textarea>
     <label>Video URL</label>
-
-    <input
-      id="exerciseVideo"
-      type="url"
-      placeholder="https://..."
-    >
-
+    <input id="exerciseVideo" type="url" placeholder="https://...">
     <br><br>
-
-    <button
-      id="saveExercise"
-      class="primary"
-    >
-      Salva esercizio
-    </button>
-
-    <button
-      id="cancelExercise"
-      class="secondary"
-    >
-      Annulla
-    </button>
-
-    <div
-      id="exerciseMessage"
-      class="message hidden"
-    ></div>
-
+    <button id="saveExercise" class="primary">Salva esercizio</button>
+    <button id="cancelExercise" class="secondary">Annulla</button>
+    <div id="exerciseMessage" class="message hidden"></div>
   </div>
-
 </section>
 
-
-<!-- =====================================
-     PORTALE PAZIENTE
-===================================== -->
-
-<section
-  id="patientPortal"
-  class="hidden"
->
+<!-- PORTALE PAZIENTE -->
+<section id="patientPortal" class="hidden">
 
   <div class="section-tabs" id="patientPortalTabs">
     <button class="section-tab active" data-target="portalExercises">🏋️ Esercizi</button>
@@ -878,37 +550,21 @@ hr {
   </div>
 
   <div class="card">
-
-    <h2 id="patientWelcome">
-      Ciao 👋
-    </h2>
-
-    <p>
-      Questo è il tuo programma di esercizi.
-    </p>
-
+    <h2 id="patientWelcome">Ciao 👋</h2>
+    <p>Questo è il tuo programma personalizzato.</p>
   </div>
-
 
   <div class="card tab-panel" id="portalExercises">
-
-    <div class="section-title"><h2>🏋️ I tuoi esercizi</h2><button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button></div>
-
-    <div id="patientPortalExercises">
-      Caricamento...
+    <div class="section-title">
+      <h2>🏋️ I tuoi esercizi</h2>
+      <button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
     </div>
-
+    <div id="patientPortalExercises">Caricamento...</div>
   </div>
 
-
   <div class="card tab-panel" id="portalDocuments">
-
     <h2>📄 I tuoi report</h2>
-
-    <div id="patientPortalDocuments">
-      Caricamento...
-    </div>
-
+    <div id="patientPortalDocuments">Caricamento...</div>
   </div>
 
   <div class="card tab-panel" id="portalNotes">
@@ -918,26 +574,21 @@ hr {
 
   <div class="card tab-panel" id="portalRunning">
     <div class="section-title">
-      <h2>🏃 I tuoi allenamenti di corsa</h2>
+      <h2>🏃 Programma di Corsa</h2>
+      <button id="patientPrintRunningButton" class="secondary">🖨️ Stampa Programma Corsa</button>
     </div>
     <div id="patientPortalRunning">Caricamento...</div>
   </div>
 
 </section>
 
-
 </div>
 
+<!-- CONTENITORE STAMPA PDF GENERATO -->
 <div id="printSheet" class="print-sheet"></div>
 
-<!-- =====================================
-     SUPABASE
-===================================== -->
-
-<script
-  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-></script>
-
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
@@ -965,196 +616,65 @@ function setupSectionTabs(containerId) {
   if(first) first.click();
 }
 
-/* =====================================
-   CONFIGURAZIONE
-===================================== */
+/* CONFIGURAZIONE SUPABASE */
+const SUPABASE_URL = "https://eutcpxmnrzisssddefau.supabase.co";
+const SUPABASE_KEY = "sb_publishable_C2DPlnqwDgOkEC1FrdGDhg_XQ8m3KLz";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const DOCUMENT_BUCKET = "patient-documents";
 
-const SUPABASE_URL =
-  "https://eutcpxmnrzisssddefau.supabase.co";
-
-
-const SUPABASE_KEY =
-  "sb_publishable_C2DPlnqwDgOkEC1FrdGDhg_XQ8m3KLz";
-
-
-const db =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-const DOCUMENT_BUCKET =
-  "patient-documents";
-
-
-/* =====================================
-   VARIABILI GLOBAL
-===================================== */
-
+/* VARIABILI GLOBALI */
 let currentUser = null;
 let currentPatient = null;
-let generatedRunningPlanData = [];
-
-
-/* =====================================
-   PAGINE
-===================================== */
 
 const pages = [
-
-  "loginPage",
-  "setPasswordPage",
-  "therapistPage",
-  "patientPage",
-  "newPatientPage",
-  "newExercisePage",
-  "patientPortal"
-
+  "loginPage", "setPasswordPage", "therapistPage", 
+  "patientPage", "newPatientPage", "newExercisePage", "patientPortal"
 ];
-
 
 setupSectionTabs("therapistPatientTabs");
 setupSectionTabs("patientPortalTabs");
 
 function showPage(pageId) {
-
-  pages.forEach(
-    function(id) {
-
-      document
-        .getElementById(id)
-        .classList
-        .add("hidden");
-
-    }
-  );
-
-
-  document
-    .getElementById(pageId)
-    .classList
-    .remove("hidden");
-
+  pages.forEach(id => document.getElementById(id).classList.add("hidden"));
+  document.getElementById(pageId).classList.remove("hidden");
 }
 
-
-/* =====================================
-   MESSAGGI
-===================================== */
-
-function showMessage(
-  id,
-  text,
-  type
-) {
-
-  const element =
-    document.getElementById(id);
-
-
-  element.innerText =
-    text;
-
-
-  element.className =
-    "message " + type;
-
+function showMessage(id, text, type) {
+  const element = document.getElementById(id);
+  element.innerText = text;
+  element.className = "message " + type;
 }
 
-
-/* =====================================
-   LOGIN
-===================================== */
-
-document
-  .getElementById("loginButton")
-  .addEventListener(
-    "click",
-    login
-  );
-
+/* AUTHENTICATION */
+document.getElementById("loginButton").addEventListener("click", login);
 
 async function login() {
-
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("password")
-      .value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
   if(!email || !password) {
-    showMessage(
-      "loginMessage",
-      "Inserisci email e password.",
-      "error"
-    );
+    showMessage("loginMessage", "Inserisci email e password.", "error");
     return;
   }
 
-  const result =
-    await db.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
-
+  const result = await db.auth.signInWithPassword({ email, password });
   if(result.error) {
-    showMessage(
-      "loginMessage",
-      result.error.message,
-      "error"
-    );
+    showMessage("loginMessage", result.error.message, "error");
     return;
   }
 
-  currentUser =
-    result.data.user;
+  currentUser = result.data.user;
 
-  const profileResult =
-    await db
-      .from("profiles")
-      .select("role, must_change_password")
-      .eq("id", currentUser.id)
-      .maybeSingle();
+  const profileResult = await db.from("profiles").select("role, must_change_password").eq("id", currentUser.id).maybeSingle();
 
-  if(profileResult.error) {
-    console.error(
-      "Errore caricamento profilo:",
-      profileResult.error
-    );
-
+  if(profileResult.error || !profileResult.data) {
     await db.auth.signOut();
     currentUser = null;
-
-    showMessage(
-      "loginMessage",
-      "Errore nel caricamento del profilo.",
-      "error"
-    );
+    showMessage("loginMessage", "Errore nel caricamento del profilo.", "error");
     return;
   }
 
-  if(!profileResult.data) {
-    await db.auth.signOut();
-    currentUser = null;
-
-    showMessage(
-      "loginMessage",
-      "Profilo utente non trovato.",
-      "error"
-    );
-    return;
-  }
-
-  if(
-    profileResult.data.role === "patient" &&
-    profileResult.data.must_change_password === true
-  ) {
+  if(profileResult.data.role === "patient" && profileResult.data.must_change_password === true) {
     showPage("setPasswordPage");
     return;
   }
@@ -1162,1081 +682,215 @@ async function login() {
   await startApp();
 }
 
-
-
-/* =====================================
-   LINK DI PRIMO ACCESSO / RECOVERY
-===================================== */
-
 async function checkRecoverySession() {
-
-  const hash =
-    window.location.hash;
-
-
-  if(
-    hash &&
-    (
-      hash.includes("type=recovery") ||
-      hash.includes("access_token=")
-    )
-  ) {
-
-    const result =
-      await db.auth.getSession();
-
-
-    if(
-      result.data &&
-      result.data.session
-    ) {
-
-      currentUser =
-        result.data.session.user;
-
-
-      showPage(
-        "setPasswordPage"
-      );
-
+  const hash = window.location.hash;
+  if(hash && (hash.includes("type=recovery") || hash.includes("access_token="))) {
+    const result = await db.auth.getSession();
+    if(result.data && result.data.session) {
+      currentUser = result.data.session.user;
+      showPage("setPasswordPage");
       return true;
-
     }
-
   }
-
-
   return false;
-
 }
 
-
-/* =====================================
-   SALVA NUOVA PASSWORD
-===================================== */
-
-document
-  .getElementById("savePasswordButton")
-  .addEventListener(
-    "click",
-    saveNewPassword
-  );
-
+document.getElementById("savePasswordButton").addEventListener("click", saveNewPassword);
 
 async function saveNewPassword() {
+  const password = document.getElementById("newPassword").value;
+  const confirmation = document.getElementById("confirmPassword").value;
 
-  const password =
-    document
-      .getElementById("newPassword")
-      .value;
-
-  const confirmation =
-    document
-      .getElementById("confirmPassword")
-      .value;
-
-  if(!password || !confirmation) {
-    showMessage(
-      "passwordMessage",
-      "Inserisci e conferma la password.",
-      "error"
-    );
+  if(!password || !confirmation || password !== confirmation || password.length < 6) {
+    showMessage("passwordMessage", "Le password devono coincidere ed essere di almeno 6 caratteri.", "error");
     return;
   }
 
-  if(password.length < 6) {
-    showMessage(
-      "passwordMessage",
-      "La password deve contenere almeno 6 caratteri.",
-      "error"
-    );
-    return;
-  }
-
-  if(password !== confirmation) {
-    showMessage(
-      "passwordMessage",
-      "Le password non coincidono.",
-      "error"
-    );
-    return;
-  }
-
-  const result =
-    await db.auth.updateUser({
-      password: password
-    });
-
+  const result = await db.auth.updateUser({ password });
   if(result.error) {
-    showMessage(
-      "passwordMessage",
-      result.error.message,
-      "error"
-    );
+    showMessage("passwordMessage", result.error.message, "error");
     return;
   }
 
   currentUser = result.data.user;
+  await db.from("profiles").update({ must_change_password: false }).eq("id", currentUser.id);
+  showMessage("passwordMessage", "Password salvata con successo!", "success");
 
-  const profileUpdate =
-    await db
-      .from("profiles")
-      .update({
-        must_change_password: false
-      })
-      .eq("id", currentUser.id);
-
-  if(profileUpdate.error) {
-    console.error(
-      "Errore aggiornamento profilo:",
-      profileUpdate.error
-    );
-
-    showMessage(
-      "passwordMessage",
-      "Password modificata, ma non riesco a completare il profilo. Riprova.",
-      "error"
-    );
-    return;
-  }
-
-  showMessage(
-    "passwordMessage",
-    "Password salvata. Accesso in corso...",
-    "success"
-  );
-
-  document.getElementById("newPassword").value = "";
-  document.getElementById("confirmPassword").value = "";
-
-  window.history.replaceState(
-    {},
-    document.title,
-    window.location.pathname
-  );
-
-  setTimeout(
-    async function() {
-      await startApp();
-    },
-    700
-  );
+  setTimeout(async () => { await startApp(); }, 700);
 }
 
-/* =====================================
-   AVVIO APP
-===================================== */
-
 async function startApp() {
-
-  const result =
-    await db.auth.getUser();
-
-
+  const result = await db.auth.getUser();
   if(result.error) {
-
     showPage("loginPage");
-
     return;
-
   }
 
+  currentUser = result.data.user;
+  document.getElementById("logoutButton").classList.remove("hidden");
 
-  currentUser =
-    result.data.user;
+  const profileResult = await db.from("profiles").select("role, must_change_password").eq("id", currentUser.id).single();
+  if(profileResult.error) return;
 
+  const role = profileResult.data.role;
 
-  document
-    .getElementById("logoutButton")
-    .classList
-    .remove("hidden");
-
-
-  const profileResult =
-    await db
-      .from("profiles")
-      .select("role, must_change_password")
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .single();
-
-
-  if(profileResult.error) {
-
-    alert(
-      "Non riesco a recuperare il ruolo dell'utente."
-    );
-
-    console.error(
-      profileResult.error
-    );
-
-    return;
-
-  }
-
-
-  const role =
-    profileResult.data.role;
-
-  if(
-    role === "patient" &&
-    profileResult.data.must_change_password === true
-  ) {
+  if(role === "patient" && profileResult.data.must_change_password === true) {
     showPage("setPasswordPage");
     return;
   }
 
-  if(role === "therapist") {
-
-    await startTherapist();
-
-    return;
-
-  }
-
-
-  if(role === "patient") {
-
-    await startPatient();
-
-    return;
-
-  }
-
-
-  alert(
-    "Ruolo utente non riconosciuto."
-  );
-
+  if(role === "therapist") await startTherapist();
+  else if(role === "patient") await startPatient();
 }
-
-
-/* =====================================
-   FISIOTERAPISTA
-===================================== */
 
 async function startTherapist() {
-
-  showPage(
-    "therapistPage"
-  );
-
-
+  showPage("therapistPage");
   await loadPatients();
-
   await loadExerciseLibrary();
-
 }
-
-
-/* =====================================
-   PAZIENTE
-===================================== */
 
 async function startPatient() {
-
-  const result =
-    await db
-      .from("patients")
-      .select("*")
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .maybeSingle();
-
-
-  if(result.error) {
-
-    alert(
-      result.error.message
-    );
-
+  const result = await db.from("patients").select("*").eq("user_id", currentUser.id).maybeSingle();
+  if(result.error || !result.data) {
+    alert("Profilo paziente non trovato.");
     return;
-
   }
-
-
-  if(!result.data) {
-
-    alert(
-      "Questo account non è ancora collegato a un profilo paziente."
-    );
-
-    return;
-
-  }
-
-
-  currentPatient =
-    result.data;
-
-
-  document
-    .getElementById("patientWelcome")
-    .innerText =
-      "Ciao " +
-      currentPatient.name +
-      " 👋";
-
-
-  showPage(
-    "patientPortal"
-  );
-
-
+  currentPatient = result.data;
+  document.getElementById("patientWelcome").innerText = "Ciao " + currentPatient.name + " 👋";
+  showPage("patientPortal");
   await loadPatientPortal();
-
 }
 
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  await db.auth.signOut();
+  currentUser = null;
+  currentPatient = null;
+  document.getElementById("logoutButton").classList.add("hidden");
+  showPage("loginPage");
+});
 
-/* =====================================
-   LOGOUT
-===================================== */
-
-document
-  .getElementById("logoutButton")
-  .addEventListener(
-    "click",
-    async function() {
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      currentPatient = null;
-
-      document
-        .getElementById("logoutButton")
-        .classList
-        .add("hidden");
-
-      showPage(
-        "loginPage"
-      );
-
-    }
-  );
-
-
-/* =====================================
-   CARICA PAZIENTI
-===================================== */
-
+/* PAZIENTI */
 async function loadPatients() {
+  const list = document.getElementById("patientsList");
+  list.innerHTML = "Caricamento...";
 
-  const list =
-    document.getElementById(
-      "patientsList"
-    );
-
-
-  list.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("patients")
-      .select("*")
-      .order(
-        "name",
-        {
-          ascending: true
-        }
-      );
-
-
-  if(result.error) {
-
-    list.innerHTML =
-      result.error.message;
-
-    console.error(
-      result.error
-    );
-
+  const result = await db.from("patients").select("*").order("name", { ascending: true });
+  if(result.error || !result.data) {
+    list.innerHTML = "Errore o nessun paziente presente.";
     return;
-
   }
-
-
-  if(!result.data || result.data.length === 0) {
-
-    list.innerHTML =
-      "Nessun paziente presente.";
-
-    return;
-
-  }
-
 
   list.innerHTML = "";
-
-
-  result.data.forEach(
-    function(patient) {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "patient";
-
-
-      const strong =
-        document.createElement(
-          "strong"
-        );
-
-      strong.innerText =
-        "👤 " +
-        patient.name;
-
-
-      const br =
-        document.createElement(
-          "br"
-        );
-
-
-      const br2 =
-        document.createElement(
-          "br"
-        );
-
-
-      const small =
-        document.createElement(
-          "small"
-        );
-
-      small.innerText =
-        "Apri scheda →";
-
-
-      div.appendChild(
-        strong
-      );
-
-      div.appendChild(
-        br
-      );
-
-      div.appendChild(
-        br2
-      );
-
-      div.appendChild(
-        small
-      );
-
-
-      div.addEventListener(
-        "click",
-        function() {
-
-          openPatient(
-            patient
-          );
-
-        }
-      );
-
-
-      list.appendChild(
-        div
-      );
-
-    }
-  );
-
+  result.data.forEach(patient => {
+    const div = document.createElement("div");
+    div.className = "patient";
+    div.innerHTML = `<strong>👤 ${patient.name}</strong><br><br><small>Apri scheda →</small>`;
+    div.addEventListener("click", () => openPatient(patient));
+    list.appendChild(div);
+  });
 }
 
-
-/* =====================================
-   APRI PAZIENTE
-===================================== */
-
 async function openPatient(patient) {
-
-  currentPatient =
-    patient;
-
-
-  document
-    .getElementById("patientTitle")
-    .innerText =
-      "👤 " +
-      patient.name;
-
-
-  showPage(
-    "patientPage"
-  );
-
+  currentPatient = patient;
+  document.getElementById("patientTitle").innerText = "👤 " + patient.name;
+  showPage("patientPage");
 
   await loadExercises();
-
   await loadPatientExercises();
-
   await loadPatientDocuments();
   await loadPatientNotes();
   await loadRunningPlans();
-
 }
 
-
-/* =====================================
-   LIBRERIA ESERCIZI - SELECT
-===================================== */
-
+/* LIBRERIA ESERCIZI */
 async function loadExercises() {
-
-  const select =
-    document.getElementById(
-      "exerciseSelect"
-    );
-
-
-  select.innerHTML = "";
-
-
-  const firstOption =
-    document.createElement(
-      "option"
-    );
-
-
-  firstOption.value =
-    "";
-
-
-  firstOption.textContent =
-    "Seleziona esercizio";
-
-
-  select.appendChild(
-    firstOption
-  );
-
-
-  const result =
-    await db
-      .from("exercises")
-      .select("*")
-      .order(
-        "name",
-        {
-          ascending: true
-        }
-      );
-
-
-  if(result.error) {
-
-    console.error(
-      result.error
-    );
-
-    return;
-
+  const select = document.getElementById("exerciseSelect");
+  select.innerHTML = '<option value="">Seleziona esercizio</option>';
+  const result = await db.from("exercises").select("*").order("name", { ascending: true });
+  if(!result.error && result.data) {
+    result.data.forEach(ex => {
+      const opt = document.createElement("option");
+      opt.value = ex.id;
+      opt.textContent = ex.name;
+      select.appendChild(opt);
+    });
   }
-
-
-  result.data.forEach(
-    function(exercise) {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-
-      option.value =
-        exercise.id;
-
-
-      option.textContent =
-        exercise.name;
-
-
-      select.appendChild(
-        option
-      );
-
-    }
-  );
-
 }
-
-
-/* =====================================
-   LIBRERIA ESERCIZI
-===================================== */
 
 async function loadExerciseLibrary() {
+  const container = document.getElementById("exerciseLibrary");
+  container.innerHTML = "Caricamento...";
+  const result = await db.from("exercises").select("*").order("name", { ascending: true });
 
-  const container =
-    document.getElementById(
-      "exerciseLibrary"
-    );
-
-
-  container.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("exercises")
-      .select("*")
-      .order(
-        "name",
-        {
-          ascending: true
-        }
-      );
-
-
-  if(result.error) {
-
-    container.innerText =
-      result.error.message;
-
+  if(result.error || !result.data || result.data.length === 0) {
+    container.innerText = "Nessun esercizio salvato.";
     return;
-
   }
-
-
-  if(!result.data || result.data.length === 0) {
-
-    container.innerText =
-      "Nessun esercizio presente.";
-
-    return;
-
-  }
-
 
   container.innerHTML = "";
-
-
-  result.data.forEach(
-    function(exercise) {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "exercise";
-
-
-      const title =
-        document.createElement(
-          "h3"
-        );
-
-
-      title.innerText =
-        exercise.name;
-
-
-      div.appendChild(
-        title
-      );
-
-
-      if(exercise.description) {
-
-        const description =
-          document.createElement(
-            "p"
-          );
-
-
-        description.innerText =
-          exercise.description;
-
-
-        div.appendChild(
-          description
-        );
-
-      }
-
-
-      if(exercise.video_url) {
-
-        const video =
-          document.createElement(
-            "p"
-          );
-
-
-        const link =
-          document.createElement(
-            "a"
-          );
-
-
-        link.href =
-          exercise.video_url;
-
-        link.target =
-          "_blank";
-
-        link.rel =
-          "noopener";
-
-        link.innerText =
-          "🎥 Video";
-
-
-        video.appendChild(
-          link
-        );
-
-        div.appendChild(
-          video
-        );
-
-      }
-
-
-      const actions =
-        document.createElement(
-          "div"
-        );
-
-
-      actions.className =
-        "actions";
-
-
-      const editButton =
-        document.createElement(
-          "button"
-        );
-
-
-      editButton.className =
-        "secondary";
-
-
-      editButton.innerText =
-        "✏️ Modifica";
-
-
-      editButton.addEventListener(
-        "click",
-        function() {
-
-          showExerciseEdit(
-            div,
-            exercise
-          );
-
-        }
-      );
-
-
-      const deleteButton =
-        document.createElement(
-          "button"
-        );
-
-
-      deleteButton.className =
-        "danger";
-
-
-      deleteButton.innerText =
-        "🗑️ Elimina";
-
-
-      deleteButton.addEventListener(
-        "click",
-        function() {
-
-          deleteExercise(
-            exercise.id
-          );
-
-        }
-      );
-
-
-      actions.appendChild(
-        editButton
-      );
-
-      actions.appendChild(
-        deleteButton
-      );
-
-
-      div.appendChild(
-        actions
-      );
-
-
-      container.appendChild(
-        div
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================
-   MODIFICA ESERCIZIO LIBRERIA
-===================================== */
-
-function showExerciseEdit(
-  container,
-  exercise
-) {
-
-  const box =
-    document.createElement(
-      "div"
-    );
-
-
-  box.className =
-    "editBox";
-
-
-  box.innerHTML = `
-
-    <label>Nome</label>
-
-    <input
-      class="editExerciseName"
-      value=""
-    >
-
-    <label>Descrizione</label>
-
-    <textarea
-      class="editExerciseDescription"
-    ></textarea>
-
-    <label>Video URL</label>
-
-    <input
-      class="editExerciseVideo"
-      type="url"
-      value=""
-    >
-
-    <br><br>
-
-    <div class="actions">
-
-      <button class="primary saveExerciseEdit">
-        Salva modifiche
-      </button>
-
-      <button class="secondary cancelExerciseEdit">
-        Annulla
-      </button>
-
-    </div>
-
-    <div class="message hidden editExerciseMessage"></div>
-
-  `;
-
-
-  box.querySelector(
-    ".editExerciseName"
-  ).value =
-    exercise.name || "";
-
-
-  box.querySelector(
-    ".editExerciseDescription"
-  ).value =
-    exercise.description || "";
-
-
-  box.querySelector(
-    ".editExerciseVideo"
-  ).value =
-    exercise.video_url || "";
-
-
-  container.appendChild(
-    box
-  );
-
-
-  box.querySelector(
-    ".cancelExerciseEdit"
-  ).addEventListener(
-    "click",
-    function() {
-
-      box.remove();
-
-    }
-  );
-
-
-  box.querySelector(
-    ".saveExerciseEdit"
-  ).addEventListener(
-    "click",
-    async function() {
-
-      const name =
-        box.querySelector(
-          ".editExerciseName"
-        ).value.trim();
-
-
-      const description =
-        box.querySelector(
-          ".editExerciseDescription"
-        ).value.trim();
-
-
-      const video =
-        box.querySelector(
-          ".editExerciseVideo"
-        ).value.trim();
-
-
-      if(!name) {
-        const msg = box.querySelector(".editExerciseMessage");
-        msg.innerText = "Inserisci un nome per l'esercizio.";
-        msg.className = "message error";
-        return;
-      }
-
-      const res = await db
-        .from("exercises")
-        .update({ name: name, description: description, video_url: video })
-        .eq("id", exercise.id);
-
-      if(res.error) {
-        const msg = box.querySelector(".editExerciseMessage");
-        msg.innerText = res.error.message;
-        msg.className = "message error";
-      } else {
-        await loadExerciseLibrary();
-        await loadExercises();
-      }
-    }
-  );
+  result.data.forEach(ex => {
+    const div = document.createElement("div");
+    div.className = "exercise";
+    div.innerHTML = `
+      <h3>${ex.name}</h3>
+      ${ex.description ? `<p>${ex.description}</p>` : ""}
+      ${ex.video_url ? `<p><a href="${ex.video_url}" target="_blank" rel="noopener">🎥 Video</a></p>` : ""}
+      <div class="actions">
+        <button class="danger" onclick="deleteExercise('${ex.id}')">🗑️ Elimina</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
 }
 
 async function deleteExercise(id) {
-  if(!confirm("Sei sicuro di voler eliminare questo esercizio dalla libreria?")) return;
-  const res = await db.from("exercises").delete().eq("id", id);
-  if(res.error) {
-    alert("Errore durante l'eliminazione: " + res.error.message);
-  } else {
-    await loadExerciseLibrary();
-    await loadExercises();
-  }
+  if(!confirm("Confermi l'eliminazione?")) return;
+  await db.from("exercises").delete().eq("id", id);
+  await loadExerciseLibrary();
+  await loadExercises();
 }
-
-/* =====================================
-   CREAZIONE ESERCIZIO E PAZIENTE
-===================================== */
 
 document.getElementById("newPatientButton").addEventListener("click", () => showPage("newPatientPage"));
 document.getElementById("cancelPatient").addEventListener("click", () => showPage("therapistPage"));
-
 document.getElementById("savePatient").addEventListener("click", async () => {
   const name = document.getElementById("newPatientName").value.trim();
   const email = document.getElementById("newPatientEmail").value.trim();
+  if(!name || !email) return;
 
-  if(!name || !email) {
-    showMessage("patientMessage", "Inserisci nome ed email del paziente.", "error");
-    return;
-  }
-
-  const res = await db.from("patients").insert([{ name: name, email: email }]);
-  if(res.error) {
-    showMessage("patientMessage", res.error.message, "error");
-  } else {
-    document.getElementById("newPatientName").value = "";
-    document.getElementById("newPatientEmail").value = "";
-    showMessage("patientMessage", "Paziente salvato con successo!", "success");
-    setTimeout(() => {
-      showPage("therapistPage");
-      loadPatients();
-    }, 1000);
+  const res = await db.from("patients").insert([{ name, email }]);
+  if(!res.error) {
+    showPage("therapistPage");
+    loadPatients();
   }
 });
 
 document.getElementById("newExerciseButton").addEventListener("click", () => showPage("newExercisePage"));
 document.getElementById("cancelExercise").addEventListener("click", () => showPage("therapistPage"));
-
 document.getElementById("saveExercise").addEventListener("click", async () => {
   const name = document.getElementById("exerciseName").value.trim();
   const description = document.getElementById("exerciseDescription").value.trim();
   const video = document.getElementById("exerciseVideo").value.trim();
 
-  if(!name) {
-    showMessage("exerciseMessage", "Inserisci il nome dell'esercizio.", "error");
-    return;
-  }
+  if(!name) return;
 
   const res = await db.from("exercises").insert([{ name, description, video_url: video }]);
-  if(res.error) {
-    showMessage("exerciseMessage", res.error.message, "error");
-  } else {
-    document.getElementById("exerciseName").value = "";
-    document.getElementById("exerciseDescription").value = "";
-    document.getElementById("exerciseVideo").value = "";
-    showMessage("exerciseMessage", "Esercizio creato con successo!", "success");
-    setTimeout(() => {
-      showPage("therapistPage");
-      loadExerciseLibrary();
-      loadExercises();
-    }, 1000);
+  if(!res.error) {
+    showPage("therapistPage");
+    loadExerciseLibrary();
+    loadExercises();
   }
 });
 
 document.getElementById("backButton").addEventListener("click", () => showPage("therapistPage"));
 
-
-/* =====================================
-   ESERCIZI ASSEGNATI AL PAZIENTE
-===================================== */
-
+/* GESTIONE ESERCIZI PAZIENTE */
 async function loadPatientExercises() {
   const container = document.getElementById("patientExercises");
   container.innerHTML = "Caricamento...";
 
-  const res = await db
-    .from("patient_exercises")
-    .select("*, exercises(*)")
-    .eq("patient_id", currentPatient.id);
-
-  if(res.error) {
-    container.innerText = res.error.message;
-    return;
-  }
-
-  if(!res.data || res.data.length === 0) {
-    container.innerText = "Nessun esercizio assegnato a questo paziente.";
+  const res = await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id", currentPatient.id);
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessun esercizio assegnato.";
     return;
   }
 
@@ -2256,7 +910,7 @@ async function loadPatientExercises() {
       <h3>${exName}</h3>
       <p><strong>Parametri:</strong> ${details.join(" | ") || "Standard"}</p>
       ${item.notes ? `<p><strong>Note:</strong> ${item.notes}</p>` : ""}
-      <div class="actions">
+      <div class="actions no-print">
         <button class="danger" onclick="removeAssignedExercise('${item.id}')">🗑️ Rimuovi</button>
       </div>
     `;
@@ -2272,10 +926,7 @@ document.getElementById("assignButton").addEventListener("click", async () => {
   const rest = document.getElementById("rest").value;
   const notes = document.getElementById("notes").value.trim();
 
-  if(!exerciseId) {
-    showMessage("assignMessage", "Seleziona un esercizio da assegnare.", "error");
-    return;
-  }
+  if(!exerciseId) return;
 
   const res = await db.from("patient_exercises").insert([{
     patient_id: currentPatient.id,
@@ -2287,51 +938,26 @@ document.getElementById("assignButton").addEventListener("click", async () => {
     notes: notes || null
   }]);
 
-  if(res.error) {
-    showMessage("assignMessage", res.error.message, "error");
-  } else {
-    showMessage("assignMessage", "Esercizio assegnato con successo!", "success");
-    document.getElementById("sets").value = "";
-    document.getElementById("reps").value = "";
-    document.getElementById("duration").value = "";
-    document.getElementById("rest").value = "";
-    document.getElementById("notes").value = "";
+  if(!res.error) {
+    showMessage("assignMessage", "Assegnato con successo!", "success");
     await loadPatientExercises();
   }
 });
 
 async function removeAssignedExercise(id) {
-  if(!confirm("Vuoi rimuovere questo esercizio dal programma del paziente?")) return;
-  const res = await db.from("patient_exercises").delete().eq("id", id);
-  if(res.error) {
-    alert("Errore: " + res.error.message);
-  } else {
-    await loadPatientExercises();
-  }
+  if(!confirm("Cancellare questo esercizio dal paziente?")) return;
+  await db.from("patient_exercises").delete().eq("id", id);
+  await loadPatientExercises();
 }
 
-
-/* =====================================
-   DOCUMENTI E REPORT PDF
-===================================== */
-
+/* DOCUMENTI */
 async function loadPatientDocuments() {
   const container = document.getElementById("patientDocuments");
   container.innerHTML = "Caricamento...";
 
-  const res = await db
-    .from("patient_documents")
-    .select("*")
-    .eq("patient_id", currentPatient.id)
-    .order("created_at", { ascending: false });
-
-  if(res.error) {
-    container.innerText = res.error.message;
-    return;
-  }
-
-  if(!res.data || res.data.length === 0) {
-    container.innerText = "Nessun documento presente.";
+  const res = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessun documento inserito.";
     return;
   }
 
@@ -2343,8 +969,8 @@ async function loadPatientDocuments() {
 
     div.innerHTML = `
       <h3>📄 ${doc.file_name}</h3>
-      <p><a href="${publicUrl}" target="_blank" rel="noopener">Visualizza / Scarica PDF</a></p>
-      <div class="document-actions">
+      <p><a href="${publicUrl}" target="_blank" rel="noopener">Visualizza PDF</a></p>
+      <div class="document-actions no-print">
         <button class="danger" onclick="deleteDocument('${doc.id}', '${doc.file_path}')">🗑️ Elimina</button>
       </div>
     `;
@@ -2355,67 +981,36 @@ async function loadPatientDocuments() {
 document.getElementById("uploadDocumentButton").addEventListener("click", async () => {
   const fileInput = document.getElementById("documentFile");
   const file = fileInput.files[0];
-
-  if(!file) {
-    showMessage("documentMessage", "Seleziona un file PDF.", "error");
-    return;
-  }
+  if(!file) return;
 
   const fileName = `${currentPatient.id}/${Date.now()}_${file.name}`;
   const uploadRes = await db.storage.from(DOCUMENT_BUCKET).upload(fileName, file);
 
-  if(uploadRes.error) {
-    showMessage("documentMessage", uploadRes.error.message, "error");
-    return;
-  }
-
-  const dbRes = await db.from("patient_documents").insert([{
-    patient_id: currentPatient.id,
-    file_name: file.name,
-    file_path: fileName
-  }]);
-
-  if(dbRes.error) {
-    showMessage("documentMessage", dbRes.error.message, "error");
-  } else {
-    showMessage("documentMessage", "Documento caricato con successo!", "success");
+  if(!uploadRes.error) {
+    await db.from("patient_documents").insert([{
+      patient_id: currentPatient.id,
+      file_name: file.name,
+      file_path: fileName
+    }]);
     fileInput.value = "";
     await loadPatientDocuments();
   }
 });
 
 async function deleteDocument(id, filePath) {
-  if(!confirm("Eliminare questo documento?")) return;
+  if(!confirm("Eliminare il PDF selezionato?")) return;
   await db.storage.from(DOCUMENT_BUCKET).remove([filePath]);
-  const res = await db.from("patient_documents").delete().eq("id", id);
-  if(res.error) {
-    alert("Errore: " + res.error.message);
-  } else {
-    await loadPatientDocuments();
-  }
+  await db.from("patient_documents").delete().eq("id", id);
+  await loadPatientDocuments();
 }
 
-
-/* =====================================
-   NOTE E COMUNICAZIONI
-===================================== */
-
+/* NOTE */
 async function loadPatientNotes() {
   const container = document.getElementById("patientNotesList");
   container.innerHTML = "Caricamento...";
 
-  const res = await db
-    .from("patient_notes")
-    .select("*")
-    .eq("patient_id", currentPatient.id)
-    .order("created_at", { ascending: false });
-
-  if(res.error) {
-    container.innerText = res.error.message;
-    return;
-  }
-
-  if(!res.data || res.data.length === 0) {
+  const res = await db.from("patient_notes").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+  if(res.error || !res.data || res.data.length === 0) {
     container.innerText = "Nessuna nota presente.";
     return;
   }
@@ -2428,7 +1023,7 @@ async function loadPatientNotes() {
     div.innerHTML = `
       <h3>${note.title || "Nota"} <small>(${date})</small></h3>
       <p>${note.content}</p>
-      <button class="danger" onclick="deletePatientNote('${note.id}')">Elimina</button>
+      <button class="danger no-print" onclick="deletePatientNote('${note.id}')">Elimina</button>
     `;
     container.appendChild(div);
   });
@@ -2437,11 +1032,7 @@ async function loadPatientNotes() {
 document.getElementById("savePatientNoteButton").addEventListener("click", async () => {
   const title = document.getElementById("patientNoteTitle").value.trim();
   const content = document.getElementById("patientNoteContent").value.trim();
-
-  if(!content) {
-    showMessage("patientNoteMessage", "Inserisci il testo della nota.", "error");
-    return;
-  }
+  if(!content) return;
 
   const res = await db.from("patient_notes").insert([{
     patient_id: currentPatient.id,
@@ -2449,39 +1040,37 @@ document.getElementById("savePatientNoteButton").addEventListener("click", async
     content: content
   }]);
 
-  if(res.error) {
-    showMessage("patientNoteMessage", res.error.message, "error");
-  } else {
+  if(!res.error) {
     document.getElementById("patientNoteTitle").value = "";
     document.getElementById("patientNoteContent").value = "";
-    showMessage("patientNoteMessage", "Nota salvata!", "success");
     await loadPatientNotes();
   }
 });
 
 async function deletePatientNote(id) {
-  if(!confirm("Eliminare questa nota?")) return;
-  const res = await db.from("patient_notes").delete().eq("id", id);
-  if(res.error) {
-    alert("Errore: " + res.error.message);
-  } else {
-    await loadPatientNotes();
-  }
+  if(!confirm("Cancellare nota?")) return;
+  await db.from("patient_notes").delete().eq("id", id);
+  await loadPatientNotes();
 }
 
+/* PROGRAMMA CORSA AVANZATO */
 
-/* =====================================
-   PROGRAMMA CORSA
-===================================== */
+function toggleIntervalInputs(w, s) {
+  const typeVal = document.getElementById(`run_type_${w}_${s}`).value;
+  const intervalBox = document.getElementById(`interval_box_${w}_${s}`);
+  if(typeVal === "Ripetute") {
+    intervalBox.classList.remove("hidden");
+  } else {
+    intervalBox.classList.add("hidden");
+  }
+}
 
 document.getElementById("generateRunningPlanButton").addEventListener("click", () => {
   const weeks = parseInt(document.getElementById("runningWeeks").value) || 4;
   const sessions = parseInt(document.getElementById("runningSessionsPerWeek").value) || 3;
   const planner = document.getElementById("runningPlanner");
 
-  generatedRunningPlanData = [];
-
-  let html = `<table class="planner-table"><thead><tr><th>Settimana</th>`;
+  let html = `<table class="running-table"><thead><tr><th>Settimana</th>`;
   for(let s = 1; s <= sessions; s++) {
     html += `<th>Allenamento ${s}</th>`;
   }
@@ -2490,8 +1079,41 @@ document.getElementById("generateRunningPlanButton").addEventListener("click", (
   for(let w = 1; w <= weeks; w++) {
     html += `<tr><td><strong>Settimana ${w}</strong></td>`;
     for(let s = 1; s <= sessions; s++) {
-      const cellId = `run_${w}_${s}`;
-      html += `<td><textarea id="${cellId}" placeholder="Es. 30 min corsa lenta"></textarea></td>`;
+      html += `<td>
+        <div class="session-box">
+          <label>Tipo di Corsa</label>
+          <select id="run_type_${w}_${s}" onchange="toggleIntervalInputs(${w}, ${s})">
+            <option value="Corsa Continua">Corsa Continua</option>
+            <option value="Ripetute">Ripetute</option>
+            <option value="Fartlek">Fartlek</option>
+            <option value="Camminata">Camminata / Passo</option>
+            <option value="Riscaldamento">Riscaldamento / Defaticamento</option>
+          </select>
+
+          <label>Durata (Minuti)</label>
+          <input type="number" id="run_dur_${w}_${s}" placeholder="Es. 45" min="1">
+
+          <div id="interval_box_${w}_${s}" class="interval-box hidden">
+            <label>Corsa Veloce (sec/min)</label>
+            <input type="text" id="run_fast_${w}_${s}" placeholder="Es. 1 min o 400m">
+
+            <label>Corsa Lenta / Recupero</label>
+            <input type="text" id="run_slow_${w}_${s}" placeholder="Es. 2 min o 200m">
+          </div>
+
+          <label>Difficoltà (RPE 1-10)</label>
+          <select id="run_rpe_${w}_${s}">
+            <option value="">Seleziona</option>
+            <option value="1-3 (Leggero)">1-3 (Leggero)</option>
+            <option value="4-6 (Moderato)">4-6 (Moderato)</option>
+            <option value="7-8 (Intenso)">7-8 (Intenso)</option>
+            <option value="9-10 (Massimale)">9-10 (Massimale)</option>
+          </select>
+
+          <label>Note / Istruzioni</label>
+          <textarea id="run_notes_${w}_${s}" rows="2" placeholder="Dettagli aggiuntivi..."></textarea>
+        </div>
+      </td>`;
     }
     html += `</tr>`;
   }
@@ -2509,8 +1131,21 @@ document.getElementById("saveRunningProgramButton").addEventListener("click", as
   for(let w = 1; w <= weeks; w++) {
     const weekSessions = [];
     for(let s = 1; s <= sessions; s++) {
-      const cell = document.getElementById(`run_${w}_${s}`);
-      weekSessions.push(cell ? cell.value : "");
+      const type = document.getElementById(`run_type_${w}_${s}`).value;
+      const duration = document.getElementById(`run_dur_${w}_${s}`).value;
+      const fast = document.getElementById(`run_fast_${w}_${s}`).value;
+      const slow = document.getElementById(`run_slow_${w}_${s}`).value;
+      const rpe = document.getElementById(`run_rpe_${w}_${s}`).value;
+      const notes = document.getElementById(`run_notes_${w}_${s}`).value;
+
+      weekSessions.push({
+        type,
+        duration,
+        fast: type === "Ripetute" ? fast : "",
+        slow: type === "Ripetute" ? slow : "",
+        rpe,
+        notes
+      });
     }
     planData.push({ week: w, sessions: weekSessions });
   }
@@ -2525,7 +1160,7 @@ document.getElementById("saveRunningProgramButton").addEventListener("click", as
   if(res.error) {
     showMessage("runningMessage", res.error.message, "error");
   } else {
-    showMessage("runningMessage", "Programma di corsa salvato!", "success");
+    showMessage("runningMessage", "Programma di corsa salvato con successo!", "success");
     await loadRunningPlans();
   }
 });
@@ -2534,19 +1169,9 @@ async function loadRunningPlans() {
   const container = document.getElementById("runningPlansList");
   container.innerHTML = "Caricamento...";
 
-  const res = await db
-    .from("running_plans")
-    .select("*")
-    .eq("patient_id", currentPatient.id)
-    .order("created_at", { ascending: false });
-
-  if(res.error) {
-    container.innerText = res.error.message;
-    return;
-  }
-
-  if(!res.data || res.data.length === 0) {
-    container.innerText = "Nessun programma salvato.";
+  const res = await db.from("running_plans").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessun programma di corsa trovato.";
     return;
   }
 
@@ -2554,6 +1179,7 @@ async function loadRunningPlans() {
   res.data.forEach(plan => {
     const div = document.createElement("div");
     div.className = "card";
+
     let tableHtml = `<table class="running-table"><thead><tr><th>Settimana</th>`;
     for(let s = 1; s <= plan.sessions_per_week; s++) {
       tableHtml += `<th>Allenamento ${s}</th>`;
@@ -2563,7 +1189,16 @@ async function loadRunningPlans() {
     plan.plan_data.forEach(wData => {
       tableHtml += `<tr><td><strong>Settimana ${wData.week}</strong></td>`;
       wData.sessions.forEach(sess => {
-        tableHtml += `<td>${sess || "-"}</td>`;
+        let sessionContent = `<strong>${sess.type || "Corsa"}</strong>`;
+        if(sess.duration) sessionContent += `<br>⏱️ Durata: ${sess.duration} min`;
+        if(sess.type === "Ripetute") {
+          if(sess.fast) sessionContent += `<br>⚡ Veloce: ${sess.fast}`;
+          if(sess.slow) sessionContent += `<br>🐢 Lenta/Recupero: ${sess.slow}`;
+        }
+        if(sess.rpe) sessionContent += `<br>📊 Difficoltà: ${sess.rpe}`;
+        if(sess.notes) sessionContent += `<br>📝 <em>${sess.notes}</em>`;
+
+        tableHtml += `<td>${sessionContent}</td>`;
       });
       tableHtml += `</tr>`;
     });
@@ -2572,48 +1207,27 @@ async function loadRunningPlans() {
     div.innerHTML = `
       ${tableHtml}
       <br>
-      <button class="danger" onclick="deleteRunningPlan('${plan.id}')">🗑️ Elimina Questo Programma</button>
+      <button class="danger no-print" onclick="deleteRunningPlan('${plan.id}')">🗑️ Elimina Questo Programma</button>
     `;
     container.appendChild(div);
   });
 }
 
 async function deleteRunningPlan(id) {
-  if(!confirm("Eliminare questo programma di corsa?")) return;
-  const res = await db.from("running_plans").delete().eq("id", id);
-  if(res.error) {
-    alert("Errore: " + res.error.message);
-  } else {
-    await loadRunningPlans();
-  }
+  if(!confirm("Eliminare definitivamente questo scheda di corsa?")) return;
+  await db.from("running_plans").delete().eq("id", id);
+  await loadRunningPlans();
 }
 
-document.getElementById("deleteRunningProgramButton").addEventListener("click", async () => {
-  if(!confirm("Vuoi cancellare tutti i programmi di corsa di questo paziente?")) return;
-  const res = await db.from("running_plans").delete().eq("patient_id", currentPatient.id);
-  if(res.error) {
-    showMessage("runningMessage", res.error.message, "error");
-  } else {
-    showMessage("runningMessage", "Tutti i programmi di corsa sono stati eliminati.", "success");
-    document.getElementById("runningPlanner").innerHTML = "";
-    document.getElementById("saveRunningProgramButton").classList.add("hidden");
-    await loadRunningPlans();
-  }
-});
-
-
-/* =====================================
-   PORTALE PAZIENTE (VISTA CLIENTE)
-===================================== */
-
+/* PORTALE PAZIENTE */
 async function loadPatientPortal() {
-  // Carica Esercizi
+  // Esercizi
   const exContainer = document.getElementById("patientPortalExercises");
   exContainer.innerHTML = "Caricamento...";
   const exRes = await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id", currentPatient.id);
 
   if(!exRes.data || exRes.data.length === 0) {
-    exContainer.innerText = "Nessun esercizio assegnato.";
+    exContainer.innerText = "Nessun esercizio presente.";
   } else {
     exContainer.innerHTML = "";
     exRes.data.forEach(item => {
@@ -2631,19 +1245,19 @@ async function loadPatientPortal() {
         <p>${ex.description || ""}</p>
         <p><strong>Parametri:</strong> ${details.join(" | ")}</p>
         ${item.notes ? `<p><strong>Note:</strong> ${item.notes}</p>` : ""}
-        ${ex.video_url ? `<p class="video"><a href="${ex.video_url}" target="_blank" rel="noopener">🎥 Guarda Video</a></p>` : ""}
+        ${ex.video_url ? `<p class="video no-print"><a href="${ex.video_url}" target="_blank" rel="noopener">🎥 Guarda Video</a></p>` : ""}
       `;
       exContainer.appendChild(div);
     });
   }
 
-  // Carica Documenti
+  // Documenti
   const docContainer = document.getElementById("patientPortalDocuments");
   docContainer.innerHTML = "Caricamento...";
   const docRes = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
 
   if(!docRes.data || docRes.data.length === 0) {
-    docContainer.innerText = "Nessun documento disponibile.";
+    docContainer.innerText = "Nessun report presente.";
   } else {
     docContainer.innerHTML = "";
     docRes.data.forEach(doc => {
@@ -2655,13 +1269,13 @@ async function loadPatientPortal() {
     });
   }
 
-  // Carica Note
+  // Note
   const notesContainer = document.getElementById("patientPortalNotes");
   notesContainer.innerHTML = "Caricamento...";
   const notesRes = await db.from("patient_notes").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
 
   if(!notesRes.data || notesRes.data.length === 0) {
-    notesContainer.innerText = "Nessuna nota presente.";
+    notesContainer.innerText = "Nessuna nota comunicata.";
   } else {
     notesContainer.innerHTML = "";
     notesRes.data.forEach(n => {
@@ -2672,13 +1286,13 @@ async function loadPatientPortal() {
     });
   }
 
-  // Carica Corsa
+  // Corsa
   const runContainer = document.getElementById("patientPortalRunning");
   runContainer.innerHTML = "Caricamento...";
   const runRes = await db.from("running_plans").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
 
   if(!runRes.data || runRes.data.length === 0) {
-    runContainer.innerText = "Nessun programma di corsa assegnato.";
+    runContainer.innerText = "Nessun programma corsa assegnato.";
   } else {
     runContainer.innerHTML = "";
     runRes.data.forEach(plan => {
@@ -2688,7 +1302,18 @@ async function loadPatientPortal() {
 
       plan.plan_data.forEach(wData => {
         tableHtml += `<tr><td><strong>Settimana ${wData.week}</strong></td>`;
-        wData.sessions.forEach(sess => { tableHtml += `<td>${sess || "-"}</td>`; });
+        wData.sessions.forEach(sess => {
+          let sessionContent = `<strong>${sess.type || "Corsa"}</strong>`;
+          if(sess.duration) sessionContent += `<br>⏱️ Durata: ${sess.duration} min`;
+          if(sess.type === "Ripetute") {
+            if(sess.fast) sessionContent += `<br>⚡ Veloce: ${sess.fast}`;
+            if(sess.slow) sessionContent += `<br>🐢 Lenta: ${sess.slow}`;
+          }
+          if(sess.rpe) sessionContent += `<br>📊 Difficoltà: ${sess.rpe}`;
+          if(sess.notes) sessionContent += `<br>📝 <em>${sess.notes}</em>`;
+
+          tableHtml += `<td>${sessionContent}</td>`;
+        });
         tableHtml += `</tr>`;
       });
       tableHtml += `</tbody></table>`;
@@ -2697,39 +1322,40 @@ async function loadPatientPortal() {
   }
 }
 
-
-/* =====================================
-   STAMPA SCHEDA ESERCIZI (PDF)
-===================================== */
-
-function triggerPrint(patientName, containerId) {
+/* GESTIONE STAMPA E GENERAZIONE PDF COMPATIBILE */
+function triggerPrint(patientName, containerId, documentTitle) {
   const container = document.getElementById(containerId);
   const printSheet = document.getElementById("printSheet");
 
+  // Creazione clone senza elementi no-print per pulizia stampa
+  const clone = container.cloneNode(true);
+  clone.querySelectorAll(".no-print").forEach(el => el.remove());
+
   printSheet.innerHTML = `
-    <div style="padding: 20px;">
-      <h1>🏥 Noceto Lab</h1>
-      <h2>Scheda Esercizi: ${patientName || ""}</h2>
-      <hr>
-      ${container.innerHTML}
+    <div>
+      <h1 style="margin-bottom:4px;">🏥 Noceto Lab</h1>
+      <h2 style="margin-top:0;">${documentTitle}: ${patientName || ""}</h2>
+      <hr style="border:0; border-top:1px solid #000; margin-bottom:20px;">
+      ${clone.innerHTML}
     </div>
   `;
+
   window.print();
 }
 
 document.getElementById("printExerciseSheetButton").addEventListener("click", () => {
-  triggerPrint(currentPatient ? currentPatient.name : "", "patientExercises");
+  triggerPrint(currentPatient ? currentPatient.name : "", "patientExercises", "Scheda Esercizi");
 });
 
 document.getElementById("patientPrintExerciseSheetButton").addEventListener("click", () => {
-  triggerPrint(currentPatient ? currentPatient.name : "", "patientPortalExercises");
+  triggerPrint(currentPatient ? currentPatient.name : "", "patientPortalExercises", "Scheda Esercizi");
 });
 
+document.getElementById("patientPrintRunningButton").addEventListener("click", () => {
+  triggerPrint(currentPatient ? currentPatient.name : "", "patientPortalRunning", "Programma di Corsa");
+});
 
-/* =====================================
-   INIZIALIZZAZIONE AUTOMATICA
-===================================== */
-
+/* INIZIALIZZAZIONE */
 window.addEventListener("DOMContentLoaded", async () => {
   const isRecovery = await checkRecoverySession();
   if(!isRecovery) {

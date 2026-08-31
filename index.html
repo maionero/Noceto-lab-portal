@@ -1429,6 +1429,15 @@ async function loadPatientExercises() {
 
         </label>
 
+        <br><br>
+
+        <button
+          class="danger delete-exercise"
+          data-id="${item.id}"
+        >
+          🗑️ Rimuovi
+        </button>
+
       `;
 
 
@@ -1454,6 +1463,74 @@ async function loadPatientExercises() {
 
       }
     );
+
+
+  document
+    .querySelectorAll(
+      ".delete-exercise"
+    )
+    .forEach(
+      function(button) {
+
+        button.addEventListener(
+          "click",
+          deletePatientExercise
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================
+   CANCELLA ESERCIZIO
+===================================== */
+
+async function deletePatientExercise(event) {
+
+  const id =
+    event.target.dataset.id;
+
+
+  const confirmed =
+    confirm(
+      "Vuoi davvero rimuovere questo esercizio dal programma del paziente?"
+    );
+
+
+  if(!confirmed) {
+
+    return;
+
+  }
+
+
+  const result =
+    await db
+
+      .from("patient_exercises")
+
+      .delete()
+
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadPatientExercises();
 
 }
 

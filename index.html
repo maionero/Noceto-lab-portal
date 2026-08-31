@@ -267,16 +267,15 @@ hr {
   }
 }
 
-/* STRUTTURA TABELLA CORSA */
+/* STRUTTURA TABELLA CORSA ADATTATIVA MOBILE */
 .running-planner {
-  overflow-x: auto;
+  width: 100%;
 }
 
 .running-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 12px;
-  min-width: 600px;
 }
 
 .running-table th,
@@ -312,6 +311,48 @@ hr {
   padding: 6px;
   margin-top: 6px;
   border-radius: 4px;
+}
+
+/* RESPONSIVE LAYOUT MOBILE CORSA */
+@media screen and (max-width: 768px) {
+  .running-table, 
+  .running-table tbody, 
+  .running-table tr, 
+  .running-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .running-table thead {
+    display: none; /* Nasconde l'intestazione standard a righe su mobile */
+  }
+
+  .running-table tr {
+    margin-bottom: 20px;
+    border: 2px solid #111;
+    border-radius: 12px;
+    background: #fff;
+    padding: 12px;
+  }
+
+  .running-table td {
+    border: none;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+  }
+
+  .running-table td:first-child {
+    font-size: 1.1em;
+    background: #111;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+
+  .running-table td:last-child {
+    border-bottom: none;
+  }
 }
 
 @media(max-width:600px) {
@@ -1094,7 +1135,7 @@ document.getElementById("generateRunningPlanButton").addEventListener("click", (
     for(let s = 1; s <= sessions; s++) {
       html += `<td>
         <div class="session-box">
-          <label>Tipo di Corsa</label>
+          <label>Allenamento ${s} - Tipo Corsa</label>
           <select id="run_type_${w}_${s}" onchange="toggleIntervalInputs(${w}, ${s})">
             <option value="Corsa Continua">Corsa Continua</option>
             <option value="Corsa + Camminata">Corsa + Camminata (Interval)</option>
@@ -1202,18 +1243,18 @@ async function loadRunningPlans() {
 
     plan.plan_data.forEach(wData => {
       tableHtml += `<tr><td><strong>Settimana ${wData.week}</strong></td>`;
-      wData.sessions.forEach(sess => {
-        let sessionContent = `<strong>${sess.type || "Corsa"}</strong>`;
-        if(sess.duration) sessionContent += `<br>⏱️ Durata: ${sess.duration} min`;
+      wData.sessions.forEach((sess, idx) => {
+        let sessionContent = `<strong style="display:block; margin-bottom:4px;">🏃 Allenamento ${idx + 1}: ${sess.type || "Corsa"}</strong>`;
+        if(sess.duration) sessionContent += `⏱️ Durata: ${sess.duration} min<br>`;
         if(sess.type === "Ripetute") {
-          if(sess.fast) sessionContent += `<br>⚡ Veloce: ${sess.fast}`;
-          if(sess.slow) sessionContent += `<br>🐢 Lenta/Recupero: ${sess.slow}`;
+          if(sess.fast) sessionContent += `⚡ Veloce: ${sess.fast}<br>`;
+          if(sess.slow) sessionContent += `🐢 Lenta/Recupero: ${sess.slow}<br>`;
         } else if(sess.type === "Corsa + Camminata") {
-          if(sess.fast) sessionContent += `<br>🏃 Corsa: ${sess.fast}`;
-          if(sess.slow) sessionContent += `<br>🚶 Camminata: ${sess.slow}`;
+          if(sess.fast) sessionContent += `🏃 Corsa: ${sess.fast}<br>`;
+          if(sess.slow) sessionContent += `🚶 Camminata: ${sess.slow}<br>`;
         }
-        if(sess.rpe) sessionContent += `<br>📊 Difficoltà: ${sess.rpe}`;
-        if(sess.notes) sessionContent += `<br>📝 <em>${sess.notes}</em>`;
+        if(sess.rpe) sessionContent += `📊 Difficoltà: ${sess.rpe}<br>`;
+        if(sess.notes) sessionContent += `📝 <em>${sess.notes}</em>`;
 
         tableHtml += `<td>${sessionContent}</td>`;
       });
@@ -1319,18 +1360,18 @@ async function loadPatientPortal() {
 
       plan.plan_data.forEach(wData => {
         tableHtml += `<tr><td><strong>Settimana ${wData.week}</strong></td>`;
-        wData.sessions.forEach(sess => {
-          let sessionContent = `<strong>${sess.type || "Corsa"}</strong>`;
-          if(sess.duration) sessionContent += `<br>⏱️ Durata: ${sess.duration} min`;
+        wData.sessions.forEach((sess, idx) => {
+          let sessionContent = `<strong style="display:block; margin-bottom:4px;">🏃 Allenamento ${idx + 1}: ${sess.type || "Corsa"}</strong>`;
+          if(sess.duration) sessionContent += `⏱️ Durata: ${sess.duration} min<br>`;
           if(sess.type === "Ripetute") {
-            if(sess.fast) sessionContent += `<br>⚡ Veloce: ${sess.fast}`;
-            if(sess.slow) sessionContent += `<br>🐢 Lenta: ${sess.slow}`;
+            if(sess.fast) sessionContent += `⚡ Veloce: ${sess.fast}<br>`;
+            if(sess.slow) sessionContent += `🐢 Lenta: ${sess.slow}<br>`;
           } else if(sess.type === "Corsa + Camminata") {
-            if(sess.fast) sessionContent += `<br>🏃 Corsa: ${sess.fast}`;
-            if(sess.slow) sessionContent += `<br>🚶 Camminata: ${sess.slow}`;
+            if(sess.fast) sessionContent += `🏃 Corsa: ${sess.fast}<br>`;
+            if(sess.slow) sessionContent += `🚶 Camminata: ${sess.slow}<br>`;
           }
-          if(sess.rpe) sessionContent += `<br>📊 Difficoltà: ${sess.rpe}`;
-          if(sess.notes) sessionContent += `<br>📝 <em>${sess.notes}</em>`;
+          if(sess.rpe) sessionContent += `📊 Difficoltà: ${sess.rpe}<br>`;
+          if(sess.notes) sessionContent += `📝 <em>${sess.notes}</em>`;
 
           tableHtml += `<td>${sessionContent}</td>`;
         });

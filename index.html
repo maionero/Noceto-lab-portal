@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="it">
 
@@ -94,11 +93,6 @@ button {
   color: white;
 }
 
-.edit {
-  background: #e8e8e8;
-  color: #111;
-}
-
 .hidden {
   display: none !important;
 }
@@ -114,7 +108,6 @@ button {
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 16px;
-  cursor: pointer;
   background: white;
 }
 
@@ -177,28 +170,26 @@ button {
   margin-bottom: 10px;
 }
 
-.exercise-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 15px;
+small {
+  color: #666;
 }
 
-.library-item {
+.exercise-editor {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.library-exercise {
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
 }
 
-.library-item h3 {
+.library-exercise h3 {
   margin-top: 0;
-  margin-bottom: 8px;
-}
-
-.library-description {
-  color: #555;
-  margin-bottom: 10px;
 }
 
 @media(max-width:600px) {
@@ -324,7 +315,7 @@ button {
       </button>
 
       <button
-        id="libraryButton"
+        id="exerciseLibraryButton"
         class="secondary"
       >
         📚 Libreria esercizi
@@ -482,101 +473,6 @@ button {
 
 
 <!-- =====================================
-     MODIFICA ESERCIZIO ASSEGNATO
-===================================== -->
-
-<section
-  id="editAssignedExercisePage"
-  class="hidden"
->
-
-  <button
-    id="backToPatientButton"
-    class="secondary back"
-  >
-    ← Torna al paziente
-  </button>
-
-
-  <div class="card">
-
-    <h2>✏️ Modifica esercizio assegnato</h2>
-
-    <p id="editAssignedExerciseName"></p>
-
-
-    <label>
-      Serie
-    </label>
-
-    <input
-      id="editSets"
-      type="number"
-      min="0"
-    >
-
-
-    <label>
-      Ripetizioni
-    </label>
-
-    <input
-      id="editReps"
-      type="number"
-      min="0"
-    >
-
-
-    <label>
-      Durata (secondi)
-    </label>
-
-    <input
-      id="editDuration"
-      type="number"
-      min="0"
-    >
-
-
-    <label>
-      Recupero (secondi)
-    </label>
-
-    <input
-      id="editRest"
-      type="number"
-      min="0"
-    >
-
-
-    <label>
-      Note
-    </label>
-
-    <textarea
-      id="editNotes"
-    ></textarea>
-
-    <br><br>
-
-    <button
-      id="saveAssignedExercise"
-      class="primary"
-    >
-      Salva modifiche
-    </button>
-
-    <div
-      id="editAssignedMessage"
-      class="message hidden"
-    ></div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================
      NUOVO PAZIENTE
 ===================================== -->
 
@@ -713,7 +609,7 @@ button {
 >
 
   <button
-    id="backFromLibraryButton"
+    id="backLibraryButton"
     class="secondary back"
   >
     ← Dashboard
@@ -724,83 +620,9 @@ button {
 
     <h2>📚 Libreria esercizi</h2>
 
-    <p>
-      Qui puoi modificare o eliminare gli esercizi disponibili.
-    </p>
-
-    <div id="exerciseLibrary">
+    <div id="exerciseLibraryList">
       Caricamento...
     </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================
-     MODIFICA ESERCIZIO
-===================================== -->
-
-<section
-  id="editExercisePage"
-  class="hidden"
->
-
-  <button
-    id="backFromEditExerciseButton"
-    class="secondary back"
-  >
-    ← Libreria esercizi
-  </button>
-
-
-  <div class="card">
-
-    <h2>✏️ Modifica esercizio</h2>
-
-    <label>
-      Nome
-    </label>
-
-    <input
-      id="editExerciseName"
-      placeholder="Nome esercizio"
-    >
-
-
-    <label>
-      Descrizione
-    </label>
-
-    <textarea
-      id="editExerciseDescription"
-      placeholder="Descrizione dell'esercizio..."
-    ></textarea>
-
-
-    <label>
-      Video URL
-    </label>
-
-    <input
-      id="editExerciseVideo"
-      type="url"
-      placeholder="https://..."
-    >
-
-    <br><br>
-
-    <button
-      id="saveEditedExercise"
-      class="primary"
-    >
-      Salva modifiche
-    </button>
-
-    <div
-      id="editExerciseMessage"
-      class="message hidden"
-    ></div>
 
   </div>
 
@@ -884,10 +706,6 @@ let currentUser = null;
 
 let currentPatient = null;
 
-let currentAssignedExercise = null;
-
-let currentLibraryExercise = null;
-
 
 /* =====================================
    PAGINE
@@ -898,11 +716,9 @@ const pages = [
   "loginPage",
   "therapistPage",
   "patientPage",
-  "editAssignedExercisePage",
   "newPatientPage",
   "newExercisePage",
   "exerciseLibraryPage",
-  "editExercisePage",
   "patientPortal"
 
 ];
@@ -1200,8 +1016,6 @@ document
 
       currentUser = null;
       currentPatient = null;
-      currentAssignedExercise = null;
-      currentLibraryExercise = null;
 
       document
         .getElementById("logoutButton")
@@ -1300,19 +1114,13 @@ async function loadPatients() {
         );
 
 
-      const br2 =
-        document.createElement(
-          "br"
-        );
-
-
       const small =
         document.createElement(
           "small"
         );
 
       small.innerText =
-        "Apri scheda →";
+        "Gestisci paziente";
 
 
       div.appendChild(
@@ -1324,11 +1132,85 @@ async function loadPatients() {
       );
 
       div.appendChild(
-        br2
+        small
       );
 
+
+      const buttons =
+        document.createElement(
+          "div"
+        );
+
+      buttons.className =
+        "actions";
+
+      buttons.style.marginTop =
+        "12px";
+
+
+      const openButton =
+        document.createElement(
+          "button"
+        );
+
+      openButton.className =
+        "primary";
+
+      openButton.innerText =
+        "Apri scheda";
+
+
+      openButton.addEventListener(
+        "click",
+        function(event) {
+
+          event.stopPropagation();
+
+          openPatient(
+            patient
+          );
+
+        }
+      );
+
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+      deleteButton.className =
+        "danger";
+
+      deleteButton.innerText =
+        "🗑 Elimina";
+
+
+      deleteButton.addEventListener(
+        "click",
+        function(event) {
+
+          event.stopPropagation();
+
+          deletePatient(
+            patient
+          );
+
+        }
+      );
+
+
+      buttons.appendChild(
+        openButton
+      );
+
+      buttons.appendChild(
+        deleteButton
+      );
+
+
       div.appendChild(
-        small
+        buttons
       );
 
 
@@ -1536,299 +1418,286 @@ async function loadPatientExercises() {
   result.data.forEach(
     function(item) {
 
-      const div =
-        document.createElement(
-          "div"
-        );
+      renderPatientExercise(
+        item,
+        container
+      );
+
+    }
+  );
+
+}
 
 
-      div.className =
-        "exercise";
+/* =====================================
+   RENDER ESERCIZIO PAZIENTE
+===================================== */
+
+function renderPatientExercise(
+  item,
+  container
+) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
 
 
-      const title =
-        document.createElement(
-          "h3"
-        );
+  div.className =
+    "exercise";
 
 
-      title.innerText =
-        item.exercises.name;
+  const title =
+    document.createElement(
+      "h3"
+    );
 
 
-      div.appendChild(
-        title
+  title.innerText =
+    item.exercises.name;
+
+
+  div.appendChild(
+    title
+  );
+
+
+  let info = [];
+
+
+  if(item.sets !== null && item.sets !== undefined) {
+
+    info.push(
+      item.sets + " serie"
+    );
+
+  }
+
+
+  if(item.reps !== null && item.reps !== undefined) {
+
+    info.push(
+      item.reps + " rip"
+    );
+
+  }
+
+
+  if(item.duration !== null && item.duration !== undefined) {
+
+    info.push(
+      item.duration + " sec"
+    );
+
+  }
+
+
+  if(item.rest !== null && item.rest !== undefined) {
+
+    info.push(
+      "recupero " +
+      item.rest +
+      "\""
+    );
+
+  }
+
+
+  if(info.length > 0) {
+
+    const infoParagraph =
+      document.createElement(
+        "p"
       );
 
 
-      let info = [];
+    infoParagraph.innerText =
+      info.join(" · ");
 
 
-      if(item.sets !== null && item.sets !== undefined) {
+    div.appendChild(
+      infoParagraph
+    );
 
-        info.push(
-          item.sets + " serie"
-        );
+  }
 
-      }
 
+  if(item.exercises.description) {
 
-      if(item.reps !== null && item.reps !== undefined) {
-
-        info.push(
-          item.reps + " rip"
-        );
-
-      }
-
-
-      if(item.duration !== null && item.duration !== undefined) {
-
-        info.push(
-          item.duration + " sec"
-        );
-
-      }
-
-
-      if(item.rest !== null && item.rest !== undefined) {
-
-        info.push(
-          "recupero " +
-          item.rest +
-          "\""
-        );
-
-      }
-
-
-      if(info.length > 0) {
-
-        const infoParagraph =
-          document.createElement(
-            "p"
-          );
-
-
-        infoParagraph.innerText =
-          info.join(" · ");
-
-
-        div.appendChild(
-          infoParagraph
-        );
-
-      }
-
-
-      if(item.exercises.description) {
-
-        const description =
-          document.createElement(
-            "p"
-          );
-
-
-        description.innerText =
-          item.exercises.description;
-
-
-        div.appendChild(
-          description
-        );
-
-      }
-
-
-      if(item.exercises.video_url) {
-
-        const video =
-          document.createElement(
-            "div"
-          );
-
-
-        video.className =
-          "video";
-
-
-        const link =
-          document.createElement(
-            "a"
-          );
-
-
-        link.href =
-          item.exercises.video_url;
-
-
-        link.target =
-          "_blank";
-
-
-        link.rel =
-          "noopener";
-
-
-        link.innerText =
-          "🎥 Guarda video";
-
-
-        video.appendChild(
-          link
-        );
-
-
-        div.appendChild(
-          video
-        );
-
-      }
-
-
-      if(item.notes) {
-
-        const notes =
-          document.createElement(
-            "p"
-          );
-
-
-        notes.innerText =
-          "📝 " +
-          item.notes;
-
-
-        div.appendChild(
-          notes
-        );
-
-      }
-
-
-      const completionLabel =
-        document.createElement(
-          "label"
-        );
-
-
-      const completion =
-        document.createElement(
-          "input"
-        );
-
-
-      completion.type =
-        "checkbox";
-
-
-      completion.className =
-        "completion";
-
-
-      completion.dataset.id =
-        item.id;
-
-
-      completion.checked =
-        !!item.completed;
-
-
-      completionLabel.appendChild(
-        completion
+    const description =
+      document.createElement(
+        "p"
       );
 
 
-      completionLabel.appendChild(
-        document.createTextNode(
-          " Completato"
-        )
+    description.innerText =
+      item.exercises.description;
+
+
+    div.appendChild(
+      description
+    );
+
+  }
+
+
+  if(item.exercises.video_url) {
+
+    const video =
+      document.createElement(
+        "div"
       );
 
 
-      div.appendChild(
-        completionLabel
+    video.className =
+      "video";
+
+
+    const link =
+      document.createElement(
+        "a"
       );
 
 
-      const actions =
-        document.createElement(
-          "div"
-        );
+    link.href =
+      item.exercises.video_url;
 
 
-      actions.className =
-        "exercise-actions";
+    link.target =
+      "_blank";
 
 
-      const editButton =
-        document.createElement(
-          "button"
-        );
+    link.rel =
+      "noopener";
 
 
-      editButton.className =
-        "edit";
+    link.innerText =
+      "🎥 Guarda video";
 
 
-      editButton.innerText =
-        "✏️ Modifica";
+    video.appendChild(
+      link
+    );
 
 
-      editButton.addEventListener(
-        "click",
-        function() {
+    div.appendChild(
+      video
+    );
 
-          openEditAssignedExercise(
-            item
-          );
+  }
 
-        }
+
+  if(item.notes) {
+
+    const notes =
+      document.createElement(
+        "p"
       );
 
 
-      actions.appendChild(
-        editButton
-      );
+    notes.innerText =
+      "📝 " +
+      item.notes;
 
 
-      const removeButton =
-        document.createElement(
-          "button"
-        );
+    div.appendChild(
+      notes
+    );
+
+  }
 
 
-      removeButton.className =
-        "danger";
+  const completionLabel =
+    document.createElement(
+      "label"
+    );
 
 
-      removeButton.innerText =
-        "🗑 Rimuovi";
+  const completion =
+    document.createElement(
+      "input"
+    );
 
 
-      removeButton.addEventListener(
-        "click",
-        function() {
-
-          deletePatientExercise(
-            item.id
-          );
-
-        }
-      );
+  completion.type =
+    "checkbox";
 
 
-      actions.appendChild(
-        removeButton
-      );
+  completion.className =
+    "completion";
 
 
-      div.appendChild(
-        actions
-      );
+  completion.dataset.id =
+    item.id;
 
 
-      container.appendChild(
+  completion.checked =
+    !!item.completed;
+
+
+  completionLabel.appendChild(
+    completion
+  );
+
+
+  completionLabel.appendChild(
+    document.createTextNode(
+      " Completato"
+    )
+  );
+
+
+  div.appendChild(
+    completionLabel
+  );
+
+
+  const spacer =
+    document.createElement(
+      "br"
+    );
+
+
+  div.appendChild(
+    spacer
+  );
+
+
+  const buttons =
+    document.createElement(
+      "div"
+    );
+
+
+  buttons.className =
+    "actions";
+
+
+  buttons.style.marginTop =
+    "10px";
+
+
+  const editButton =
+    document.createElement(
+      "button"
+    );
+
+
+  editButton.className =
+    "secondary";
+
+
+  editButton.innerText =
+    "✏️ Modifica";
+
+
+  editButton.addEventListener(
+    "click",
+    function() {
+
+      showAssignmentEditor(
+        item,
         div
       );
 
@@ -1836,16 +1705,201 @@ async function loadPatientExercises() {
   );
 
 
-  document
-    .querySelectorAll(
-      ".completion"
-    )
-    .forEach(
-      function(box) {
+  const removeButton =
+    document.createElement(
+      "button"
+    );
 
-        box.addEventListener(
-          "change",
-          updateCompletion
+
+  removeButton.className =
+    "danger";
+
+
+  removeButton.innerText =
+    "🗑 Rimuovi";
+
+
+  removeButton.addEventListener(
+    "click",
+    function() {
+
+      deletePatientExercise(
+        item.id
+      );
+
+    }
+  );
+
+
+  buttons.appendChild(
+    editButton
+  );
+
+  buttons.appendChild(
+    removeButton
+  );
+
+
+  div.appendChild(
+    buttons
+  );
+
+
+  container.appendChild(
+    div
+  );
+
+}
+
+
+/* =====================================
+   MODIFICA ESERCIZIO ASSEGNATO
+===================================== */
+
+function showAssignmentEditor(
+  item,
+  parent
+) {
+
+  const oldEditor =
+    parent.querySelector(
+      ".exercise-editor"
+    );
+
+
+  if(oldEditor) {
+
+    oldEditor.remove();
+
+    return;
+
+  }
+
+
+  const editor =
+    document.createElement(
+      "div"
+    );
+
+
+  editor.className =
+    "exercise-editor";
+
+
+  editor.innerHTML = `
+
+    <label>
+      Serie
+    </label>
+
+    <input
+      class="edit-sets"
+      type="number"
+      min="0"
+      value="${item.sets ?? ""}"
+    >
+
+
+    <label>
+      Ripetizioni
+    </label>
+
+    <input
+      class="edit-reps"
+      type="number"
+      min="0"
+      value="${item.reps ?? ""}"
+    >
+
+
+    <label>
+      Durata (secondi)
+    </label>
+
+    <input
+      class="edit-duration"
+      type="number"
+      min="0"
+      value="${item.duration ?? ""}"
+    >
+
+
+    <label>
+      Recupero (secondi)
+    </label>
+
+    <input
+      class="edit-rest"
+      type="number"
+      min="0"
+      value="${item.rest ?? ""}"
+    >
+
+
+    <label>
+      Note
+    </label>
+
+    <textarea
+      class="edit-notes"
+    >${item.notes ?? ""}</textarea>
+
+
+    <br><br>
+
+    <div class="actions">
+
+      <button
+        class="primary save-assignment"
+      >
+        💾 Salva modifiche
+      </button>
+
+      <button
+        class="secondary cancel-assignment"
+      >
+        Annulla
+      </button>
+
+    </div>
+
+    <div
+      class="message edit-message hidden"
+    ></div>
+
+  `;
+
+
+  parent.appendChild(
+    editor
+  );
+
+
+  editor
+    .querySelector(
+      ".cancel-assignment"
+    )
+    .addEventListener(
+      "click",
+      function() {
+
+        editor.remove();
+
+      }
+    );
+
+
+  editor
+    .querySelector(
+      ".save-assignment"
+    )
+    .addEventListener(
+      "click",
+      async function() {
+
+        await saveAssignmentChanges(
+          item.id,
+          editor
         );
 
       }
@@ -1855,130 +1909,41 @@ async function loadPatientExercises() {
 
 
 /* =====================================
-   MODIFICA ESERCIZIO ASSEGNATO
+   SALVA MODIFICA ASSEGNAZIONE
 ===================================== */
 
-function openEditAssignedExercise(item) {
+async function saveAssignmentChanges(
+  id,
+  editor
+) {
 
-  currentAssignedExercise =
-    item;
-
-
-  document
-    .getElementById(
-      "editAssignedExerciseName"
-    )
-    .innerText =
-      item.exercises.name;
-
-
-  document
-    .getElementById(
-      "editSets"
-    )
-    .value =
-      item.sets ?? "";
-
-
-  document
-    .getElementById(
-      "editReps"
-    )
-    .value =
-      item.reps ?? "";
-
-
-  document
-    .getElementById(
-      "editDuration"
-    )
-    .value =
-      item.duration ?? "";
-
-
-  document
-    .getElementById(
-      "editRest"
-    )
-    .value =
-      item.rest ?? "";
-
-
-  document
-    .getElementById(
-      "editNotes"
-    )
-    .value =
-      item.notes ?? "";
-
-
-  showPage(
-    "editAssignedExercisePage"
-  );
-
-}
-
-
-/* =====================================
-   SALVA MODIFICA ESERCIZIO ASSEGNATO
-===================================== */
-
-document
-  .getElementById(
-    "saveAssignedExercise"
-  )
-  .addEventListener(
-    "click",
-    saveAssignedExercise
-  );
-
-
-async function saveAssignedExercise() {
-
-  if(!currentAssignedExercise) {
-
-    return;
-
-  }
-
-
-  const setsValue =
-    document
-      .getElementById(
-        "editSets"
-      )
+  const sets =
+    editor
+      .querySelector(".edit-sets")
       .value;
 
 
-  const repsValue =
-    document
-      .getElementById(
-        "editReps"
-      )
+  const reps =
+    editor
+      .querySelector(".edit-reps")
       .value;
 
 
-  const durationValue =
-    document
-      .getElementById(
-        "editDuration"
-      )
+  const duration =
+    editor
+      .querySelector(".edit-duration")
       .value;
 
 
-  const restValue =
-    document
-      .getElementById(
-        "editRest"
-      )
+  const rest =
+    editor
+      .querySelector(".edit-rest")
       .value;
 
 
-  const notesValue =
-    document
-      .getElementById(
-        "editNotes"
-      )
+  const notes =
+    editor
+      .querySelector(".edit-notes")
       .value
       .trim();
 
@@ -1989,43 +1954,49 @@ async function saveAssignedExercise() {
       .update({
 
         sets:
-          setsValue === ""
+          sets === ""
             ? null
-            : parseInt(setsValue),
+            : parseInt(sets),
 
         reps:
-          repsValue === ""
+          reps === ""
             ? null
-            : parseInt(repsValue),
+            : parseInt(reps),
 
         duration:
-          durationValue === ""
+          duration === ""
             ? null
-            : parseInt(durationValue),
+            : parseInt(duration),
 
         rest:
-          restValue === ""
+          rest === ""
             ? null
-            : parseInt(restValue),
+            : parseInt(rest),
 
         notes:
-          notesValue || null
+          notes || null
 
       })
       .eq(
         "id",
-        currentAssignedExercise.id
+        id
       );
 
 
   if(result.error) {
 
-    showMessage(
-      "editAssignedMessage",
-      "Errore nel salvataggio: " +
+    const message =
+      editor.querySelector(
+        ".edit-message"
+      );
+
+
+    showInlineMessage(
+      message,
       result.error.message,
       "error"
     );
+
 
     console.error(
       result.error
@@ -2036,52 +2007,13 @@ async function saveAssignedExercise() {
   }
 
 
-  showMessage(
-    "editAssignedMessage",
-    "Modifiche salvate correttamente.",
-    "success"
-  );
-
-
   await loadPatientExercises();
-
-
-  setTimeout(
-    function() {
-
-      showPage(
-        "patientPage"
-      );
-
-    },
-    500
-  );
 
 }
 
 
 /* =====================================
-   TORNA AL PAZIENTE
-===================================== */
-
-document
-  .getElementById(
-    "backToPatientButton"
-  )
-  .addEventListener(
-    "click",
-    function() {
-
-      showPage(
-        "patientPage"
-      );
-
-    }
-  );
-
-
-/* =====================================
-   RIMUOVI ESERCIZIO ASSEGNATO
+   ELIMINA ESERCIZIO ASSEGNATO
 ===================================== */
 
 async function deletePatientExercise(id) {
@@ -2804,17 +2736,15 @@ document
         ).value = "";
 
 
-        await loadPatients();
-
-
         setTimeout(
-          function() {
+          async function() {
 
-            startTherapist();
+            await startTherapist();
 
           },
           700
         );
+
 
       } catch(error) {
 
@@ -2951,9 +2881,6 @@ document
       ).value = "";
 
 
-      await loadExercises();
-
-
       setTimeout(
         function() {
 
@@ -2972,32 +2899,26 @@ document
 ===================================== */
 
 document
-  .getElementById(
-    "libraryButton"
-  )
+  .getElementById("exerciseLibraryButton")
   .addEventListener(
     "click",
-    openExerciseLibrary
+    async function() {
+
+      showPage(
+        "exerciseLibraryPage"
+      );
+
+      await loadExerciseLibrary();
+
+    }
   );
-
-
-async function openExerciseLibrary() {
-
-  showPage(
-    "exerciseLibraryPage"
-  );
-
-
-  await loadExerciseLibrary();
-
-}
 
 
 async function loadExerciseLibrary() {
 
   const container =
     document.getElementById(
-      "exerciseLibrary"
+      "exerciseLibraryList"
     );
 
 
@@ -3020,7 +2941,6 @@ async function loadExerciseLibrary() {
   if(result.error) {
 
     container.innerText =
-      "Errore: " +
       result.error.message;
 
     console.error(
@@ -3048,180 +2968,9 @@ async function loadExerciseLibrary() {
   result.data.forEach(
     function(exercise) {
 
-      const item =
-        document.createElement(
-          "div"
-        );
-
-
-      item.className =
-        "library-item";
-
-
-      const title =
-        document.createElement(
-          "h3"
-        );
-
-
-      title.innerText =
-        "🏋️ " +
-        exercise.name;
-
-
-      item.appendChild(
-        title
-      );
-
-
-      if(exercise.description) {
-
-        const description =
-          document.createElement(
-            "div"
-          );
-
-
-        description.className =
-          "library-description";
-
-
-        description.innerText =
-          exercise.description;
-
-
-        item.appendChild(
-          description
-        );
-
-      }
-
-
-      if(exercise.video_url) {
-
-        const video =
-          document.createElement(
-            "div"
-          );
-
-
-        video.className =
-          "video";
-
-
-        const link =
-          document.createElement(
-            "a"
-          );
-
-
-        link.href =
-          exercise.video_url;
-
-
-        link.target =
-          "_blank";
-
-
-        link.rel =
-          "noopener";
-
-
-        link.innerText =
-          "🎥 Guarda video";
-
-
-        video.appendChild(
-          link
-        );
-
-
-        item.appendChild(
-          video
-        );
-
-      }
-
-
-      const actions =
-        document.createElement(
-          "div"
-        );
-
-
-      actions.className =
-        "exercise-actions";
-
-
-      const editButton =
-        document.createElement(
-          "button"
-        );
-
-
-      editButton.className =
-        "edit";
-
-
-      editButton.innerText =
-        "✏️ Modifica";
-
-
-      editButton.addEventListener(
-        "click",
-        function() {
-
-          openEditExercise(
-            exercise
-          );
-
-        }
-      );
-
-
-      actions.appendChild(
-        editButton
-      );
-
-
-      const deleteButton =
-        document.createElement(
-          "button"
-        );
-
-
-      deleteButton.className =
-        "danger";
-
-
-      deleteButton.innerText =
-        "🗑 Elimina";
-
-
-      deleteButton.addEventListener(
-        "click",
-        function() {
-
-          deleteExercise(
-            exercise
-          );
-
-        }
-      );
-
-
-      actions.appendChild(
-        deleteButton
-      );
-
-
-      item.appendChild(
-        actions
-      );
-
-
-      container.appendChild(
-        item
+      renderLibraryExercise(
+        exercise,
+        container
       );
 
     }
@@ -3231,91 +2980,352 @@ async function loadExerciseLibrary() {
 
 
 /* =====================================
-   APRI MODIFICA ESERCIZIO
+   RENDER LIBRERIA
 ===================================== */
 
-function openEditExercise(exercise) {
+function renderLibraryExercise(
+  exercise,
+  container
+) {
 
-  currentLibraryExercise =
-    exercise;
-
-
-  document
-    .getElementById(
-      "editExerciseName"
-    )
-    .value =
-      exercise.name || "";
+  const div =
+    document.createElement(
+      "div"
+    );
 
 
-  document
-    .getElementById(
-      "editExerciseDescription"
-    )
-    .value =
-      exercise.description || "";
+  div.className =
+    "library-exercise";
 
 
-  document
-    .getElementById(
-      "editExerciseVideo"
-    )
-    .value =
-      exercise.video_url || "";
+  const title =
+    document.createElement(
+      "h3"
+    );
 
 
-  showPage(
-    "editExercisePage"
+  title.innerText =
+    exercise.name;
+
+
+  div.appendChild(
+    title
+  );
+
+
+  if(exercise.description) {
+
+    const description =
+      document.createElement(
+        "p"
+      );
+
+
+    description.innerText =
+      exercise.description;
+
+
+    div.appendChild(
+      description
+    );
+
+  }
+
+
+  if(exercise.video_url) {
+
+    const video =
+      document.createElement(
+        "div"
+      );
+
+
+    video.className =
+      "video";
+
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+
+    link.href =
+      exercise.video_url;
+
+
+    link.target =
+      "_blank";
+
+
+    link.rel =
+      "noopener";
+
+
+    link.innerText =
+      "🎥 Guarda video";
+
+
+    video.appendChild(
+      link
+    );
+
+
+    div.appendChild(
+      video
+    );
+
+  }
+
+
+  const buttons =
+    document.createElement(
+      "div"
+    );
+
+
+  buttons.className =
+    "actions";
+
+
+  buttons.style.marginTop =
+    "12px";
+
+
+  const editButton =
+    document.createElement(
+      "button"
+    );
+
+
+  editButton.className =
+    "secondary";
+
+
+  editButton.innerText =
+    "✏️ Modifica";
+
+
+  editButton.addEventListener(
+    "click",
+    function() {
+
+      showLibraryEditor(
+        exercise,
+        div
+      );
+
+    }
+  );
+
+
+  const deleteButton =
+    document.createElement(
+      "button"
+    );
+
+
+  deleteButton.className =
+    "danger";
+
+
+  deleteButton.innerText =
+    "🗑 Elimina";
+
+
+  deleteButton.addEventListener(
+    "click",
+    function() {
+
+      deleteLibraryExercise(
+        exercise.id
+      );
+
+    }
+  );
+
+
+  buttons.appendChild(
+    editButton
+  );
+
+  buttons.appendChild(
+    deleteButton
+  );
+
+
+  div.appendChild(
+    buttons
+  );
+
+
+  container.appendChild(
+    div
   );
 
 }
 
 
 /* =====================================
-   SALVA MODIFICA ESERCIZIO
+   MODIFICA ESERCIZIO LIBRERIA
 ===================================== */
 
-document
-  .getElementById(
-    "saveEditedExercise"
-  )
-  .addEventListener(
-    "click",
-    saveEditedExercise
-  );
+function showLibraryEditor(
+  exercise,
+  parent
+) {
+
+  const oldEditor =
+    parent.querySelector(
+      ".exercise-editor"
+    );
 
 
-async function saveEditedExercise() {
+  if(oldEditor) {
 
-  if(!currentLibraryExercise) {
+    oldEditor.remove();
 
     return;
 
   }
 
 
+  const editor =
+    document.createElement(
+      "div"
+    );
+
+
+  editor.className =
+    "exercise-editor";
+
+
+  editor.innerHTML = `
+
+    <label>
+      Nome
+    </label>
+
+    <input
+      class="library-edit-name"
+      value="${escapeHtmlAttribute(exercise.name)}"
+    >
+
+
+    <label>
+      Descrizione
+    </label>
+
+    <textarea
+      class="library-edit-description"
+    >${escapeHtml(exercise.description || "")}</textarea>
+
+
+    <label>
+      Video URL
+    </label>
+
+    <input
+      class="library-edit-video"
+      type="url"
+      value="${escapeHtmlAttribute(exercise.video_url || "")}"
+    >
+
+
+    <br><br>
+
+    <div class="actions">
+
+      <button
+        class="primary save-library-exercise"
+      >
+        💾 Salva
+      </button>
+
+      <button
+        class="secondary cancel-library-exercise"
+      >
+        Annulla
+      </button>
+
+    </div>
+
+    <div
+      class="message library-edit-message hidden"
+    ></div>
+
+  `;
+
+
+  parent.appendChild(
+    editor
+  );
+
+
+  editor
+    .querySelector(
+      ".cancel-library-exercise"
+    )
+    .addEventListener(
+      "click",
+      function() {
+
+        editor.remove();
+
+      }
+    );
+
+
+  editor
+    .querySelector(
+      ".save-library-exercise"
+    )
+    .addEventListener(
+      "click",
+      async function() {
+
+        await saveLibraryExercise(
+          exercise.id,
+          editor
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================
+   SALVA ESERCIZIO LIBRERIA
+===================================== */
+
+async function saveLibraryExercise(
+  id,
+  editor
+) {
+
   const name =
-    document
-      .getElementById(
-        "editExerciseName"
+    editor
+      .querySelector(
+        ".library-edit-name"
       )
       .value
       .trim();
 
 
   const description =
-    document
-      .getElementById(
-        "editExerciseDescription"
+    editor
+      .querySelector(
+        ".library-edit-description"
       )
       .value
       .trim();
 
 
   const video =
-    document
-      .getElementById(
-        "editExerciseVideo"
+    editor
+      .querySelector(
+        ".library-edit-video"
       )
       .value
       .trim();
@@ -3323,11 +3333,18 @@ async function saveEditedExercise() {
 
   if(!name) {
 
-    showMessage(
-      "editExerciseMessage",
+    const message =
+      editor.querySelector(
+        ".library-edit-message"
+      );
+
+
+    showInlineMessage(
+      message,
       "Inserisci il nome dell'esercizio.",
       "error"
     );
+
 
     return;
 
@@ -3351,18 +3368,24 @@ async function saveEditedExercise() {
       })
       .eq(
         "id",
-        currentLibraryExercise.id
+        id
       );
 
 
   if(result.error) {
 
-    showMessage(
-      "editExerciseMessage",
-      "Errore nel salvataggio: " +
+    const message =
+      editor.querySelector(
+        ".library-edit-message"
+      );
+
+
+    showInlineMessage(
+      message,
       result.error.message,
       "error"
     );
+
 
     console.error(
       result.error
@@ -3373,39 +3396,20 @@ async function saveEditedExercise() {
   }
 
 
-  showMessage(
-    "editExerciseMessage",
-    "Esercizio modificato correttamente.",
-    "success"
-  );
-
-
-  await loadExercises();
-
-
-  setTimeout(
-    function() {
-
-      openExerciseLibrary();
-
-    },
-    500
-  );
+  await loadExerciseLibrary();
 
 }
 
 
 /* =====================================
-   ELIMINA ESERCIZIO DALLA LIBRERIA
+   ELIMINA ESERCIZIO LIBRERIA
 ===================================== */
 
-async function deleteExercise(exercise) {
+async function deleteLibraryExercise(id) {
 
   const confirmed =
     confirm(
-      "Vuoi davvero eliminare \"" +
-      exercise.name +
-      "\" dalla libreria?"
+      "Vuoi davvero eliminare questo esercizio dalla libreria?"
     );
 
 
@@ -3422,7 +3426,7 @@ async function deleteExercise(exercise) {
       .delete()
       .eq(
         "id",
-        exercise.id
+        id
       );
 
 
@@ -3444,7 +3448,125 @@ async function deleteExercise(exercise) {
 
   await loadExerciseLibrary();
 
-  await loadExercises();
+}
+
+
+/* =====================================
+   ELIMINA PAZIENTE
+===================================== */
+
+async function deletePatient(patient) {
+
+  const confirmed =
+    confirm(
+      "Vuoi davvero eliminare " +
+      patient.name +
+      "?\n\n" +
+      "Verranno eliminati anche gli esercizi assegnati e l'account del paziente."
+    );
+
+
+  if(!confirmed) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const sessionResult =
+      await db.auth.getSession();
+
+
+    if(
+      sessionResult.error ||
+      !sessionResult.data.session
+    ) {
+
+      alert(
+        "Sessione non valida. Effettua nuovamente il login."
+      );
+
+      return;
+
+    }
+
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/functions/v1/delete-patient",
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              sessionResult.data.session.access_token,
+
+            "apikey":
+              SUPABASE_KEY
+
+          },
+
+          body:
+            JSON.stringify({
+
+              patient_id:
+                patient.id
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok) {
+
+      alert(
+        data.error ||
+        "Errore durante l'eliminazione del paziente."
+      );
+
+      console.error(
+        data
+      );
+
+      return;
+
+    }
+
+
+    alert(
+      "Paziente eliminato correttamente."
+    );
+
+
+    await loadPatients();
+
+
+  } catch(error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Errore di connessione."
+    );
+
+  }
 
 }
 
@@ -3478,27 +3600,53 @@ document
 
 
 document
-  .getElementById(
-    "backFromLibraryButton"
-  )
+  .getElementById("backLibraryButton")
   .addEventListener(
     "click",
     startTherapist
   );
 
 
-document
-  .getElementById(
-    "backFromEditExerciseButton"
-  )
-  .addEventListener(
-    "click",
-    openExerciseLibrary
-  );
+/* =====================================
+   UTILITY
+===================================== */
+
+function showInlineMessage(
+  element,
+  text,
+  type
+) {
+
+  element.innerText =
+    text;
+
+  element.className =
+    "message " + type;
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+function escapeHtmlAttribute(value) {
+
+  return escapeHtml(value);
+
+}
 
 
 /* =====================================
-   CONTROLLO SESSIONE ALL'AVVIO
+   CONTROLLO SESSIONE
 ===================================== */
 
 db.auth
@@ -3530,4 +3678,3 @@ db.auth
 </body>
 
 </html>
-```

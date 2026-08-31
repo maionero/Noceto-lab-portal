@@ -1,11 +1,3 @@
-Ecco il codice completo aggiornato.
-
-### Modifiche apportate:
-
-1. **Risolto il PDF bianco**: Corretta la funzione `triggerPrint` rimuovendo `display: none` dal contenitore `#printSheet` durante la stampa e formattando il foglio A4 con margini puliti.
-2. **Aggiunta la Stampa PDF per la Corsa**: Inserito il pulsante **🖨️ Stampa / Salva PDF Corsa** sia nella scheda Fisioterapista che nel Portale Paziente per esportare la tabella salvata.
-
-```html
 <!DOCTYPE html>
 <html lang="it">
 
@@ -347,6 +339,7 @@ hr {
 
 <div class="container">
 
+<!-- LOGIN -->
 <section id="loginPage" class="login">
   <div class="card">
     <h2>Accedi</h2>
@@ -360,6 +353,7 @@ hr {
   </div>
 </section>
 
+<!-- IMPOSTAZIONE PASSWORD -->
 <section id="setPasswordPage" class="login hidden">
   <div class="card">
     <h2>🔐 Imposta la tua password</h2>
@@ -374,6 +368,7 @@ hr {
   </div>
 </section>
 
+<!-- DASHBOARD FISIOTERAPISTA -->
 <section id="therapistPage" class="hidden">
   <div class="card">
     <h2>👨‍⚕️ Dashboard</h2>
@@ -397,6 +392,7 @@ hr {
   </div>
 </section>
 
+<!-- SCHEDA PAZIENTE -->
 <section id="patientPage" class="hidden">
   <button id="backButton" class="secondary back">← Pazienti</button>
 
@@ -411,6 +407,7 @@ hr {
     <h2 id="patientTitle">Paziente</h2>
   </div>
 
+  <!-- PROGRAMMA ESERCIZI -->
   <div class="card tab-panel" id="therapistTabProgram">
     <div class="section-title">
       <h2>📋 Programma Esercizi</h2>
@@ -419,6 +416,7 @@ hr {
     <div id="patientExercises">Caricamento...</div>
   </div>
 
+  <!-- ASSEGNA ESERCIZIO -->
   <div class="card tab-panel" id="therapistTabProgramAssign">
     <h2>＋ Assegna esercizio</h2>
     <label>Esercizio</label>
@@ -440,6 +438,7 @@ hr {
     <div id="assignMessage" class="message hidden"></div>
   </div>
 
+  <!-- REPORT E DOCUMENTI -->
   <div class="card tab-panel" id="therapistTabDocuments">
     <div class="section-title">
       <h2>📄 Report e documenti</h2>
@@ -453,6 +452,7 @@ hr {
     <div id="patientDocuments">Caricamento...</div>
   </div>
 
+  <!-- NOTE E COMUNICAZIONI -->
   <div class="card tab-panel" id="therapistTabNotes">
     <div class="section-title">
       <h2>📝 Note e comunicazioni</h2>
@@ -468,6 +468,7 @@ hr {
     <div id="patientNotesList">Caricamento...</div>
   </div>
 
+  <!-- ALLENAMENTO CORSA -->
   <div class="card tab-panel" id="therapistTabRunning">
     <div class="section-title">
       <h2>🏃 Programma di Corsa Dettagliato</h2>
@@ -510,6 +511,7 @@ hr {
 
 </section>
 
+<!-- NUOVO PAZIENTE -->
 <section id="newPatientPage" class="hidden">
   <div class="card">
     <h2>👤 Nuovo paziente</h2>
@@ -524,6 +526,7 @@ hr {
   </div>
 </section>
 
+<!-- NUOVO ESERCIZIO -->
 <section id="newExercisePage" class="hidden">
   <div class="card">
     <h2>🏋️ Nuovo esercizio</h2>
@@ -540,6 +543,7 @@ hr {
   </div>
 </section>
 
+<!-- PORTALE PAZIENTE -->
 <section id="patientPortal" class="hidden">
 
   <div class="section-tabs" id="patientPortalTabs">
@@ -584,8 +588,10 @@ hr {
 
 </div>
 
+<!-- CONTENITORE STAMPA PDF GENERATO -->
 <div id="printSheet" class="print-sheet"></div>
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -1388,5 +1394,3 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 </body>
 </html>
-
-```

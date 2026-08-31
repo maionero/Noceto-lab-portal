@@ -4365,20 +4365,58 @@ const deleteRunningProgramButton = document.getElementById("deleteRunningProgram
 if(deleteRunningProgramButton) deleteRunningProgramButton.addEventListener("click", deleteRunningProgram);
 
 function generateRunningPlan() {
-  const weeks = Math.max(1, Math.min(52, parseInt(document.getElementById("runningWeeks").value || "4", 10)));
-  const sessions = Math.max(2, Math.min(5, parseInt(document.getElementById("runningSessionsPerWeek").value || "2", 10)));
+  const weeks = Math.max(
+    1,
+    Math.min(
+      52,
+      parseInt(
+        document.getElementById("runningWeeks").value || "4",
+        10
+      )
+    )
+  );
+
+  const sessions = Math.max(
+    2,
+    Math.min(
+      5,
+      parseInt(
+        document.getElementById("runningSessionsPerWeek").value || "2",
+        10
+      )
+    )
+  );
+
   generatedRunningRows = [];
-  for(let week=1; week<=weeks; week++) {
-    for(let day=1; day<=sessions; day++) {
-      generatedRunningRows.push({ week, day, type:"", title:"", distance:"", duration:"", pace:"", workout:"", notes:"" });
+
+  for(let week = 1; week <= weeks; week++) {
+    for(let day = 1; day <= sessions; day++) {
+      generatedRunningRows.push({
+        week,
+        day,
+        type: "",
+        title: "",
+        duration: "",
+        effort: "",
+        fast: "",
+        slow: "",
+        total: "",
+        workout: "",
+        notes: ""
+      });
     }
   }
+
   renderRunningPlanner();
-  if(saveRunningProgramButton) saveRunningProgramButton.classList.remove("hidden");
+
+  if(saveRunningProgramButton) {
+    saveRunningProgramButton.classList.remove("hidden");
+  }
 }
 
 function renderRunningPlanner() {
   const container = document.getElementById("runningPlanner");
+
   if(!container) return;
 
   if(!generatedRunningRows.length) {
@@ -4389,8 +4427,8 @@ function renderRunningPlanner() {
   container.innerHTML = "";
 
   let currentWeek = 0;
-  let table = null;
-  let tbody = null;
+  let table;
+  let tbody;
 
   generatedRunningRows.forEach((row) => {
 
@@ -4399,7 +4437,9 @@ function renderRunningPlanner() {
 
       const weekTitle = document.createElement("h3");
       weekTitle.innerText = "Settimana " + currentWeek;
-      weekTitle.style.marginTop = currentWeek === 1 ? "0" : "28px";
+      weekTitle.style.marginTop =
+        currentWeek === 1 ? "0" : "28px";
+
       container.appendChild(weekTitle);
 
       table = document.createElement("table");
@@ -4408,13 +4448,15 @@ function renderRunningPlanner() {
       table.innerHTML = `
         <thead>
           <tr>
-            <th>Giorno</th>
+            <th>Allenamento</th>
             <th>Tipo</th>
             <th>Titolo</th>
-            <th>Km</th>
-            <th>Durata</th>
-            <th>Ritmo</th>
-            <th>Allenamento</th>
+            <th>Tempo</th>
+            <th>Fatica 1-10</th>
+            <th>Corsa veloce</th>
+            <th>Corsa lenta</th>
+            <th>Totale seduta</th>
+            <th>Descrizione</th>
             <th>Note</th>
           </tr>
         </thead>
@@ -4428,15 +4470,17 @@ function renderRunningPlanner() {
     const tr = document.createElement("tr");
 
     const dayTd = document.createElement("td");
-    dayTd.innerText = row.day;
+    dayTd.innerText = "Giorno " + row.day;
     tr.appendChild(dayTd);
 
     const fields = [
       ["type", "select"],
       ["title", "input"],
-      ["distance", "input"],
       ["duration", "input"],
-      ["pace", "input"],
+      ["effort", "input"],
+      ["fast", "input"],
+      ["slow", "input"],
+      ["total", "input"],
       ["workout", "textarea"],
       ["notes", "textarea"]
     ];
@@ -4460,29 +4504,36 @@ function renderRunningPlanner() {
           "Test",
           "Altro"
         ].forEach(opt => {
-          const o = document.createElement("option");
-          o.value = opt;
-          o.textContent = opt || "Seleziona";
-          el.appendChild(o);
+          const option = document.createElement("option");
+          option.value = opt;
+          option.textContent = opt || "Seleziona";
+          el.appendChild(option);
         });
       } else {
         el = document.createElement(kind);
 
-        if(key === "distance") {
-          el.type = "number";
-          el.step = "0.1";
-          el.min = "0";
-          el.placeholder = "Km";
-        }
-
         if(key === "duration") {
-          el.type = "number";
-          el.min = "0";
-          el.placeholder = "Min";
+          el.placeholder = "es. 45'";
         }
 
-        if(key === "pace") {
-          el.placeholder = "es. 5:00/km";
+        if(key === "effort") {
+          el.type = "number";
+          el.min = "1";
+          el.max = "10";
+          el.step = "1";
+          el.placeholder = "1-10";
+        }
+
+        if(key === "fast") {
+          el.placeholder = "es. 30''";
+        }
+
+        if(key === "slow") {
+          el.placeholder = "es. 30''";
+        }
+
+        if(key === "total") {
+          el.placeholder = "es. 40'";
         }
       }
 
@@ -4499,7 +4550,6 @@ function renderRunningPlanner() {
     tbody.appendChild(tr);
   });
 }
-
 async function saveRunningProgram() {
   if(!currentPatient || !generatedRunningRows.length) return;
   const weeks=parseInt(document.getElementById("runningWeeks").value,10);
@@ -4508,7 +4558,18 @@ async function saveRunningProgram() {
   if(programResult.error) { showMessage("runningMessage", programResult.error.message,"error"); return; }
   const programId=programResult.data.id;
   const rows=generatedRunningRows.map(row=>({
-    program_id:programId, week_number:row.week, day_number:row.day, workout_type:row.type||null, title:row.title||`Allenamento ${row.day}`, distance_km:row.distance?Number(row.distance):null, duration_min:row.duration?Number(row.duration):null, pace:row.pace||null, workout:row.workout||null, notes:row.notes||null
+    program_id:programId,
+    week_number:row.week,
+    day_number:row.day,
+    workout_type:row.type||null,
+    title:row.title||`Allenamento ${row.day}`,
+    duration_min:row.duration ? Number(String(row.duration).replace(/[^0-9.]/g, "")) : null,
+    effort:row.effort ? Number(row.effort) : null,
+    fast_duration:row.fast||null,
+    slow_duration:row.slow||null,
+    total_duration:row.total||null,
+    workout:row.workout||null,
+    notes:row.notes||null
   }));
   const sessionResult=await db.from("running_sessions").insert(rows);
   if(sessionResult.error) { await db.from("running_programs").delete().eq("id",programId); showMessage("runningMessage",sessionResult.error.message,"error"); return; }
@@ -4520,7 +4581,7 @@ async function loadRunningPlans() {
   const container=document.getElementById("runningPlansList");
   if(!container || !currentPatient) return;
   container.innerHTML="Caricamento...";
-  const result=await db.from("running_programs").select(`id,weeks,sessions_per_week,created_at,running_sessions(id,week_number,day_number,workout_type,title,distance_km,duration_min,pace,workout,notes)`).eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1);
+  const result=await db.from("running_programs").select(`id,weeks,sessions_per_week,created_at,running_sessions(id,week_number,day_number,workout_type,title,duration_min,effort,fast_duration,slow_duration,total_duration,workout,notes)`).eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1);
   if(result.error){container.innerText=result.error.message;return;}
   if(!result.data?.length){container.innerText="Nessun programma di corsa presente.";return;}
   const program=result.data[0];
@@ -4532,10 +4593,10 @@ async function loadRunningPlans() {
     if(item.week_number!==currentWeek){
       currentWeek=item.week_number;
       const wh=document.createElement("h4"); wh.innerText=`Settimana ${currentWeek}`; wrap.appendChild(wh);
-      table=document.createElement("table"); table.className="running-table"; table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Note</th></tr></thead>`; tbody=document.createElement("tbody"); table.appendChild(tbody); wrap.appendChild(table);
+      table=document.createElement("table"); table.className="running-table"; table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Tempo</th><th>Fatica 1-10</th><th>Corsa veloce</th><th>Corsa lenta</th><th>Totale seduta</th><th>Descrizione</th><th>Note</th></tr></thead>`; tbody=document.createElement("tbody"); table.appendChild(tbody); wrap.appendChild(table);
     }
     const tr=document.createElement("tr");
-    ["day_number","workout_type","title","distance_km","duration_min","pace","notes"].forEach(key=>{const td=document.createElement("td"); td.innerText=key==="distance_km"&&item[key]!=null?item[key]+" km":key==="duration_min"&&item[key]!=null?item[key]+" min":item[key]||"—";tr.appendChild(td);});
+    ["day_number","workout_type","title","duration_min","effort","fast_duration","slow_duration","total_duration","workout","notes"].forEach(key=>{const td=document.createElement("td"); td.innerText=key==="duration_min"&&item[key]!=null?item[key]+" min":key==="effort"&&item[key]!=null?item[key]+"/10":item[key]||"—";tr.appendChild(td);});
     tbody.appendChild(tr);
   });
   container.innerHTML=""; container.appendChild(wrap);
@@ -4587,7 +4648,7 @@ async function loadPatientPortalRunning() {
   const container=document.getElementById("patientPortalRunning");
   if(!container || !currentPatient) return;
   container.innerHTML="Caricamento...";
-  const result=await db.from("running_programs").select(`id,weeks,sessions_per_week,created_at,running_sessions(id,week_number,day_number,workout_type,title,distance_km,duration_min,pace,workout,notes)`).eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1);
+  const result=await db.from("running_programs").select(`id,weeks,sessions_per_week,created_at,running_sessions(id,week_number,day_number,workout_type,title,duration_min,effort,fast_duration,slow_duration,total_duration,workout,notes)`).eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1);
   if(result.error){container.innerText=result.error.message;return;}
   if(!result.data?.length){container.innerText="Nessun programma di corsa presente.";return;}
   const program=result.data[0];
@@ -4595,7 +4656,7 @@ async function loadPatientPortalRunning() {
   const sessions=[...(program.running_sessions||[])].sort((a,b)=>a.week_number-b.week_number||a.day_number-b.day_number);
   let currentWeek=0, table, tbody;
   sessions.forEach(item=>{
-    if(item.week_number!==currentWeek){currentWeek=item.week_number; const h=document.createElement("h4");h.innerText=`Settimana ${currentWeek}`;container.appendChild(h);table=document.createElement("table");table.className="running-table";table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Note</th></tr></thead>`;tbody=document.createElement("tbody");table.appendChild(tbody);container.appendChild(table);}
+    if(item.week_number!==currentWeek){currentWeek=item.week_number; const h=document.createElement("h4");h.innerText=`Settimana ${currentWeek}`;container.appendChild(h);table=document.createElement("table");table.className="running-table";table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Tempo</th><th>Fatica 1-10</th><th>Corsa veloce</th><th>Corsa lenta</th><th>Totale seduta</th><th>Descrizione</th><th>Note</th></tr></thead>`;tbody=document.createElement("tbody");table.appendChild(tbody);container.appendChild(table);}
     const tr=document.createElement("tr");["day_number","workout_type","title","distance_km","duration_min","pace","notes"].forEach(key=>{const td=document.createElement("td");td.innerText=key==="distance_km"&&item[key]!=null?item[key]+" km":key==="duration_min"&&item[key]!=null?item[key]+" min":item[key]||"—";tr.appendChild(td);});tbody.appendChild(tr);
   });
 }
@@ -4610,64 +4671,122 @@ async function printExerciseSheet() {
   const result = await db
     .from("patient_exercises")
     .select(`
-      sets, reps, duration, rest, notes,
-      exercises (name, description)
+      *,
+      exercises (
+        name,
+        description,
+        video_url
+      )
     `)
     .eq("patient_id", currentPatient.id);
 
   if(result.error) {
-    alert(result.error.message);
+    alert("Errore nel caricamento degli esercizi: " + result.error.message);
     return;
   }
 
-  const sheet = document.getElementById("printSheet");
-  sheet.innerHTML = "";
+  const exercises = result.data || [];
 
-  const h1 = document.createElement("h1");
-  h1.innerText = "Noceto Lab";
-  sheet.appendChild(h1);
+  if(!exercises.length) {
+    alert("Non ci sono esercizi da stampare.");
+    return;
+  }
 
-  const h2 = document.createElement("h2");
-  h2.innerText = "Scheda esercizi — " + currentPatient.name;
-  sheet.appendChild(h2);
+  const oldTitle = document.title;
+  document.title = "Scheda esercizi - " + (currentPatient.name || "Paziente");
 
-  const date = document.createElement("p");
-  date.innerText = "Data: " + new Date().toLocaleDateString("it-IT");
-  sheet.appendChild(date);
+  const printWindow = window.open("", "_blank");
 
-  result.data.forEach((item, index) => {
-    const card = document.createElement("div");
-    card.style.marginBottom = "18px";
-    const title = document.createElement("h3");
-    title.innerText = (index + 1) + ". " + (item.exercises?.name || "Esercizio");
-    card.appendChild(title);
-    const info = [
-      item.sets != null ? item.sets + " serie" : null,
-      item.reps != null ? item.reps + " ripetizioni" : null,
-      item.duration != null ? item.duration + " secondi" : null,
-      item.rest != null ? "recupero " + item.rest + " sec" : null
-    ].filter(Boolean);
-    if(info.length) {
-      const p = document.createElement("p");
-      p.innerText = info.join(" · ");
-      card.appendChild(p);
-    }
-    if(item.exercises?.description) {
-      const p = document.createElement("p");
-      p.innerText = item.exercises.description;
-      card.appendChild(p);
-    }
-    if(item.notes) {
-      const p = document.createElement("p");
-      p.innerText = "Note: " + item.notes;
-      card.appendChild(p);
-    }
-    sheet.appendChild(card);
-  });
+  if(!printWindow) {
+    alert("Il browser ha bloccato la finestra di stampa. Consenti le finestre popup per questo sito.");
+    document.title = oldTitle;
+    return;
+  }
 
-  window.print();
+  const esc = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  const rows = exercises.map((item, index) => {
+    const ex = item.exercises || {};
+
+    return `
+      <section class="exercise">
+        <h2>${index + 1}. ${esc(ex.name || item.exercise_name || "Esercizio")}</h2>
+        ${ex.description || item.description
+          ? `<p>${esc(ex.description || item.description).replace(/\n/g, "<br>")}</p>`
+          : ""}
+        <div class="details">
+          ${item.sets ? `<div><strong>Serie:</strong> ${esc(item.sets)}</div>` : ""}
+          ${item.reps ? `<div><strong>Ripetizioni:</strong> ${esc(item.reps)}</div>` : ""}
+          ${item.duration ? `<div><strong>Durata:</strong> ${esc(item.duration)}</div>` : ""}
+          ${item.rest ? `<div><strong>Recupero:</strong> ${esc(item.rest)}</div>` : ""}
+          ${item.notes ? `<div><strong>Note:</strong> ${esc(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
+        </div>
+      </section>
+    `;
+  }).join("");
+
+  printWindow.document.write(`
+    <!doctype html>
+    <html lang="it">
+    <head>
+      <meta charset="utf-8">
+      <title>Scheda esercizi</title>
+      <style>
+        @page { margin: 18mm; }
+        body {
+          font-family: Arial, sans-serif;
+          color: #111;
+          max-width: 850px;
+          margin: 0 auto;
+          line-height: 1.45;
+        }
+        h1 { margin-bottom: 4px; }
+        .patient { margin-bottom: 28px; color: #555; }
+        .exercise {
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          padding: 16px;
+          margin-bottom: 16px;
+          break-inside: avoid;
+        }
+        .exercise h2 { margin-top: 0; }
+        .details {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+          margin-top: 12px;
+        }
+        @media print {
+          .exercise { border: 1px solid #ccc; }
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Scheda esercizi</h1>
+      <div class="patient">
+        <strong>Paziente:</strong> ${esc(currentPatient.name || "")}
+      </div>
+      ${rows}
+      <script>
+        window.onload = function() {
+          window.print();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  setTimeout(() => {
+    document.title = oldTitle;
+  }, 1000);
 }
-
 document.getElementById("printExerciseSheetButton")
   .addEventListener("click", printExerciseSheet);
 

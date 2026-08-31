@@ -64,6 +64,11 @@ select {
   font-size: 15px;
 }
 
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 6px;
+}
+
 label {
   display: block;
   margin-top: 14px;
@@ -94,8 +99,13 @@ button {
 }
 
 .edit {
-  background: #e8e8e8;
-  color: #111;
+  background: #1976d2;
+  color: white;
+}
+
+.successButton {
+  background: #2e7d32;
+  color: white;
 }
 
 .hidden {
@@ -126,6 +136,10 @@ button {
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
+}
+
+.exercise.completed {
+  opacity: .6;
 }
 
 .exercise h3 {
@@ -183,15 +197,10 @@ small {
   color: #666;
 }
 
-.edit-box {
-  background: #f5f5f5;
-  border-radius: 12px;
-  padding: 15px;
-  margin-top: 15px;
-}
-
-.edit-box label {
-  margin-top: 10px;
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
 @media(max-width:600px) {
@@ -204,8 +213,8 @@ small {
     padding: 16px;
   }
 
-  .exercise-actions button {
-    width: 100%;
+  .edit-grid {
+    grid-template-columns: 1fr;
   }
 
 }
@@ -377,10 +386,6 @@ small {
 
   </div>
 
-
-  <!-- =====================================
-       ASSEGNA ESERCIZIO
-  ===================================== -->
 
   <div class="card">
 
@@ -1075,7 +1080,6 @@ async function loadPatients() {
           "strong"
         );
 
-
       strong.innerText =
         "👤 " +
         patient.name;
@@ -1098,7 +1102,6 @@ async function loadPatients() {
           "small"
         );
 
-
       small.innerText =
         "Apri scheda →";
 
@@ -1107,16 +1110,13 @@ async function loadPatients() {
         strong
       );
 
-
       div.appendChild(
         br
       );
 
-
       div.appendChild(
         br2
       );
-
 
       div.appendChild(
         small
@@ -1285,6 +1285,7 @@ async function loadPatientExercises() {
         rest,
         notes,
         completed,
+        exercise_id,
         exercises (
           name,
           description,
@@ -1361,39 +1362,44 @@ async function loadPatientExercises() {
       ============================ */
 
       const info =
-        [];
+        document.createElement(
+          "p"
+        );
 
 
-      if(item.sets) {
+      let infoParts = [];
 
-        info.push(
+
+      if(item.sets !== null) {
+
+        infoParts.push(
           item.sets + " serie"
         );
 
       }
 
 
-      if(item.reps) {
+      if(item.reps !== null) {
 
-        info.push(
+        infoParts.push(
           item.reps + " rip"
         );
 
       }
 
 
-      if(item.duration) {
+      if(item.duration !== null) {
 
-        info.push(
+        infoParts.push(
           item.duration + " sec"
         );
 
       }
 
 
-      if(item.rest) {
+      if(item.rest !== null) {
 
-        info.push(
+        infoParts.push(
           "recupero " +
           item.rest +
           "\""
@@ -1402,20 +1408,14 @@ async function loadPatientExercises() {
       }
 
 
-      if(info.length > 0) {
-
-        const infoParagraph =
-          document.createElement(
-            "p"
-          );
+      info.innerText =
+        infoParts.join(" · ");
 
 
-        infoParagraph.innerText =
-          info.join(" · ");
-
+      if(infoParts.length > 0) {
 
         div.appendChild(
-          infoParagraph
+          info
         );
 
       }
@@ -1425,7 +1425,10 @@ async function loadPatientExercises() {
          DESCRIZIONE
       ============================ */
 
-      if(item.exercises.description) {
+      if(
+        item.exercises &&
+        item.exercises.description
+      ) {
 
         const description =
           document.createElement(
@@ -1448,7 +1451,10 @@ async function loadPatientExercises() {
          VIDEO
       ============================ */
 
-      if(item.exercises.video_url) {
+      if(
+        item.exercises &&
+        item.exercises.video_url
+      ) {
 
         const video =
           document.createElement(
@@ -1601,7 +1607,7 @@ async function loadPatientExercises() {
         "click",
         function() {
 
-          showEditExercise(
+          showEditForm(
             item,
             div
           );
@@ -1628,7 +1634,7 @@ async function loadPatientExercises() {
 
 
       removeButton.innerText =
-        "🗑 Rimuovi";
+        "🗑 Elimina";
 
 
       removeButton.addEventListener(
@@ -1683,37 +1689,49 @@ async function loadPatientExercises() {
    MODIFICA ESERCIZIO
 ===================================== */
 
-function showEditExercise(
+function showEditForm(
   item,
-  exerciseDiv
+  container
 ) {
 
-  const oldBox =
-    exerciseDiv.querySelector(
-      ".edit-box"
-    );
+  /* Evita di creare due form */
 
-
-  if(oldBox) {
-
-    oldBox.remove();
+  if(
+    container.querySelector(
+      ".edit-form"
+    )
+  ) {
 
     return;
 
   }
 
 
-  const editBox =
+  const form =
     document.createElement(
       "div"
     );
 
 
-  editBox.className =
-    "edit-box";
+  form.className =
+    "edit-form";
 
 
-  /* SERIE */
+  form.style.marginTop =
+    "15px";
+
+
+  form.style.paddingTop =
+    "15px";
+
+
+  form.style.borderTop =
+    "1px solid #ddd";
+
+
+  /* ============================
+     SERIE
+  ============================ */
 
   const setsLabel =
     document.createElement(
@@ -1748,12 +1766,14 @@ function showEditExercise(
   );
 
 
-  editBox.appendChild(
+  form.appendChild(
     setsLabel
   );
 
 
-  /* RIPETIZIONI */
+  /* ============================
+     RIPETIZIONI
+  ============================ */
 
   const repsLabel =
     document.createElement(
@@ -1788,12 +1808,14 @@ function showEditExercise(
   );
 
 
-  editBox.appendChild(
+  form.appendChild(
     repsLabel
   );
 
 
-  /* DURATA */
+  /* ============================
+     DURATA
+  ============================ */
 
   const durationLabel =
     document.createElement(
@@ -1828,12 +1850,14 @@ function showEditExercise(
   );
 
 
-  editBox.appendChild(
+  form.appendChild(
     durationLabel
   );
 
 
-  /* RECUPERO */
+  /* ============================
+     RECUPERO
+  ============================ */
 
   const restLabel =
     document.createElement(
@@ -1868,12 +1892,14 @@ function showEditExercise(
   );
 
 
-  editBox.appendChild(
+  form.appendChild(
     restLabel
   );
 
 
-  /* NOTE */
+  /* ============================
+     NOTE
+  ============================ */
 
   const notesLabel =
     document.createElement(
@@ -1900,22 +1926,23 @@ function showEditExercise(
   );
 
 
-  editBox.appendChild(
+  form.appendChild(
     notesLabel
   );
 
 
-  /* SPAZIO */
+  /* ============================
+     BOTTONI
+  ============================ */
 
-  const br =
+  const actions =
     document.createElement(
-      "br"
+      "div"
     );
 
 
-  editBox.appendChild(
-    br
-  );
+  actions.className =
+    "exercise-actions";
 
 
   /* SALVA */
@@ -1927,7 +1954,7 @@ function showEditExercise(
 
 
   saveButton.className =
-    "primary";
+    "successButton";
 
 
   saveButton.innerText =
@@ -1939,26 +1966,20 @@ function showEditExercise(
     async function() {
 
       await updatePatientExercise(
-
         item.id,
-
         setsInput.value,
-
         repsInput.value,
-
         durationInput.value,
-
         restInput.value,
-
-        notesInput.value
-
+        notesInput.value,
+        saveButton
       );
 
     }
   );
 
 
-  editBox.appendChild(
+  actions.appendChild(
     saveButton
   );
 
@@ -1979,76 +2000,98 @@ function showEditExercise(
     "Annulla";
 
 
-  cancelButton.style.marginLeft =
-    "8px";
-
-
   cancelButton.addEventListener(
     "click",
     function() {
 
-      editBox.remove();
+      form.remove();
 
     }
   );
 
 
-  editBox.appendChild(
+  actions.appendChild(
     cancelButton
   );
 
 
-  exerciseDiv.appendChild(
-    editBox
+  form.appendChild(
+    actions
+  );
+
+
+  container.appendChild(
+    form
   );
 
 }
 
 
 /* =====================================
-   SALVA MODIFICA
+   UPDATE REALE SU SUPABASE
 ===================================== */
 
 async function updatePatientExercise(
-
   id,
   sets,
   reps,
   duration,
   rest,
-  notes
-
+  notes,
+  saveButton
 ) {
+
+  saveButton.disabled =
+    true;
+
+
+  saveButton.innerText =
+    "Salvataggio...";
+
+
+  const updateData = {
+
+    sets:
+      sets !== ""
+        ? parseInt(sets, 10)
+        : null,
+
+    reps:
+      reps !== ""
+        ? parseInt(reps, 10)
+        : null,
+
+    duration:
+      duration !== ""
+        ? parseInt(duration, 10)
+        : null,
+
+    rest:
+      rest !== ""
+        ? parseInt(rest, 10)
+        : null,
+
+    notes:
+      notes.trim() !== ""
+        ? notes.trim()
+        : null
+
+  };
+
+
+  console.log(
+    "UPDATE patient_exercises:",
+    id,
+    updateData
+  );
+
 
   const result =
     await db
       .from("patient_exercises")
-      .update({
-
-        sets:
-          sets
-            ? parseInt(sets)
-            : null,
-
-        reps:
-          reps
-            ? parseInt(reps)
-            : null,
-
-        duration:
-          duration
-            ? parseInt(duration)
-            : null,
-
-        rest:
-          rest
-            ? parseInt(rest)
-            : null,
-
-        notes:
-          notes.trim() || null
-
-      })
+      .update(
+        updateData
+      )
       .eq(
         "id",
         id
@@ -2057,18 +2100,68 @@ async function updatePatientExercise(
 
   if(result.error) {
 
+    console.error(
+      "Errore UPDATE:",
+      result.error
+    );
+
+
     alert(
-      "Errore nel salvataggio: " +
+      "Errore durante il salvataggio:\n" +
       result.error.message
     );
 
+
+    saveButton.disabled =
+      false;
+
+
+    saveButton.innerText =
+      "💾 Salva modifiche";
+
+
+    return;
+
+  }
+
+
+  /*
+    IMPORTANTE:
+    rileggiamo il record da Supabase.
+    In questo modo vediamo subito
+    i dati realmente salvati nel database.
+  */
+
+  const verify =
+    await db
+      .from("patient_exercises")
+      .select("id, sets, reps, duration, rest, notes")
+      .eq(
+        "id",
+        id
+      )
+      .single();
+
+
+  if(verify.error) {
+
+    alert(
+      "Modifica inviata, ma non riesco a verificare il salvataggio."
+    );
+
     console.error(
-      result.error
+      verify.error
     );
 
     return;
 
   }
+
+
+  console.log(
+    "Dati salvati su Supabase:",
+    verify.data
+  );
 
 
   await loadPatientExercises();
@@ -2084,7 +2177,7 @@ async function deletePatientExercise(id) {
 
   const confirmed =
     confirm(
-      "Vuoi davvero rimuovere questo esercizio dal programma del paziente?"
+      "Vuoi davvero eliminare questo esercizio dal programma del paziente?"
     );
 
 
@@ -2108,7 +2201,7 @@ async function deletePatientExercise(id) {
   if(result.error) {
 
     alert(
-      "Errore nella rimozione: " +
+      "Errore nella rimozione:\n" +
       result.error.message
     );
 
@@ -2216,11 +2309,10 @@ async function loadPatientPortal() {
       );
 
 
-      const info =
-        [];
+      let info = [];
 
 
-      if(item.sets) {
+      if(item.sets !== null) {
 
         info.push(
           item.sets + " serie"
@@ -2229,7 +2321,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.reps) {
+      if(item.reps !== null) {
 
         info.push(
           item.reps + " ripetizioni"
@@ -2238,7 +2330,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.duration) {
+      if(item.duration !== null) {
 
         info.push(
           item.duration + " secondi"
@@ -2247,7 +2339,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.rest) {
+      if(item.rest !== null) {
 
         info.push(
           "recupero " +
@@ -2277,7 +2369,10 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.exercises.description) {
+      if(
+        item.exercises &&
+        item.exercises.description
+      ) {
 
         const description =
           document.createElement(
@@ -2296,7 +2391,10 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.exercises.video_url) {
+      if(
+        item.exercises &&
+        item.exercises.video_url
+      ) {
 
         const video =
           document.createElement(
@@ -2557,22 +2655,22 @@ async function assignExercise() {
 
         sets:
           setsValue
-            ? parseInt(setsValue)
+            ? parseInt(setsValue, 10)
             : null,
 
         reps:
           repsValue
-            ? parseInt(repsValue)
+            ? parseInt(repsValue, 10)
             : null,
 
         duration:
           durationValue
-            ? parseInt(durationValue)
+            ? parseInt(durationValue, 10)
             : null,
 
         rest:
           restValue
-            ? parseInt(restValue)
+            ? parseInt(restValue, 10)
             : null,
 
         notes:
@@ -2951,6 +3049,9 @@ document
       document.getElementById(
         "exerciseVideo"
       ).value = "";
+
+
+      await loadExercises();
 
 
       setTimeout(

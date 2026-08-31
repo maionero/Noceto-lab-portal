@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="it">
 
 <head>
@@ -6,8 +7,9 @@
 <meta charset="UTF-8">
 
 <meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
 >
 
 <title>Noceto Lab</title>
@@ -76,6 +78,11 @@ button {
   padding: 11px 15px;
   cursor: pointer;
   font-weight: bold;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
 }
 
 .primary {
@@ -191,26 +198,27 @@ small {
 
 </head>
 
-
 <body>
-
 
 <header>
 
   <h1>🏥 Noceto Lab</h1>
 
-  <button
-    id="logoutButton"
-    class="secondary hidden"
-  >
-    Esci
+<button
+id="logoutButton"
+class="secondary hidden"
+
+>
+
+```
+Esci
+```
+
   </button>
 
 </header>
 
-
 <div class="container">
-
 
 <!-- =====================================
      LOGIN
@@ -223,46 +231,47 @@ small {
 
   <div class="card">
 
-    <h2>Accedi</h2>
+```
+<h2>Accedi</h2>
 
-    <label>
-      Email
-    </label>
+<label>
+  Email
+</label>
 
-    <input
-      id="email"
-      type="email"
-      placeholder="La tua email"
-    >
+<input
+  id="email"
+  type="email"
+  placeholder="La tua email"
+>
 
-    <label>
-      Password
-    </label>
+<label>
+  Password
+</label>
 
-    <input
-      id="password"
-      type="password"
-      placeholder="Password"
-    >
+<input
+  id="password"
+  type="password"
+  placeholder="Password"
+>
 
-    <br><br>
+<br><br>
 
-    <button
-      id="loginButton"
-      class="primary"
-    >
-      Accedi
-    </button>
+<button
+  id="loginButton"
+  class="primary"
+>
+  Accedi
+</button>
 
-    <div
-      id="loginMessage"
-      class="message hidden"
-    ></div>
+<div
+  id="loginMessage"
+  class="message hidden"
+></div>
+```
 
   </div>
 
 </section>
-
 
 <!-- =====================================
      DASHBOARD FISIOTERAPISTA
@@ -275,48 +284,50 @@ small {
 
   <div class="card">
 
-    <h2>👨‍⚕️ Dashboard</h2>
+```
+<h2>👨‍⚕️ Dashboard</h2>
 
-    <p>
-      Gestisci pazienti e programmi di esercizio.
-    </p>
+<p>
+  Gestisci pazienti e programmi di esercizio.
+</p>
 
-    <div class="actions">
+<div class="actions">
 
-      <button
-        id="newPatientButton"
-        class="primary"
-      >
-        ＋ Nuovo paziente
-      </button>
+  <button
+    id="newPatientButton"
+    class="primary"
+  >
+    ＋ Nuovo paziente
+  </button>
 
-      <button
-        id="newExerciseButton"
-        class="secondary"
-      >
-        ＋ Nuovo esercizio
-      </button>
+  <button
+    id="newExerciseButton"
+    class="secondary"
+  >
+    ＋ Nuovo esercizio
+  </button>
 
-    </div>
+</div>
+```
 
   </div>
 
-
   <div class="card">
 
-    <h2>👥 Pazienti</h2>
+```
+<h2>👥 Pazienti</h2>
 
-    <div
-      id="patientsList"
-      class="grid"
-    >
-      Caricamento...
-    </div>
+<div
+  id="patientsList"
+  class="grid"
+>
+  Caricamento...
+</div>
+```
 
   </div>
 
 </section>
-
 
 <!-- =====================================
      SCHEDA PAZIENTE
@@ -327,126 +338,133 @@ small {
   class="hidden"
 >
 
-  <button
-    id="backButton"
-    class="secondary back"
-  >
-    ← Pazienti
+<button
+id="backButton"
+class="secondary back"
+
+>
+
+```
+← Pazienti
+```
+
   </button>
 
-
   <div class="card">
 
-    <h2 id="patientTitle">
-      Paziente
-    </h2>
+```
+<h2 id="patientTitle">
+  Paziente
+</h2>
+```
 
   </div>
 
-
   <div class="card">
 
-    <h2>📋 Programma</h2>
+```
+<h2>📋 Programma</h2>
 
-    <div id="patientExercises">
-      Caricamento...
-    </div>
+<div id="patientExercises">
+  Caricamento...
+</div>
+```
 
   </div>
 
-
   <div class="card">
 
-    <h2>＋ Assegna esercizio</h2>
+```
+<h2>＋ Assegna esercizio</h2>
 
-    <label>
-      Esercizio
-    </label>
+<label>
+  Esercizio
+</label>
 
-    <select id="exerciseSelect">
+<select id="exerciseSelect">
 
-      <option value="">
-        Seleziona esercizio
-      </option>
+  <option value="">
+    Seleziona esercizio
+  </option>
 
-    </select>
-
-
-    <label>
-      Serie
-    </label>
-
-    <input
-      id="sets"
-      type="number"
-      min="0"
-      placeholder="3"
-    >
+</select>
 
 
-    <label>
-      Ripetizioni
-    </label>
+<label>
+  Serie
+</label>
 
-    <input
-      id="reps"
-      type="number"
-      min="0"
-      placeholder="10"
-    >
-
-
-    <label>
-      Durata (secondi)
-    </label>
-
-    <input
-      id="duration"
-      type="number"
-      min="0"
-      placeholder="30"
-    >
+<input
+  id="sets"
+  type="number"
+  min="0"
+  placeholder="3"
+>
 
 
-    <label>
-      Recupero (secondi)
-    </label>
+<label>
+  Ripetizioni
+</label>
 
-    <input
-      id="rest"
-      type="number"
-      min="0"
-      placeholder="60"
-    >
+<input
+  id="reps"
+  type="number"
+  min="0"
+  placeholder="10"
+>
 
 
-    <label>
-      Note
-    </label>
+<label>
+  Durata (secondi)
+</label>
 
-    <textarea
-      id="notes"
-      placeholder="Indicazioni per il paziente..."
-    ></textarea>
+<input
+  id="duration"
+  type="number"
+  min="0"
+  placeholder="30"
+>
 
-    <br><br>
 
-    <button
-      id="assignButton"
-      class="primary"
-    >
-      Assegna esercizio
-    </button>
+<label>
+  Recupero (secondi)
+</label>
 
-    <div
-      id="assignMessage"
-      class="message hidden"
-    ></div>
+<input
+  id="rest"
+  type="number"
+  min="0"
+  placeholder="60"
+>
+
+
+<label>
+  Note
+</label>
+
+<textarea
+  id="notes"
+  placeholder="Indicazioni per il paziente..."
+></textarea>
+
+<br><br>
+
+<button
+  id="assignButton"
+  class="primary"
+>
+  Assegna esercizio
+</button>
+
+<div
+  id="assignMessage"
+  class="message hidden"
+></div>
+```
 
   </div>
 
 </section>
-
 
 <!-- =====================================
      NUOVO PAZIENTE
@@ -459,52 +477,53 @@ small {
 
   <div class="card">
 
-    <h2>👤 Nuovo paziente</h2>
+```
+<h2>👤 Nuovo paziente</h2>
 
-    <label>
-      Nome
-    </label>
+<label>
+  Nome
+</label>
 
-    <input
-      id="newPatientName"
-      placeholder="Nome paziente"
-    >
+<input
+  id="newPatientName"
+  placeholder="Nome paziente"
+>
 
-    <label>
-      Email account paziente
-    </label>
+<label>
+  Email account paziente
+</label>
 
-    <input
-      id="newPatientEmail"
-      type="email"
-      placeholder="email@esempio.it"
-    >
+<input
+  id="newPatientEmail"
+  type="email"
+  placeholder="email@esempio.it"
+>
 
-    <br><br>
+<br><br>
 
-    <button
-      id="savePatient"
-      class="primary"
-    >
-      Salva
-    </button>
+<button
+  id="savePatient"
+  class="primary"
+>
+  Crea paziente
+</button>
 
-    <button
-      id="cancelPatient"
-      class="secondary"
-    >
-      Annulla
-    </button>
+<button
+  id="cancelPatient"
+  class="secondary"
+>
+  Annulla
+</button>
 
-    <div
-      id="patientMessage"
-      class="message hidden"
-    ></div>
+<div
+  id="patientMessage"
+  class="message hidden"
+></div>
+```
 
   </div>
 
 </section>
-
 
 <!-- =====================================
      NUOVO ESERCIZIO
@@ -517,63 +536,64 @@ small {
 
   <div class="card">
 
-    <h2>🏋️ Nuovo esercizio</h2>
+```
+<h2>🏋️ Nuovo esercizio</h2>
 
-    <label>
-      Nome
-    </label>
+<label>
+  Nome
+</label>
 
-    <input
-      id="exerciseName"
-      placeholder="Es. Squat"
-    >
-
-
-    <label>
-      Descrizione
-    </label>
-
-    <textarea
-      id="exerciseDescription"
-      placeholder="Descrizione dell'esercizio..."
-    ></textarea>
+<input
+  id="exerciseName"
+  placeholder="Es. Squat"
+>
 
 
-    <label>
-      Video URL
-    </label>
+<label>
+  Descrizione
+</label>
 
-    <input
-      id="exerciseVideo"
-      type="url"
-      placeholder="https://..."
-    >
+<textarea
+  id="exerciseDescription"
+  placeholder="Descrizione dell'esercizio..."
+></textarea>
 
-    <br><br>
 
-    <button
-      id="saveExercise"
-      class="primary"
-    >
-      Salva esercizio
-    </button>
+<label>
+  Video URL
+</label>
 
-    <button
-      id="cancelExercise"
-      class="secondary"
-    >
-      Annulla
-    </button>
+<input
+  id="exerciseVideo"
+  type="url"
+  placeholder="https://..."
+>
 
-    <div
-      id="exerciseMessage"
-      class="message hidden"
-    ></div>
+<br><br>
+
+<button
+  id="saveExercise"
+  class="primary"
+>
+  Salva esercizio
+</button>
+
+<button
+  id="cancelExercise"
+  class="secondary"
+>
+  Annulla
+</button>
+
+<div
+  id="exerciseMessage"
+  class="message hidden"
+></div>
+```
 
   </div>
 
 </section>
-
 
 <!-- =====================================
      PORTALE PAZIENTE
@@ -586,32 +606,33 @@ small {
 
   <div class="card">
 
-    <h2 id="patientWelcome">
-      Ciao 👋
-    </h2>
+```
+<h2 id="patientWelcome">
+  Ciao 👋
+</h2>
 
-    <p>
-      Questo è il tuo programma di esercizi.
-    </p>
+<p>
+  Questo è il tuo programma di esercizi.
+</p>
+```
 
   </div>
 
-
   <div class="card">
 
-    <h2>🏋️ I tuoi esercizi</h2>
+```
+<h2>🏋️ I tuoi esercizi</h2>
 
-    <div id="patientPortalExercises">
-      Caricamento...
-    </div>
+<div id="patientPortalExercises">
+  Caricamento...
+</div>
+```
 
   </div>
 
 </section>
 
-
 </div>
-
 
 <!-- =====================================
      SUPABASE
@@ -620,7 +641,6 @@ small {
 <script
   src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
 ></script>
-
 
 <script>
 
@@ -824,10 +844,6 @@ async function startApp() {
     .classList
     .remove("hidden");
 
-
-  /* ---------------------------------
-     RECUPERA IL RUOLO DAL DATABASE
-  --------------------------------- */
 
   const profileResult =
     await db
@@ -1880,79 +1896,161 @@ document
   .getElementById("savePatient")
   .addEventListener(
     "click",
+    createPatient
+  );
+
+
+async function createPatient() {
+
+  const name =
+    document
+      .getElementById(
+        "newPatientName"
+      )
+      .value
+      .trim();
+
+
+  const email =
+    document
+      .getElementById(
+        "newPatientEmail"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  if(!name) {
+
+    showMessage(
+      "patientMessage",
+      "Inserisci il nome.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!email) {
+
+    showMessage(
+      "patientMessage",
+      "Inserisci l'email del paziente.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "savePatient"
+    );
+
+
+  button.disabled =
+    true;
+
+
+  button.innerText =
+    "Creazione...";
+
+
+  const result =
+    await db.functions.invoke(
+      "create-patient",
+      {
+        body: {
+
+          name:
+            name,
+
+          email:
+            email
+
+        }
+      }
+    );
+
+
+  button.disabled =
+    false;
+
+
+  button.innerText =
+    "Crea paziente";
+
+
+  if(result.error) {
+
+    console.error(
+      result.error
+    );
+
+    showMessage(
+      "patientMessage",
+      result.error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !result.data ||
+    !result.data.success
+  ) {
+
+    showMessage(
+      "patientMessage",
+      result.data?.error ||
+      "Errore nella creazione del paziente.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "patientMessage",
+    "Paziente creato correttamente.",
+    "success"
+  );
+
+
+  document
+    .getElementById(
+      "newPatientName"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "newPatientEmail"
+    )
+    .value = "";
+
+
+  setTimeout(
     async function() {
 
-      const name =
-        document
-          .getElementById(
-            "newPatientName"
-          )
-          .value
-          .trim();
+      await startTherapist();
 
-
-      if(!name) {
-
-        showMessage(
-          "patientMessage",
-          "Inserisci il nome.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      /*
-        In questa fase creiamo il profilo
-        senza collegarlo ancora all'account.
-      */
-
-      const result =
-        await db
-
-          .from("patients")
-
-          .insert({
-
-            name:
-              name
-
-          });
-
-
-      if(result.error) {
-
-        showMessage(
-          "patientMessage",
-          result.error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      showMessage(
-        "patientMessage",
-        "Paziente creato.",
-        "success"
-      );
-
-
-      setTimeout(
-        function() {
-
-          startTherapist();
-
-        },
-        700
-      );
-
-    }
+    },
+    1000
   );
+
+}
 
 
 /* =====================================

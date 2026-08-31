@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 
@@ -64,11 +65,6 @@ select {
   font-size: 15px;
 }
 
-input[type="checkbox"] {
-  width: auto;
-  margin-right: 6px;
-}
-
 label {
   display: block;
   margin-top: 14px;
@@ -99,13 +95,8 @@ button {
 }
 
 .edit {
-  background: #1976d2;
-  color: white;
-}
-
-.successButton {
-  background: #2e7d32;
-  color: white;
+  background: #e8e8e8;
+  color: #111;
 }
 
 .hidden {
@@ -182,6 +173,10 @@ button {
   flex-wrap: wrap;
 }
 
+.back {
+  margin-bottom: 10px;
+}
+
 .exercise-actions {
   display: flex;
   gap: 8px;
@@ -189,18 +184,21 @@ button {
   margin-top: 15px;
 }
 
-.back {
+.library-item {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.library-item h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.library-description {
+  color: #555;
   margin-bottom: 10px;
-}
-
-small {
-  color: #666;
-}
-
-.edit-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
 }
 
 @media(max-width:600px) {
@@ -211,10 +209,6 @@ small {
 
   .card {
     padding: 16px;
-  }
-
-  .edit-grid {
-    grid-template-columns: 1fr;
   }
 
 }
@@ -327,6 +321,13 @@ small {
         class="secondary"
       >
         ＋ Nuovo esercizio
+      </button>
+
+      <button
+        id="libraryButton"
+        class="secondary"
+      >
+        📚 Libreria esercizi
       </button>
 
     </div>
@@ -481,6 +482,101 @@ small {
 
 
 <!-- =====================================
+     MODIFICA ESERCIZIO ASSEGNATO
+===================================== -->
+
+<section
+  id="editAssignedExercisePage"
+  class="hidden"
+>
+
+  <button
+    id="backToPatientButton"
+    class="secondary back"
+  >
+    ← Torna al paziente
+  </button>
+
+
+  <div class="card">
+
+    <h2>✏️ Modifica esercizio assegnato</h2>
+
+    <p id="editAssignedExerciseName"></p>
+
+
+    <label>
+      Serie
+    </label>
+
+    <input
+      id="editSets"
+      type="number"
+      min="0"
+    >
+
+
+    <label>
+      Ripetizioni
+    </label>
+
+    <input
+      id="editReps"
+      type="number"
+      min="0"
+    >
+
+
+    <label>
+      Durata (secondi)
+    </label>
+
+    <input
+      id="editDuration"
+      type="number"
+      min="0"
+    >
+
+
+    <label>
+      Recupero (secondi)
+    </label>
+
+    <input
+      id="editRest"
+      type="number"
+      min="0"
+    >
+
+
+    <label>
+      Note
+    </label>
+
+    <textarea
+      id="editNotes"
+    ></textarea>
+
+    <br><br>
+
+    <button
+      id="saveAssignedExercise"
+      class="primary"
+    >
+      Salva modifiche
+    </button>
+
+    <div
+      id="editAssignedMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================
      NUOVO PAZIENTE
 ===================================== -->
 
@@ -608,6 +704,110 @@ small {
 
 
 <!-- =====================================
+     LIBRERIA ESERCIZI
+===================================== -->
+
+<section
+  id="exerciseLibraryPage"
+  class="hidden"
+>
+
+  <button
+    id="backFromLibraryButton"
+    class="secondary back"
+  >
+    ← Dashboard
+  </button>
+
+
+  <div class="card">
+
+    <h2>📚 Libreria esercizi</h2>
+
+    <p>
+      Qui puoi modificare o eliminare gli esercizi disponibili.
+    </p>
+
+    <div id="exerciseLibrary">
+      Caricamento...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================
+     MODIFICA ESERCIZIO
+===================================== -->
+
+<section
+  id="editExercisePage"
+  class="hidden"
+>
+
+  <button
+    id="backFromEditExerciseButton"
+    class="secondary back"
+  >
+    ← Libreria esercizi
+  </button>
+
+
+  <div class="card">
+
+    <h2>✏️ Modifica esercizio</h2>
+
+    <label>
+      Nome
+    </label>
+
+    <input
+      id="editExerciseName"
+      placeholder="Nome esercizio"
+    >
+
+
+    <label>
+      Descrizione
+    </label>
+
+    <textarea
+      id="editExerciseDescription"
+      placeholder="Descrizione dell'esercizio..."
+    ></textarea>
+
+
+    <label>
+      Video URL
+    </label>
+
+    <input
+      id="editExerciseVideo"
+      type="url"
+      placeholder="https://..."
+    >
+
+    <br><br>
+
+    <button
+      id="saveEditedExercise"
+      class="primary"
+    >
+      Salva modifiche
+    </button>
+
+    <div
+      id="editExerciseMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================
      PORTALE PAZIENTE
 ===================================== -->
 
@@ -684,6 +884,10 @@ let currentUser = null;
 
 let currentPatient = null;
 
+let currentAssignedExercise = null;
+
+let currentLibraryExercise = null;
+
 
 /* =====================================
    PAGINE
@@ -694,8 +898,11 @@ const pages = [
   "loginPage",
   "therapistPage",
   "patientPage",
+  "editAssignedExercisePage",
   "newPatientPage",
   "newExercisePage",
+  "exerciseLibraryPage",
+  "editExercisePage",
   "patientPortal"
 
 ];
@@ -993,6 +1200,8 @@ document
 
       currentUser = null;
       currentPatient = null;
+      currentAssignedExercise = null;
+      currentLibraryExercise = null;
 
       document
         .getElementById("logoutButton")
@@ -1285,7 +1494,6 @@ async function loadPatientExercises() {
         rest,
         notes,
         completed,
-        exercise_id,
         exercises (
           name,
           description,
@@ -1338,10 +1546,6 @@ async function loadPatientExercises() {
         "exercise";
 
 
-      /* ============================
-         TITOLO
-      ============================ */
-
       const title =
         document.createElement(
           "h3"
@@ -1357,49 +1561,39 @@ async function loadPatientExercises() {
       );
 
 
-      /* ============================
-         INFORMAZIONI
-      ============================ */
-
-      const info =
-        document.createElement(
-          "p"
-        );
+      let info = [];
 
 
-      let infoParts = [];
+      if(item.sets !== null && item.sets !== undefined) {
 
-
-      if(item.sets !== null) {
-
-        infoParts.push(
+        info.push(
           item.sets + " serie"
         );
 
       }
 
 
-      if(item.reps !== null) {
+      if(item.reps !== null && item.reps !== undefined) {
 
-        infoParts.push(
+        info.push(
           item.reps + " rip"
         );
 
       }
 
 
-      if(item.duration !== null) {
+      if(item.duration !== null && item.duration !== undefined) {
 
-        infoParts.push(
+        info.push(
           item.duration + " sec"
         );
 
       }
 
 
-      if(item.rest !== null) {
+      if(item.rest !== null && item.rest !== undefined) {
 
-        infoParts.push(
+        info.push(
           "recupero " +
           item.rest +
           "\""
@@ -1408,27 +1602,26 @@ async function loadPatientExercises() {
       }
 
 
-      info.innerText =
-        infoParts.join(" · ");
+      if(info.length > 0) {
+
+        const infoParagraph =
+          document.createElement(
+            "p"
+          );
 
 
-      if(infoParts.length > 0) {
+        infoParagraph.innerText =
+          info.join(" · ");
+
 
         div.appendChild(
-          info
+          infoParagraph
         );
 
       }
 
 
-      /* ============================
-         DESCRIZIONE
-      ============================ */
-
-      if(
-        item.exercises &&
-        item.exercises.description
-      ) {
+      if(item.exercises.description) {
 
         const description =
           document.createElement(
@@ -1447,14 +1640,7 @@ async function loadPatientExercises() {
       }
 
 
-      /* ============================
-         VIDEO
-      ============================ */
-
-      if(
-        item.exercises &&
-        item.exercises.video_url
-      ) {
+      if(item.exercises.video_url) {
 
         const video =
           document.createElement(
@@ -1500,10 +1686,6 @@ async function loadPatientExercises() {
       }
 
 
-      /* ============================
-         NOTE
-      ============================ */
-
       if(item.notes) {
 
         const notes =
@@ -1523,10 +1705,6 @@ async function loadPatientExercises() {
 
       }
 
-
-      /* ============================
-         COMPLETAMENTO
-      ============================ */
 
       const completionLabel =
         document.createElement(
@@ -1573,10 +1751,6 @@ async function loadPatientExercises() {
       );
 
 
-      /* ============================
-         AZIONI
-      ============================ */
-
       const actions =
         document.createElement(
           "div"
@@ -1586,8 +1760,6 @@ async function loadPatientExercises() {
       actions.className =
         "exercise-actions";
 
-
-      /* MODIFICA */
 
       const editButton =
         document.createElement(
@@ -1607,9 +1779,8 @@ async function loadPatientExercises() {
         "click",
         function() {
 
-          showEditForm(
-            item,
-            div
+          openEditAssignedExercise(
+            item
           );
 
         }
@@ -1620,8 +1791,6 @@ async function loadPatientExercises() {
         editButton
       );
 
-
-      /* ELIMINA */
 
       const removeButton =
         document.createElement(
@@ -1634,7 +1803,7 @@ async function loadPatientExercises() {
 
 
       removeButton.innerText =
-        "🗑 Elimina";
+        "🗑 Rimuovi";
 
 
       removeButton.addEventListener(
@@ -1686,498 +1855,240 @@ async function loadPatientExercises() {
 
 
 /* =====================================
-   MODIFICA ESERCIZIO
+   MODIFICA ESERCIZIO ASSEGNATO
 ===================================== */
 
-function showEditForm(
-  item,
-  container
-) {
+function openEditAssignedExercise(item) {
 
-  /* Evita di creare due form */
+  currentAssignedExercise =
+    item;
 
-  if(
-    container.querySelector(
-      ".edit-form"
+
+  document
+    .getElementById(
+      "editAssignedExerciseName"
     )
-  ) {
+    .innerText =
+      item.exercises.name;
 
-    return;
 
-  }
+  document
+    .getElementById(
+      "editSets"
+    )
+    .value =
+      item.sets ?? "";
 
 
-  const form =
-    document.createElement(
-      "div"
-    );
+  document
+    .getElementById(
+      "editReps"
+    )
+    .value =
+      item.reps ?? "";
 
 
-  form.className =
-    "edit-form";
+  document
+    .getElementById(
+      "editDuration"
+    )
+    .value =
+      item.duration ?? "";
 
 
-  form.style.marginTop =
-    "15px";
+  document
+    .getElementById(
+      "editRest"
+    )
+    .value =
+      item.rest ?? "";
 
 
-  form.style.paddingTop =
-    "15px";
+  document
+    .getElementById(
+      "editNotes"
+    )
+    .value =
+      item.notes ?? "";
 
 
-  form.style.borderTop =
-    "1px solid #ddd";
-
-
-  /* ============================
-     SERIE
-  ============================ */
-
-  const setsLabel =
-    document.createElement(
-      "label"
-    );
-
-
-  setsLabel.innerText =
-    "Serie";
-
-
-  const setsInput =
-    document.createElement(
-      "input"
-    );
-
-
-  setsInput.type =
-    "number";
-
-
-  setsInput.min =
-    "0";
-
-
-  setsInput.value =
-    item.sets ?? "";
-
-
-  setsLabel.appendChild(
-    setsInput
-  );
-
-
-  form.appendChild(
-    setsLabel
-  );
-
-
-  /* ============================
-     RIPETIZIONI
-  ============================ */
-
-  const repsLabel =
-    document.createElement(
-      "label"
-    );
-
-
-  repsLabel.innerText =
-    "Ripetizioni";
-
-
-  const repsInput =
-    document.createElement(
-      "input"
-    );
-
-
-  repsInput.type =
-    "number";
-
-
-  repsInput.min =
-    "0";
-
-
-  repsInput.value =
-    item.reps ?? "";
-
-
-  repsLabel.appendChild(
-    repsInput
-  );
-
-
-  form.appendChild(
-    repsLabel
-  );
-
-
-  /* ============================
-     DURATA
-  ============================ */
-
-  const durationLabel =
-    document.createElement(
-      "label"
-    );
-
-
-  durationLabel.innerText =
-    "Durata (secondi)";
-
-
-  const durationInput =
-    document.createElement(
-      "input"
-    );
-
-
-  durationInput.type =
-    "number";
-
-
-  durationInput.min =
-    "0";
-
-
-  durationInput.value =
-    item.duration ?? "";
-
-
-  durationLabel.appendChild(
-    durationInput
-  );
-
-
-  form.appendChild(
-    durationLabel
-  );
-
-
-  /* ============================
-     RECUPERO
-  ============================ */
-
-  const restLabel =
-    document.createElement(
-      "label"
-    );
-
-
-  restLabel.innerText =
-    "Recupero (secondi)";
-
-
-  const restInput =
-    document.createElement(
-      "input"
-    );
-
-
-  restInput.type =
-    "number";
-
-
-  restInput.min =
-    "0";
-
-
-  restInput.value =
-    item.rest ?? "";
-
-
-  restLabel.appendChild(
-    restInput
-  );
-
-
-  form.appendChild(
-    restLabel
-  );
-
-
-  /* ============================
-     NOTE
-  ============================ */
-
-  const notesLabel =
-    document.createElement(
-      "label"
-    );
-
-
-  notesLabel.innerText =
-    "Note";
-
-
-  const notesInput =
-    document.createElement(
-      "textarea"
-    );
-
-
-  notesInput.value =
-    item.notes ?? "";
-
-
-  notesLabel.appendChild(
-    notesInput
-  );
-
-
-  form.appendChild(
-    notesLabel
-  );
-
-
-  /* ============================
-     BOTTONI
-  ============================ */
-
-  const actions =
-    document.createElement(
-      "div"
-    );
-
-
-  actions.className =
-    "exercise-actions";
-
-
-  /* SALVA */
-
-  const saveButton =
-    document.createElement(
-      "button"
-    );
-
-
-  saveButton.className =
-    "successButton";
-
-
-  saveButton.innerText =
-    "💾 Salva modifiche";
-
-
-  saveButton.addEventListener(
-    "click",
-    async function() {
-
-      await updatePatientExercise(
-        item.id,
-        setsInput.value,
-        repsInput.value,
-        durationInput.value,
-        restInput.value,
-        notesInput.value,
-        saveButton
-      );
-
-    }
-  );
-
-
-  actions.appendChild(
-    saveButton
-  );
-
-
-  /* ANNULLA */
-
-  const cancelButton =
-    document.createElement(
-      "button"
-    );
-
-
-  cancelButton.className =
-    "secondary";
-
-
-  cancelButton.innerText =
-    "Annulla";
-
-
-  cancelButton.addEventListener(
-    "click",
-    function() {
-
-      form.remove();
-
-    }
-  );
-
-
-  actions.appendChild(
-    cancelButton
-  );
-
-
-  form.appendChild(
-    actions
-  );
-
-
-  container.appendChild(
-    form
+  showPage(
+    "editAssignedExercisePage"
   );
 
 }
 
 
 /* =====================================
-   UPDATE REALE SU SUPABASE
+   SALVA MODIFICA ESERCIZIO ASSEGNATO
 ===================================== */
 
-async function updatePatientExercise(
-  id,
-  sets,
-  reps,
-  duration,
-  rest,
-  notes,
-  saveButton
-) {
-
-  saveButton.disabled =
-    true;
-
-
-  saveButton.innerText =
-    "Salvataggio...";
-
-
-  const updateData = {
-
-    sets:
-      sets !== ""
-        ? parseInt(sets, 10)
-        : null,
-
-    reps:
-      reps !== ""
-        ? parseInt(reps, 10)
-        : null,
-
-    duration:
-      duration !== ""
-        ? parseInt(duration, 10)
-        : null,
-
-    rest:
-      rest !== ""
-        ? parseInt(rest, 10)
-        : null,
-
-    notes:
-      notes.trim() !== ""
-        ? notes.trim()
-        : null
-
-  };
-
-
-  console.log(
-    "UPDATE patient_exercises:",
-    id,
-    updateData
+document
+  .getElementById(
+    "saveAssignedExercise"
+  )
+  .addEventListener(
+    "click",
+    saveAssignedExercise
   );
+
+
+async function saveAssignedExercise() {
+
+  if(!currentAssignedExercise) {
+
+    return;
+
+  }
+
+
+  const setsValue =
+    document
+      .getElementById(
+        "editSets"
+      )
+      .value;
+
+
+  const repsValue =
+    document
+      .getElementById(
+        "editReps"
+      )
+      .value;
+
+
+  const durationValue =
+    document
+      .getElementById(
+        "editDuration"
+      )
+      .value;
+
+
+  const restValue =
+    document
+      .getElementById(
+        "editRest"
+      )
+      .value;
+
+
+  const notesValue =
+    document
+      .getElementById(
+        "editNotes"
+      )
+      .value
+      .trim();
 
 
   const result =
     await db
       .from("patient_exercises")
-      .update(
-        updateData
-      )
+      .update({
+
+        sets:
+          setsValue === ""
+            ? null
+            : parseInt(setsValue),
+
+        reps:
+          repsValue === ""
+            ? null
+            : parseInt(repsValue),
+
+        duration:
+          durationValue === ""
+            ? null
+            : parseInt(durationValue),
+
+        rest:
+          restValue === ""
+            ? null
+            : parseInt(restValue),
+
+        notes:
+          notesValue || null
+
+      })
       .eq(
         "id",
-        id
+        currentAssignedExercise.id
       );
 
 
   if(result.error) {
 
+    showMessage(
+      "editAssignedMessage",
+      "Errore nel salvataggio: " +
+      result.error.message,
+      "error"
+    );
+
     console.error(
-      "Errore UPDATE:",
       result.error
     );
 
-
-    alert(
-      "Errore durante il salvataggio:\n" +
-      result.error.message
-    );
-
-
-    saveButton.disabled =
-      false;
-
-
-    saveButton.innerText =
-      "💾 Salva modifiche";
-
-
     return;
 
   }
 
 
-  /*
-    IMPORTANTE:
-    rileggiamo il record da Supabase.
-    In questo modo vediamo subito
-    i dati realmente salvati nel database.
-  */
-
-  const verify =
-    await db
-      .from("patient_exercises")
-      .select("id, sets, reps, duration, rest, notes")
-      .eq(
-        "id",
-        id
-      )
-      .single();
-
-
-  if(verify.error) {
-
-    alert(
-      "Modifica inviata, ma non riesco a verificare il salvataggio."
-    );
-
-    console.error(
-      verify.error
-    );
-
-    return;
-
-  }
-
-
-  console.log(
-    "Dati salvati su Supabase:",
-    verify.data
+  showMessage(
+    "editAssignedMessage",
+    "Modifiche salvate correttamente.",
+    "success"
   );
 
 
   await loadPatientExercises();
 
+
+  setTimeout(
+    function() {
+
+      showPage(
+        "patientPage"
+      );
+
+    },
+    500
+  );
+
 }
 
 
 /* =====================================
-   RIMUOVI ESERCIZIO
+   TORNA AL PAZIENTE
+===================================== */
+
+document
+  .getElementById(
+    "backToPatientButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      showPage(
+        "patientPage"
+      );
+
+    }
+  );
+
+
+/* =====================================
+   RIMUOVI ESERCIZIO ASSEGNATO
 ===================================== */
 
 async function deletePatientExercise(id) {
 
   const confirmed =
     confirm(
-      "Vuoi davvero eliminare questo esercizio dal programma del paziente?"
+      "Vuoi davvero rimuovere questo esercizio dal programma del paziente?"
     );
 
 
@@ -2201,7 +2112,7 @@ async function deletePatientExercise(id) {
   if(result.error) {
 
     alert(
-      "Errore nella rimozione:\n" +
+      "Errore nella rimozione: " +
       result.error.message
     );
 
@@ -2312,7 +2223,7 @@ async function loadPatientPortal() {
       let info = [];
 
 
-      if(item.sets !== null) {
+      if(item.sets !== null && item.sets !== undefined) {
 
         info.push(
           item.sets + " serie"
@@ -2321,7 +2232,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.reps !== null) {
+      if(item.reps !== null && item.reps !== undefined) {
 
         info.push(
           item.reps + " ripetizioni"
@@ -2330,7 +2241,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.duration !== null) {
+      if(item.duration !== null && item.duration !== undefined) {
 
         info.push(
           item.duration + " secondi"
@@ -2339,7 +2250,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.rest !== null) {
+      if(item.rest !== null && item.rest !== undefined) {
 
         info.push(
           "recupero " +
@@ -2369,10 +2280,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(
-        item.exercises &&
-        item.exercises.description
-      ) {
+      if(item.exercises.description) {
 
         const description =
           document.createElement(
@@ -2391,10 +2299,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(
-        item.exercises &&
-        item.exercises.video_url
-      ) {
+      if(item.exercises.video_url) {
 
         const video =
           document.createElement(
@@ -2549,10 +2454,7 @@ async function updateCompletion(event) {
     await db
       .from("patient_exercises")
       .update({
-
-        completed:
-          completed
-
+        completed: completed
       })
       .eq(
         "id",
@@ -2655,22 +2557,22 @@ async function assignExercise() {
 
         sets:
           setsValue
-            ? parseInt(setsValue, 10)
+            ? parseInt(setsValue)
             : null,
 
         reps:
           repsValue
-            ? parseInt(repsValue, 10)
+            ? parseInt(repsValue)
             : null,
 
         duration:
           durationValue
-            ? parseInt(durationValue, 10)
+            ? parseInt(durationValue)
             : null,
 
         rest:
           restValue
-            ? parseInt(restValue, 10)
+            ? parseInt(restValue)
             : null,
 
         notes:
@@ -2857,11 +2759,9 @@ document
               body:
                 JSON.stringify({
 
-                  name:
-                    name,
+                  name: name,
 
-                  email:
-                    email
+                  email: email
 
                 })
 
@@ -3068,6 +2968,488 @@ document
 
 
 /* =====================================
+   LIBRERIA ESERCIZI
+===================================== */
+
+document
+  .getElementById(
+    "libraryButton"
+  )
+  .addEventListener(
+    "click",
+    openExerciseLibrary
+  );
+
+
+async function openExerciseLibrary() {
+
+  showPage(
+    "exerciseLibraryPage"
+  );
+
+
+  await loadExerciseLibrary();
+
+}
+
+
+async function loadExerciseLibrary() {
+
+  const container =
+    document.getElementById(
+      "exerciseLibrary"
+    );
+
+
+  container.innerHTML =
+    "Caricamento...";
+
+
+  const result =
+    await db
+      .from("exercises")
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending: true
+        }
+      );
+
+
+  if(result.error) {
+
+    container.innerText =
+      "Errore: " +
+      result.error.message;
+
+    console.error(
+      result.error
+    );
+
+    return;
+
+  }
+
+
+  if(!result.data || result.data.length === 0) {
+
+    container.innerText =
+      "Nessun esercizio presente.";
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  result.data.forEach(
+    function(exercise) {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "library-item";
+
+
+      const title =
+        document.createElement(
+          "h3"
+        );
+
+
+      title.innerText =
+        "🏋️ " +
+        exercise.name;
+
+
+      item.appendChild(
+        title
+      );
+
+
+      if(exercise.description) {
+
+        const description =
+          document.createElement(
+            "div"
+          );
+
+
+        description.className =
+          "library-description";
+
+
+        description.innerText =
+          exercise.description;
+
+
+        item.appendChild(
+          description
+        );
+
+      }
+
+
+      if(exercise.video_url) {
+
+        const video =
+          document.createElement(
+            "div"
+          );
+
+
+        video.className =
+          "video";
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href =
+          exercise.video_url;
+
+
+        link.target =
+          "_blank";
+
+
+        link.rel =
+          "noopener";
+
+
+        link.innerText =
+          "🎥 Guarda video";
+
+
+        video.appendChild(
+          link
+        );
+
+
+        item.appendChild(
+          video
+        );
+
+      }
+
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+
+      actions.className =
+        "exercise-actions";
+
+
+      const editButton =
+        document.createElement(
+          "button"
+        );
+
+
+      editButton.className =
+        "edit";
+
+
+      editButton.innerText =
+        "✏️ Modifica";
+
+
+      editButton.addEventListener(
+        "click",
+        function() {
+
+          openEditExercise(
+            exercise
+          );
+
+        }
+      );
+
+
+      actions.appendChild(
+        editButton
+      );
+
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+
+      deleteButton.className =
+        "danger";
+
+
+      deleteButton.innerText =
+        "🗑 Elimina";
+
+
+      deleteButton.addEventListener(
+        "click",
+        function() {
+
+          deleteExercise(
+            exercise
+          );
+
+        }
+      );
+
+
+      actions.appendChild(
+        deleteButton
+      );
+
+
+      item.appendChild(
+        actions
+      );
+
+
+      container.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================
+   APRI MODIFICA ESERCIZIO
+===================================== */
+
+function openEditExercise(exercise) {
+
+  currentLibraryExercise =
+    exercise;
+
+
+  document
+    .getElementById(
+      "editExerciseName"
+    )
+    .value =
+      exercise.name || "";
+
+
+  document
+    .getElementById(
+      "editExerciseDescription"
+    )
+    .value =
+      exercise.description || "";
+
+
+  document
+    .getElementById(
+      "editExerciseVideo"
+    )
+    .value =
+      exercise.video_url || "";
+
+
+  showPage(
+    "editExercisePage"
+  );
+
+}
+
+
+/* =====================================
+   SALVA MODIFICA ESERCIZIO
+===================================== */
+
+document
+  .getElementById(
+    "saveEditedExercise"
+  )
+  .addEventListener(
+    "click",
+    saveEditedExercise
+  );
+
+
+async function saveEditedExercise() {
+
+  if(!currentLibraryExercise) {
+
+    return;
+
+  }
+
+
+  const name =
+    document
+      .getElementById(
+        "editExerciseName"
+      )
+      .value
+      .trim();
+
+
+  const description =
+    document
+      .getElementById(
+        "editExerciseDescription"
+      )
+      .value
+      .trim();
+
+
+  const video =
+    document
+      .getElementById(
+        "editExerciseVideo"
+      )
+      .value
+      .trim();
+
+
+  if(!name) {
+
+    showMessage(
+      "editExerciseMessage",
+      "Inserisci il nome dell'esercizio.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const result =
+    await db
+      .from("exercises")
+      .update({
+
+        name:
+          name,
+
+        description:
+          description || null,
+
+        video_url:
+          video || null
+
+      })
+      .eq(
+        "id",
+        currentLibraryExercise.id
+      );
+
+
+  if(result.error) {
+
+    showMessage(
+      "editExerciseMessage",
+      "Errore nel salvataggio: " +
+      result.error.message,
+      "error"
+    );
+
+    console.error(
+      result.error
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "editExerciseMessage",
+    "Esercizio modificato correttamente.",
+    "success"
+  );
+
+
+  await loadExercises();
+
+
+  setTimeout(
+    function() {
+
+      openExerciseLibrary();
+
+    },
+    500
+  );
+
+}
+
+
+/* =====================================
+   ELIMINA ESERCIZIO DALLA LIBRERIA
+===================================== */
+
+async function deleteExercise(exercise) {
+
+  const confirmed =
+    confirm(
+      "Vuoi davvero eliminare \"" +
+      exercise.name +
+      "\" dalla libreria?"
+    );
+
+
+  if(!confirmed) {
+
+    return;
+
+  }
+
+
+  const result =
+    await db
+      .from("exercises")
+      .delete()
+      .eq(
+        "id",
+        exercise.id
+      );
+
+
+  if(result.error) {
+
+    alert(
+      "Errore nell'eliminazione: " +
+      result.error.message
+    );
+
+    console.error(
+      result.error
+    );
+
+    return;
+
+  }
+
+
+  await loadExerciseLibrary();
+
+  await loadExercises();
+
+}
+
+
+/* =====================================
    NAVIGAZIONE
 ===================================== */
 
@@ -3092,6 +3474,26 @@ document
   .addEventListener(
     "click",
     startTherapist
+  );
+
+
+document
+  .getElementById(
+    "backFromLibraryButton"
+  )
+  .addEventListener(
+    "click",
+    startTherapist
+  );
+
+
+document
+  .getElementById(
+    "backFromEditExerciseButton"
+  )
+  .addEventListener(
+    "click",
+    openExerciseLibrary
   );
 
 
@@ -3128,3 +3530,4 @@ db.auth
 </body>
 
 </html>
+```

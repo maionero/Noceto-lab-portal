@@ -236,6 +236,70 @@ hr {
   margin-bottom: 10px;
 }
 
+.section-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f4f4f5;
+  padding: 8px 0;
+}
+
+.section-tab {
+  background: white;
+  border: 1px solid #ddd;
+  color: #111;
+}
+
+.section-tab.active {
+  background: #111;
+  color: white;
+}
+
+.tab-panel.hidden-panel {
+  display: none !important;
+}
+
+.running-planner {
+  overflow-x: auto;
+}
+
+.planner-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.planner-table th,
+.planner-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: top;
+}
+
+.planner-table th {
+  background: #f4f4f5;
+  text-align: left;
+}
+
+.planner-table input,
+.planner-table textarea,
+.planner-table select {
+  margin-top: 0;
+  min-width: 90px;
+}
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  .print-only { display: block; }
+}
+
 @media(max-width:600px) {
 
   .container {
@@ -464,6 +528,12 @@ hr {
     ← Pazienti
   </button>
 
+  <div class="section-tabs" id="therapistPatientTabs">
+    <button class="section-tab active" data-target="therapistTabProgram">📋 Programma</button>
+    <button class="section-tab" data-target="therapistTabDocuments">📄 Documenti</button>
+    <button class="section-tab" data-target="therapistTabNotes">📝 Note</button>
+    <button class="section-tab" data-target="therapistTabRunning">🏃 Corsa</button>
+  </div>
 
   <div class="card">
 
@@ -476,9 +546,12 @@ hr {
 
   <!-- PROGRAMMA -->
 
-  <div class="card">
+  <div class="card tab-panel" id="therapistTabProgram">
 
-    <h2>📋 Programma</h2>
+    <div class="section-title">
+      <h2>📋 Programma</h2>
+      <button id="printExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
+    </div>
 
     <div id="patientExercises">
       Caricamento...
@@ -489,7 +562,7 @@ hr {
 
   <!-- ASSEGNA ESERCIZIO -->
 
-  <div class="card">
+  <div class="card tab-panel" id="therapistTabProgramAssign">
 
     <h2>＋ Assegna esercizio</h2>
 
@@ -570,7 +643,7 @@ hr {
 
   <!-- REPORT E DOCUMENTI -->
 
-  <div class="card">
+  <div class="card tab-panel" id="therapistTabDocuments">
 
     <div class="section-title">
 
@@ -613,7 +686,7 @@ hr {
   </div>
 
   <!-- NOTE E COMUNICAZIONI -->
-  <div class="card">
+  <div class="card tab-panel" id="therapistTabNotes">
     <div class="section-title">
       <h2>📝 Note e comunicazioni</h2>
     </div>
@@ -633,38 +706,41 @@ hr {
   </div>
 
   <!-- ALLENAMENTO CORSA -->
-  <div class="card">
+  <div class="card tab-panel" id="therapistTabRunning">
     <div class="section-title">
-      <h2>🏃 Allenamenti di corsa</h2>
-      <button id="printExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
+      <h2>🏃 Programma di corsa</h2>
     </div>
 
-    <label>Data</label>
-    <input id="runningDate" type="date">
+    <p>Costruisci una programmazione settimanale personalizzata. Di default puoi scegliere da 2 a 5 allenamenti a settimana e il numero di settimane.</p>
 
-    <label>Titolo</label>
-    <input id="runningTitle" placeholder="Es. Ripetute 30" / 30"">
+    <div class="grid">
+      <div>
+        <label>Numero di settimane</label>
+        <input id="runningWeeks" type="number" min="1" max="52" value="4">
+      </div>
+      <div>
+        <label>Allenamenti a settimana</label>
+        <select id="runningSessionsPerWeek">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+    </div>
 
-    <label>Distanza (km)</label>
-    <input id="runningDistance" type="number" step="0.1" min="0" placeholder="8">
+    <br>
+    <div class="actions">
+      <button id="generateRunningPlanButton" class="primary">＋ Genera tabella</button>
+      <button id="saveRunningProgramButton" class="primary hidden">💾 Salva programma</button>
+      <button id="deleteRunningProgramButton" class="danger">🗑️ Elimina programma attuale</button>
+    </div>
 
-    <label>Durata (min)</label>
-    <input id="runningDuration" type="number" min="0" placeholder="45">
-
-    <label>Ritmo</label>
-    <input id="runningPace" placeholder="Es. 5:00/km">
-
-    <label>Allenamento</label>
-    <textarea id="runningWorkout" placeholder="Es. 10' riscaldamento + 8 x (1' veloce / 1' lento) + 10' defaticamento"></textarea>
-
-    <label>Note</label>
-    <textarea id="runningNotes" placeholder="Indicazioni, recuperi, sensazioni..."></textarea>
-
-    <br><br>
-    <button id="saveRunningButton" class="primary">＋ Aggiungi allenamento</button>
     <div id="runningMessage" class="message hidden"></div>
-
     <hr>
+    <div id="runningPlanner" class="running-planner"></div>
+    <hr>
+    <h3>Programma salvato</h3>
     <div id="runningPlansList">Caricamento...</div>
   </div>
 
@@ -794,6 +870,13 @@ hr {
   class="hidden"
 >
 
+  <div class="section-tabs" id="patientPortalTabs">
+    <button class="section-tab active" data-target="portalExercises">🏋️ Esercizi</button>
+    <button class="section-tab" data-target="portalDocuments">📄 Report</button>
+    <button class="section-tab" data-target="portalNotes">📝 Note</button>
+    <button class="section-tab" data-target="portalRunning">🏃 Corsa</button>
+  </div>
+
   <div class="card">
 
     <h2 id="patientWelcome">
@@ -807,9 +890,9 @@ hr {
   </div>
 
 
-  <div class="card">
+  <div class="card tab-panel" id="portalExercises">
 
-    <h2>🏋️ I tuoi esercizi</h2>
+    <div class="section-title"><h2>🏋️ I tuoi esercizi</h2><button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button></div>
 
     <div id="patientPortalExercises">
       Caricamento...
@@ -818,7 +901,7 @@ hr {
   </div>
 
 
-  <div class="card">
+  <div class="card tab-panel" id="portalDocuments">
 
     <h2>📄 I tuoi report</h2>
 
@@ -828,15 +911,14 @@ hr {
 
   </div>
 
-  <div class="card">
+  <div class="card tab-panel" id="portalNotes">
     <h2>📝 Note e comunicazioni</h2>
     <div id="patientPortalNotes">Caricamento...</div>
   </div>
 
-  <div class="card">
+  <div class="card tab-panel" id="portalRunning">
     <div class="section-title">
       <h2>🏃 I tuoi allenamenti di corsa</h2>
-      <button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa / Salva PDF</button>
     </div>
     <div id="patientPortalRunning">Caricamento...</div>
   </div>
@@ -846,6 +928,7 @@ hr {
 
 </div>
 
+<div id="printSheet" class="print-sheet"></div>
 
 <!-- =====================================
      SUPABASE
@@ -858,6 +941,29 @@ hr {
 
 <script>
 
+function setupSectionTabs(containerId) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const buttons = container.querySelectorAll(".section-tab");
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      button.classList.add("active");
+      const targetId = button.dataset.target;
+      const section = document.getElementById(targetId);
+      if(!section) return;
+      const root = container.closest("section");
+      root.querySelectorAll(".tab-panel").forEach(panel => panel.classList.add("hidden-panel"));
+      section.classList.remove("hidden-panel");
+      if(containerId === "therapistPatientTabs") {
+        const assignPanel = document.getElementById("therapistTabProgramAssign");
+        if(assignPanel) assignPanel.classList.toggle("hidden-panel", targetId !== "therapistTabProgram");
+      }
+    });
+  });
+  const first = buttons[0];
+  if(first) first.click();
+}
 
 /* =====================================
    CONFIGURAZIONE
@@ -907,6 +1013,9 @@ const pages = [
 
 ];
 
+
+setupSectionTabs("therapistPatientTabs");
+setupSectionTabs("patientPortalTabs");
 
 function showPage(pageId) {
 
@@ -4241,114 +4350,118 @@ async function loadPatientNotes() {
 }
 
 /* =====================================
-   ALLENAMENTI CORSA
+   PROGRAMMA CORSA SETTIMANALE
 ===================================== */
 
-document
-  .getElementById("saveRunningButton")
-  .addEventListener("click", saveRunningPlan);
+let generatedRunningRows = [];
 
-async function saveRunningPlan() {
-  if(!currentPatient) return;
+const generateRunningButton = document.getElementById("generateRunningPlanButton");
+if(generateRunningButton) generateRunningButton.addEventListener("click", generateRunningPlan);
 
-  const date = document.getElementById("runningDate").value || null;
-  const title = document.getElementById("runningTitle").value.trim();
-  const distanceValue = document.getElementById("runningDistance").value;
-  const durationValue = document.getElementById("runningDuration").value;
-  const pace = document.getElementById("runningPace").value.trim();
-  const workout = document.getElementById("runningWorkout").value.trim();
-  const notes = document.getElementById("runningNotes").value.trim();
+const saveRunningProgramButton = document.getElementById("saveRunningProgramButton");
+if(saveRunningProgramButton) saveRunningProgramButton.addEventListener("click", saveRunningProgram);
 
-  if(!title && !workout) {
-    showMessage("runningMessage", "Inserisci almeno il titolo o l'allenamento.", "error");
-    return;
+const deleteRunningProgramButton = document.getElementById("deleteRunningProgramButton");
+if(deleteRunningProgramButton) deleteRunningProgramButton.addEventListener("click", deleteRunningProgram);
+
+function generateRunningPlan() {
+  const weeks = Math.max(1, Math.min(52, parseInt(document.getElementById("runningWeeks").value || "4", 10)));
+  const sessions = Math.max(2, Math.min(5, parseInt(document.getElementById("runningSessionsPerWeek").value || "2", 10)));
+  generatedRunningRows = [];
+  for(let week=1; week<=weeks; week++) {
+    for(let day=1; day<=sessions; day++) {
+      generatedRunningRows.push({ week, day, type:"", title:"", distance:"", duration:"", pace:"", workout:"", notes:"" });
+    }
   }
+  renderRunningPlanner();
+  if(saveRunningProgramButton) saveRunningProgramButton.classList.remove("hidden");
+}
 
-  const result = await db
-    .from("running_plans")
-    .insert({
-      patient_id: currentPatient.id,
-      date,
-      title: title || "Allenamento corsa",
-      distance_km: distanceValue ? Number(distanceValue) : null,
-      duration_min: durationValue ? Number(durationValue) : null,
-      pace: pace || null,
-      workout: workout || null,
-      notes: notes || null
+function renderRunningPlanner() {
+  const container = document.getElementById("runningPlanner");
+  if(!container) return;
+  if(!generatedRunningRows.length) { container.innerHTML = "Genera una tabella per iniziare."; return; }
+  const table = document.createElement("table");
+  table.className = "planner-table";
+  table.innerHTML = `<thead><tr><th>Settimana</th><th>Giorno</th><th>Tipo</th><th>Titolo</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Allenamento</th><th>Note</th></tr></thead>`;
+  const tbody = document.createElement("tbody");
+  generatedRunningRows.forEach((row,index) => {
+    const tr=document.createElement("tr");
+    const vals=[row.week,row.day];
+    vals.forEach(v=>{ const td=document.createElement("td"); td.innerText=v; tr.appendChild(td); });
+    const fields=[
+      ["type","select"],["title","input"],["distance","input"],["duration","input"],["pace","input"],["workout","textarea"],["notes","textarea"]
+    ];
+    fields.forEach(([key,kind])=>{
+      const td=document.createElement("td");
+      let el;
+      if(kind==="select") {
+        el=document.createElement("select");
+        ["","Corsa facile","Lungo","Ripetute","Tempo","Progressivo","Salite","Recupero","Test","Altro"].forEach(opt=>{ const o=document.createElement("option"); o.value=opt; o.textContent=opt||"Seleziona"; el.appendChild(o); });
+      } else {
+        el=document.createElement(kind);
+        if(key==="distance") { el.type="number"; el.step="0.1"; el.min="0"; }
+        if(key==="duration") { el.type="number"; el.min="0"; }
+      }
+      el.value=row[key]||"";
+      el.addEventListener("input",()=>{ row[key]=el.value; });
+      td.appendChild(el); tr.appendChild(td);
     });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody); container.innerHTML=""; container.appendChild(table);
+}
 
-  if(result.error) {
-    showMessage("runningMessage", result.error.message, "error");
-    return;
-  }
-
-  ["runningDate","runningTitle","runningDistance","runningDuration","runningPace","runningWorkout","runningNotes"]
-    .forEach(id => document.getElementById(id).value = "");
-
-  showMessage("runningMessage", "Allenamento aggiunto.", "success");
+async function saveRunningProgram() {
+  if(!currentPatient || !generatedRunningRows.length) return;
+  const weeks=parseInt(document.getElementById("runningWeeks").value,10);
+  const sessions=parseInt(document.getElementById("runningSessionsPerWeek").value,10);
+  const programResult=await db.from("running_programs").insert({ patient_id: currentPatient.id, weeks, sessions_per_week:sessions }).select().single();
+  if(programResult.error) { showMessage("runningMessage", programResult.error.message,"error"); return; }
+  const programId=programResult.data.id;
+  const rows=generatedRunningRows.map(row=>({
+    program_id:programId, week_number:row.week, day_number:row.day, workout_type:row.type||null, title:row.title||`Allenamento ${row.day}`, distance_km:row.distance?Number(row.distance):null, duration_min:row.duration?Number(row.duration):null, pace:row.pace||null, workout:row.workout||null, notes:row.notes||null
+  }));
+  const sessionResult=await db.from("running_sessions").insert(rows);
+  if(sessionResult.error) { await db.from("running_programs").delete().eq("id",programId); showMessage("runningMessage",sessionResult.error.message,"error"); return; }
+  showMessage("runningMessage","Programma di corsa salvato.","success");
   await loadRunningPlans();
 }
 
 async function loadRunningPlans() {
-  const container = document.getElementById("runningPlansList");
+  const container=document.getElementById("runningPlansList");
   if(!container || !currentPatient) return;
-
-  container.innerHTML = "Caricamento...";
-
-  const result = await db
-    .from("running_plans")
-    .select("id, date, title, distance_km, duration_min, pace, workout, notes, created_at")
-    .eq("patient_id", currentPatient.id)
-    .order("date", { ascending: false, nullsFirst: false });
-
-  if(result.error) {
-    container.innerText = result.error.message;
-    return;
-  }
-
-  if(!result.data?.length) {
-    container.innerText = "Nessun allenamento di corsa presente.";
-    return;
-  }
-
-  container.innerHTML = "";
-  const table = document.createElement("table");
-  table.className = "running-table";
-  table.innerHTML = `<thead><tr><th>Data</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Dettagli</th><th></th></tr></thead>`;
-  const tbody = document.createElement("tbody");
-
-  result.data.forEach(item => {
-    const tr = document.createElement("tr");
-    const values = [
-      item.date ? formatDate(item.date) : "—",
-      item.title || "—",
-      item.distance_km ?? "—",
-      item.duration_min ? item.duration_min + " min" : "—",
-      item.pace || "—",
-      [item.workout, item.notes].filter(Boolean).join("\n\n") || "—"
-    ];
-    values.forEach(value => {
-      const td = document.createElement("td");
-      td.innerText = value;
-      tr.appendChild(td);
-    });
-    const actionTd = document.createElement("td");
-    const del = document.createElement("button");
-    del.className = "danger";
-    del.innerText = "🗑️";
-    del.addEventListener("click", async () => {
-      if(!confirm("Vuoi eliminare questo allenamento?")) return;
-      const r = await db.from("running_plans").delete().eq("id", item.id);
-      if(r.error) alert(r.error.message);
-      else await loadRunningPlans();
-    });
-    actionTd.appendChild(del);
-    tr.appendChild(actionTd);
+  container.innerHTML="Caricamento...";
+  const result=await db.from("running_programs").select(`id,weeks,sessions_per_week,created_at,running_sessions(id,week_number,day_number,workout_type,title,distance_km,duration_min,pace,workout,notes)`).eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1);
+  if(result.error){container.innerText=result.error.message;return;}
+  if(!result.data?.length){container.innerText="Nessun programma di corsa presente.";return;}
+  const program=result.data[0];
+  const wrap=document.createElement("div");
+  const h=document.createElement("h4"); h.innerText=`${program.weeks} settimane · ${program.sessions_per_week} allenamenti/settimana`; wrap.appendChild(h);
+  const sessions=[...(program.running_sessions||[])].sort((a,b)=>a.week_number-b.week_number||a.day_number-b.day_number);
+  let currentWeek=0, table, tbody;
+  sessions.forEach(item=>{
+    if(item.week_number!==currentWeek){
+      currentWeek=item.week_number;
+      const wh=document.createElement("h4"); wh.innerText=`Settimana ${currentWeek}`; wrap.appendChild(wh);
+      table=document.createElement("table"); table.className="running-table"; table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Note</th></tr></thead>`; tbody=document.createElement("tbody"); table.appendChild(tbody); wrap.appendChild(table);
+    }
+    const tr=document.createElement("tr");
+    ["day_number","workout_type","title","distance_km","duration_min","pace","notes"].forEach(key=>{const td=document.createElement("td"); td.innerText=key==="distance_km"&&item[key]!=null?item[key]+" km":key==="duration_min"&&item[key]!=null?item[key]+" min":item[key]||"—";tr.appendChild(td);});
     tbody.appendChild(tr);
   });
+  container.innerHTML=""; container.appendChild(wrap);
+}
 
-  table.appendChild(tbody);
-  container.appendChild(table);
+async function deleteRunningProgram(){
+  if(!currentPatient) return;
+  if(!confirm("Vuoi eliminare il programma di corsa attuale?")) return;
+  const result=await db.from("running_programs").select("id").eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1).maybeSingle();
+  if(result.error){alert(result.error.message);return;}
+  if(!result.data){alert("Nessun programma presente.");return;}
+  const del=await db.from("running_programs").delete().eq("id",result.data.id);
+  if(del.error){alert(del.error.message);return;}
+  await loadRunningPlans();
 }
 
 async function loadPatientPortalNotes() {
@@ -4383,42 +4496,20 @@ async function loadPatientPortalNotes() {
 }
 
 async function loadPatientPortalRunning() {
-  const container = document.getElementById("patientPortalRunning");
+  const container=document.getElementById("patientPortalRunning");
   if(!container || !currentPatient) return;
-  container.innerHTML = "Caricamento...";
-
-  const result = await db
-    .from("running_plans")
-    .select("id, date, title, distance_km, duration_min, pace, workout, notes")
-    .eq("patient_id", currentPatient.id)
-    .order("date", { ascending: false, nullsFirst: false });
-
-  if(result.error) { container.innerText = result.error.message; return; }
-  if(!result.data?.length) { container.innerText = "Nessun allenamento di corsa presente."; return; }
-
-  container.innerHTML = "";
-  const table = document.createElement("table");
-  table.className = "running-table";
-  table.innerHTML = `<thead><tr><th>Data</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Dettagli</th></tr></thead>`;
-  const tbody = document.createElement("tbody");
-  result.data.forEach(item => {
-    const tr = document.createElement("tr");
-    [
-      item.date ? formatDate(item.date) : "—",
-      item.title || "—",
-      item.distance_km ?? "—",
-      item.duration_min ? item.duration_min + " min" : "—",
-      item.pace || "—",
-      [item.workout, item.notes].filter(Boolean).join("\n\n") || "—"
-    ].forEach(value => {
-      const td = document.createElement("td");
-      td.innerText = value;
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
+  container.innerHTML="Caricamento...";
+  const result=await db.from("running_programs").select(`id,weeks,sessions_per_week,created_at,running_sessions(id,week_number,day_number,workout_type,title,distance_km,duration_min,pace,workout,notes)`).eq("patient_id",currentPatient.id).order("created_at",{ascending:false}).limit(1);
+  if(result.error){container.innerText=result.error.message;return;}
+  if(!result.data?.length){container.innerText="Nessun programma di corsa presente.";return;}
+  const program=result.data[0];
+  const title=document.createElement("p"); title.innerText=`Programma: ${program.weeks} settimane · ${program.sessions_per_week} allenamenti a settimana`; container.innerHTML=""; container.appendChild(title);
+  const sessions=[...(program.running_sessions||[])].sort((a,b)=>a.week_number-b.week_number||a.day_number-b.day_number);
+  let currentWeek=0, table, tbody;
+  sessions.forEach(item=>{
+    if(item.week_number!==currentWeek){currentWeek=item.week_number; const h=document.createElement("h4");h.innerText=`Settimana ${currentWeek}`;container.appendChild(h);table=document.createElement("table");table.className="running-table";table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Note</th></tr></thead>`;tbody=document.createElement("tbody");table.appendChild(tbody);container.appendChild(table);}
+    const tr=document.createElement("tr");["day_number","workout_type","title","distance_km","duration_min","pace","notes"].forEach(key=>{const td=document.createElement("td");td.innerText=key==="distance_km"&&item[key]!=null?item[key]+" km":key==="duration_min"&&item[key]!=null?item[key]+" min":item[key]||"—";tr.appendChild(td);});tbody.appendChild(tr);
   });
-  table.appendChild(tbody);
-  container.appendChild(table);
 }
 
 /* =====================================

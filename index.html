@@ -108,6 +108,7 @@ button {
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 16px;
+  cursor: pointer;
   background: white;
 }
 
@@ -115,7 +116,8 @@ button {
   background: #f1f1f1;
 }
 
-.exercise {
+.exercise,
+.document {
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 16px;
@@ -126,7 +128,8 @@ button {
   opacity: .6;
 }
 
-.exercise h3 {
+.exercise h3,
+.document h3 {
   margin-top: 0;
 }
 
@@ -134,7 +137,8 @@ button {
   margin-top: 10px;
 }
 
-.video a {
+.video a,
+.document a {
   color: #0645ad;
   font-weight: bold;
 }
@@ -174,22 +178,32 @@ small {
   color: #666;
 }
 
-.exercise-editor {
+.editBox {
   background: #f7f7f7;
   border-radius: 10px;
   padding: 14px;
   margin-top: 12px;
 }
 
-.library-exercise {
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
+.document-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
 }
 
-.library-exercise h3 {
-  margin-top: 0;
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
 }
 
 @media(max-width:600px) {
@@ -242,9 +256,7 @@ small {
 
     <h2>Accedi</h2>
 
-    <label>
-      Email
-    </label>
+    <label>Email</label>
 
     <input
       id="email"
@@ -252,9 +264,7 @@ small {
       placeholder="La tua email"
     >
 
-    <label>
-      Password
-    </label>
+    <label>Password</label>
 
     <input
       id="password"
@@ -273,6 +283,58 @@ small {
 
     <div
       id="loginMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================
+     IMPOSTAZIONE PASSWORD
+===================================== -->
+
+<section
+  id="setPasswordPage"
+  class="login hidden"
+>
+
+  <div class="card">
+
+    <h2>🔐 Imposta la tua password</h2>
+
+    <p>
+      Scegli una password per accedere al tuo programma.
+    </p>
+
+    <label>Nuova password</label>
+
+    <input
+      id="newPassword"
+      type="password"
+      placeholder="Nuova password"
+    >
+
+    <label>Conferma password</label>
+
+    <input
+      id="confirmPassword"
+      type="password"
+      placeholder="Ripeti la password"
+    >
+
+    <br><br>
+
+    <button
+      id="savePasswordButton"
+      class="primary"
+    >
+      Salva password
+    </button>
+
+    <div
+      id="passwordMessage"
       class="message hidden"
     ></div>
 
@@ -314,17 +376,12 @@ small {
         ＋ Nuovo esercizio
       </button>
 
-      <button
-        id="exerciseLibraryButton"
-        class="secondary"
-      >
-        📚 Libreria esercizi
-      </button>
-
     </div>
 
   </div>
 
+
+  <!-- PAZIENTI -->
 
   <div class="card">
 
@@ -335,6 +392,25 @@ small {
       class="grid"
     >
       Caricamento...
+    </div>
+
+  </div>
+
+
+  <!-- LIBRERIA ESERCIZI -->
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>🏋️ Libreria esercizi</h2>
+
+    </div>
+
+    <div id="exerciseLibrary">
+
+      Caricamento...
+
     </div>
 
   </div>
@@ -368,6 +444,8 @@ small {
   </div>
 
 
+  <!-- PROGRAMMA -->
+
   <div class="card">
 
     <h2>📋 Programma</h2>
@@ -379,13 +457,13 @@ small {
   </div>
 
 
+  <!-- ASSEGNA ESERCIZIO -->
+
   <div class="card">
 
     <h2>＋ Assegna esercizio</h2>
 
-    <label>
-      Esercizio
-    </label>
+    <label>Esercizio</label>
 
     <select id="exerciseSelect">
 
@@ -396,9 +474,7 @@ small {
     </select>
 
 
-    <label>
-      Serie
-    </label>
+    <label>Serie</label>
 
     <input
       id="sets"
@@ -408,9 +484,7 @@ small {
     >
 
 
-    <label>
-      Ripetizioni
-    </label>
+    <label>Ripetizioni</label>
 
     <input
       id="reps"
@@ -420,9 +494,7 @@ small {
     >
 
 
-    <label>
-      Durata (secondi)
-    </label>
+    <label>Durata (secondi)</label>
 
     <input
       id="duration"
@@ -432,9 +504,7 @@ small {
     >
 
 
-    <label>
-      Recupero (secondi)
-    </label>
+    <label>Recupero (secondi)</label>
 
     <input
       id="rest"
@@ -444,9 +514,7 @@ small {
     >
 
 
-    <label>
-      Note
-    </label>
+    <label>Note</label>
 
     <textarea
       id="notes"
@@ -469,6 +537,51 @@ small {
 
   </div>
 
+
+  <!-- REPORT E DOCUMENTI -->
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>📄 Report e documenti</h2>
+
+    </div>
+
+    <p>
+      Carica documenti PDF da rendere disponibili al paziente.
+    </p>
+
+    <input
+      id="documentFile"
+      type="file"
+      accept="application/pdf,.pdf"
+    >
+
+    <br><br>
+
+    <button
+      id="uploadDocumentButton"
+      class="primary"
+    >
+      📎 Carica PDF
+    </button>
+
+    <div
+      id="documentMessage"
+      class="message hidden"
+    ></div>
+
+    <hr>
+
+    <div id="patientDocuments">
+
+      Caricamento...
+
+    </div>
+
+  </div>
+
 </section>
 
 
@@ -485,18 +598,14 @@ small {
 
     <h2>👤 Nuovo paziente</h2>
 
-    <label>
-      Nome
-    </label>
+    <label>Nome</label>
 
     <input
       id="newPatientName"
       placeholder="Nome paziente"
     >
 
-    <label>
-      Email account paziente
-    </label>
+    <label>Email account paziente</label>
 
     <input
       id="newPatientEmail"
@@ -543,29 +652,21 @@ small {
 
     <h2>🏋️ Nuovo esercizio</h2>
 
-    <label>
-      Nome
-    </label>
+    <label>Nome</label>
 
     <input
       id="exerciseName"
       placeholder="Es. Squat"
     >
 
-
-    <label>
-      Descrizione
-    </label>
+    <label>Descrizione</label>
 
     <textarea
       id="exerciseDescription"
       placeholder="Descrizione dell'esercizio..."
     ></textarea>
 
-
-    <label>
-      Video URL
-    </label>
+    <label>Video URL</label>
 
     <input
       id="exerciseVideo"
@@ -600,36 +701,6 @@ small {
 
 
 <!-- =====================================
-     LIBRERIA ESERCIZI
-===================================== -->
-
-<section
-  id="exerciseLibraryPage"
-  class="hidden"
->
-
-  <button
-    id="backLibraryButton"
-    class="secondary back"
-  >
-    ← Dashboard
-  </button>
-
-
-  <div class="card">
-
-    <h2>📚 Libreria esercizi</h2>
-
-    <div id="exerciseLibraryList">
-      Caricamento...
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- =====================================
      PORTALE PAZIENTE
 ===================================== -->
 
@@ -656,6 +727,17 @@ small {
     <h2>🏋️ I tuoi esercizi</h2>
 
     <div id="patientPortalExercises">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>📄 I tuoi report</h2>
+
+    <div id="patientPortalDocuments">
       Caricamento...
     </div>
 
@@ -698,6 +780,10 @@ const db =
   );
 
 
+const DOCUMENT_BUCKET =
+  "patient-documents";
+
+
 /* =====================================
    VARIABILI
 ===================================== */
@@ -714,11 +800,11 @@ let currentPatient = null;
 const pages = [
 
   "loginPage",
+  "setPasswordPage",
   "therapistPage",
   "patientPage",
   "newPatientPage",
   "newExercisePage",
-  "exerciseLibraryPage",
   "patientPortal"
 
 ];
@@ -842,6 +928,169 @@ async function login() {
 
 
 /* =====================================
+   LINK DI PRIMO ACCESSO / RECOVERY
+===================================== */
+
+async function checkRecoverySession() {
+
+  const hash =
+    window.location.hash;
+
+
+  if(
+    hash &&
+    (
+      hash.includes("type=recovery") ||
+      hash.includes("access_token=")
+    )
+  ) {
+
+    const result =
+      await db.auth.getSession();
+
+
+    if(
+      result.data &&
+      result.data.session
+    ) {
+
+      currentUser =
+        result.data.session.user;
+
+
+      showPage(
+        "setPasswordPage"
+      );
+
+      return true;
+
+    }
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =====================================
+   SALVA NUOVA PASSWORD
+===================================== */
+
+document
+  .getElementById("savePasswordButton")
+  .addEventListener(
+    "click",
+    saveNewPassword
+  );
+
+
+async function saveNewPassword() {
+
+  const password =
+    document
+      .getElementById("newPassword")
+      .value;
+
+
+  const confirmation =
+    document
+      .getElementById("confirmPassword")
+      .value;
+
+
+  if(!password || !confirmation) {
+
+    showMessage(
+      "passwordMessage",
+      "Inserisci e conferma la password.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(password.length < 6) {
+
+    showMessage(
+      "passwordMessage",
+      "La password deve contenere almeno 6 caratteri.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(password !== confirmation) {
+
+    showMessage(
+      "passwordMessage",
+      "Le password non coincidono.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const result =
+    await db.auth.updateUser({
+
+      password: password
+
+    });
+
+
+  if(result.error) {
+
+    showMessage(
+      "passwordMessage",
+      result.error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "passwordMessage",
+    "Password salvata. Accesso in corso...",
+    "success"
+  );
+
+
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+
+  currentUser =
+    result.data.user;
+
+
+  setTimeout(
+    async function() {
+
+      await startApp();
+
+    },
+    700
+  );
+
+}
+
+
+/* =====================================
    AVVIO APP
 ===================================== */
 
@@ -938,6 +1187,8 @@ async function startTherapist() {
 
   await loadPatients();
 
+  await loadExerciseLibrary();
+
 }
 
 
@@ -1015,6 +1266,7 @@ document
       await db.auth.signOut();
 
       currentUser = null;
+
       currentPatient = null;
 
       document
@@ -1114,13 +1366,19 @@ async function loadPatients() {
         );
 
 
+      const br2 =
+        document.createElement(
+          "br"
+        );
+
+
       const small =
         document.createElement(
           "small"
         );
 
       small.innerText =
-        "Gestisci paziente";
+        "Apri scheda →";
 
 
       div.appendChild(
@@ -1132,85 +1390,11 @@ async function loadPatients() {
       );
 
       div.appendChild(
-        small
+        br2
       );
-
-
-      const buttons =
-        document.createElement(
-          "div"
-        );
-
-      buttons.className =
-        "actions";
-
-      buttons.style.marginTop =
-        "12px";
-
-
-      const openButton =
-        document.createElement(
-          "button"
-        );
-
-      openButton.className =
-        "primary";
-
-      openButton.innerText =
-        "Apri scheda";
-
-
-      openButton.addEventListener(
-        "click",
-        function(event) {
-
-          event.stopPropagation();
-
-          openPatient(
-            patient
-          );
-
-        }
-      );
-
-
-      const deleteButton =
-        document.createElement(
-          "button"
-        );
-
-      deleteButton.className =
-        "danger";
-
-      deleteButton.innerText =
-        "🗑 Elimina";
-
-
-      deleteButton.addEventListener(
-        "click",
-        function(event) {
-
-          event.stopPropagation();
-
-          deletePatient(
-            patient
-          );
-
-        }
-      );
-
-
-      buttons.appendChild(
-        openButton
-      );
-
-      buttons.appendChild(
-        deleteButton
-      );
-
 
       div.appendChild(
-        buttons
+        small
       );
 
 
@@ -1262,11 +1446,13 @@ async function openPatient(patient) {
 
   await loadPatientExercises();
 
+  await loadPatientDocuments();
+
 }
 
 
 /* =====================================
-   LIBRERIA ESERCIZI
+   LIBRERIA ESERCIZI - SELECT
 ===================================== */
 
 async function loadExercises() {
@@ -1350,6 +1536,468 @@ async function loadExercises() {
 
 
 /* =====================================
+   LIBRERIA ESERCIZI
+===================================== */
+
+async function loadExerciseLibrary() {
+
+  const container =
+    document.getElementById(
+      "exerciseLibrary"
+    );
+
+
+  container.innerHTML =
+    "Caricamento...";
+
+
+  const result =
+    await db
+      .from("exercises")
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending: true
+        }
+      );
+
+
+  if(result.error) {
+
+    container.innerText =
+      result.error.message;
+
+    return;
+
+  }
+
+
+  if(!result.data || result.data.length === 0) {
+
+    container.innerText =
+      "Nessun esercizio presente.";
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  result.data.forEach(
+    function(exercise) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "exercise";
+
+
+      const title =
+        document.createElement(
+          "h3"
+        );
+
+
+      title.innerText =
+        exercise.name;
+
+
+      div.appendChild(
+        title
+      );
+
+
+      if(exercise.description) {
+
+        const description =
+          document.createElement(
+            "p"
+          );
+
+
+        description.innerText =
+          exercise.description;
+
+
+        div.appendChild(
+          description
+        );
+
+      }
+
+
+      if(exercise.video_url) {
+
+        const video =
+          document.createElement(
+            "p"
+          );
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href =
+          exercise.video_url;
+
+        link.target =
+          "_blank";
+
+        link.rel =
+          "noopener";
+
+        link.innerText =
+          "🎥 Video";
+
+
+        video.appendChild(
+          link
+        );
+
+        div.appendChild(
+          video
+        );
+
+      }
+
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+
+      actions.className =
+        "actions";
+
+
+      const editButton =
+        document.createElement(
+          "button"
+        );
+
+
+      editButton.className =
+        "secondary";
+
+
+      editButton.innerText =
+        "✏️ Modifica";
+
+
+      editButton.addEventListener(
+        "click",
+        function() {
+
+          showExerciseEdit(
+            div,
+            exercise
+          );
+
+        }
+      );
+
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+
+      deleteButton.className =
+        "danger";
+
+
+      deleteButton.innerText =
+        "🗑️ Elimina";
+
+
+      deleteButton.addEventListener(
+        "click",
+        function() {
+
+          deleteExercise(
+            exercise.id
+          );
+
+        }
+      );
+
+
+      actions.appendChild(
+        editButton
+      );
+
+      actions.appendChild(
+        deleteButton
+      );
+
+
+      div.appendChild(
+        actions
+      );
+
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================
+   MODIFICA ESERCIZIO LIBRERIA
+===================================== */
+
+function showExerciseEdit(
+  container,
+  exercise
+) {
+
+  const box =
+    document.createElement(
+      "div"
+    );
+
+
+  box.className =
+    "editBox";
+
+
+  box.innerHTML = `
+
+    <label>Nome</label>
+
+    <input
+      class="editExerciseName"
+      value=""
+    >
+
+    <label>Descrizione</label>
+
+    <textarea
+      class="editExerciseDescription"
+    ></textarea>
+
+    <label>Video URL</label>
+
+    <input
+      class="editExerciseVideo"
+      type="url"
+      value=""
+    >
+
+    <br><br>
+
+    <div class="actions">
+
+      <button class="primary saveExerciseEdit">
+        Salva modifiche
+      </button>
+
+      <button class="secondary cancelExerciseEdit">
+        Annulla
+      </button>
+
+    </div>
+
+    <div class="message hidden editExerciseMessage"></div>
+
+  `;
+
+
+  box.querySelector(
+    ".editExerciseName"
+  ).value =
+    exercise.name || "";
+
+
+  box.querySelector(
+    ".editExerciseDescription"
+  ).value =
+    exercise.description || "";
+
+
+  box.querySelector(
+    ".editExerciseVideo"
+  ).value =
+    exercise.video_url || "";
+
+
+  container.appendChild(
+    box
+  );
+
+
+  box.querySelector(
+    ".cancelExerciseEdit"
+  ).addEventListener(
+    "click",
+    function() {
+
+      box.remove();
+
+    }
+  );
+
+
+  box.querySelector(
+    ".saveExerciseEdit"
+  ).addEventListener(
+    "click",
+    async function() {
+
+      const name =
+        box.querySelector(
+          ".editExerciseName"
+        ).value.trim();
+
+
+      const description =
+        box.querySelector(
+          ".editExerciseDescription"
+        ).value.trim();
+
+
+      const video =
+        box.querySelector(
+          ".editExerciseVideo"
+        ).value.trim();
+
+
+      if(!name) {
+
+        showMessage(
+          box.querySelector(
+            ".editExerciseMessage"
+          ),
+          "Inserisci il nome.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const result =
+        await db
+          .from("exercises")
+          .update({
+
+            name:
+              name,
+
+            description:
+              description || null,
+
+            video_url:
+              video || null
+
+          })
+          .eq(
+            "id",
+            exercise.id
+          );
+
+
+      if(result.error) {
+
+        showMessage(
+          box.querySelector(
+            ".editExerciseMessage"
+          ),
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      await loadExerciseLibrary();
+
+      await loadExercises();
+
+      if(currentPatient) {
+
+        await loadPatientExercises();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================================
+   ELIMINA ESERCIZIO DALLA LIBRERIA
+===================================== */
+
+async function deleteExercise(id) {
+
+  const confirmed =
+    confirm(
+      "Vuoi davvero eliminare questo esercizio dalla libreria?"
+    );
+
+
+  if(!confirmed) {
+
+    return;
+
+  }
+
+
+  const result =
+    await db
+      .from("exercises")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error) {
+
+    alert(
+      "Errore nell'eliminazione: " +
+      result.error.message
+    );
+
+    console.error(
+      result.error
+    );
+
+    return;
+
+  }
+
+
+  await loadExerciseLibrary();
+
+  await loadExercises();
+
+}
+
+
+/* =====================================
    ESERCIZI DEL PAZIENTE
 ===================================== */
 
@@ -1377,6 +2025,7 @@ async function loadPatientExercises() {
         notes,
         completed,
         exercises (
+          id,
           name,
           description,
           video_url
@@ -1418,715 +2067,6 @@ async function loadPatientExercises() {
   result.data.forEach(
     function(item) {
 
-      renderPatientExercise(
-        item,
-        container
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================
-   RENDER ESERCIZIO PAZIENTE
-===================================== */
-
-function renderPatientExercise(
-  item,
-  container
-) {
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-
-  div.className =
-    "exercise";
-
-
-  const title =
-    document.createElement(
-      "h3"
-    );
-
-
-  title.innerText =
-    item.exercises.name;
-
-
-  div.appendChild(
-    title
-  );
-
-
-  let info = [];
-
-
-  if(item.sets !== null && item.sets !== undefined) {
-
-    info.push(
-      item.sets + " serie"
-    );
-
-  }
-
-
-  if(item.reps !== null && item.reps !== undefined) {
-
-    info.push(
-      item.reps + " rip"
-    );
-
-  }
-
-
-  if(item.duration !== null && item.duration !== undefined) {
-
-    info.push(
-      item.duration + " sec"
-    );
-
-  }
-
-
-  if(item.rest !== null && item.rest !== undefined) {
-
-    info.push(
-      "recupero " +
-      item.rest +
-      "\""
-    );
-
-  }
-
-
-  if(info.length > 0) {
-
-    const infoParagraph =
-      document.createElement(
-        "p"
-      );
-
-
-    infoParagraph.innerText =
-      info.join(" · ");
-
-
-    div.appendChild(
-      infoParagraph
-    );
-
-  }
-
-
-  if(item.exercises.description) {
-
-    const description =
-      document.createElement(
-        "p"
-      );
-
-
-    description.innerText =
-      item.exercises.description;
-
-
-    div.appendChild(
-      description
-    );
-
-  }
-
-
-  if(item.exercises.video_url) {
-
-    const video =
-      document.createElement(
-        "div"
-      );
-
-
-    video.className =
-      "video";
-
-
-    const link =
-      document.createElement(
-        "a"
-      );
-
-
-    link.href =
-      item.exercises.video_url;
-
-
-    link.target =
-      "_blank";
-
-
-    link.rel =
-      "noopener";
-
-
-    link.innerText =
-      "🎥 Guarda video";
-
-
-    video.appendChild(
-      link
-    );
-
-
-    div.appendChild(
-      video
-    );
-
-  }
-
-
-  if(item.notes) {
-
-    const notes =
-      document.createElement(
-        "p"
-      );
-
-
-    notes.innerText =
-      "📝 " +
-      item.notes;
-
-
-    div.appendChild(
-      notes
-    );
-
-  }
-
-
-  const completionLabel =
-    document.createElement(
-      "label"
-    );
-
-
-  const completion =
-    document.createElement(
-      "input"
-    );
-
-
-  completion.type =
-    "checkbox";
-
-
-  completion.className =
-    "completion";
-
-
-  completion.dataset.id =
-    item.id;
-
-
-  completion.checked =
-    !!item.completed;
-
-
-  completionLabel.appendChild(
-    completion
-  );
-
-
-  completionLabel.appendChild(
-    document.createTextNode(
-      " Completato"
-    )
-  );
-
-
-  div.appendChild(
-    completionLabel
-  );
-
-
-  const spacer =
-    document.createElement(
-      "br"
-    );
-
-
-  div.appendChild(
-    spacer
-  );
-
-
-  const buttons =
-    document.createElement(
-      "div"
-    );
-
-
-  buttons.className =
-    "actions";
-
-
-  buttons.style.marginTop =
-    "10px";
-
-
-  const editButton =
-    document.createElement(
-      "button"
-    );
-
-
-  editButton.className =
-    "secondary";
-
-
-  editButton.innerText =
-    "✏️ Modifica";
-
-
-  editButton.addEventListener(
-    "click",
-    function() {
-
-      showAssignmentEditor(
-        item,
-        div
-      );
-
-    }
-  );
-
-
-  const removeButton =
-    document.createElement(
-      "button"
-    );
-
-
-  removeButton.className =
-    "danger";
-
-
-  removeButton.innerText =
-    "🗑 Rimuovi";
-
-
-  removeButton.addEventListener(
-    "click",
-    function() {
-
-      deletePatientExercise(
-        item.id
-      );
-
-    }
-  );
-
-
-  buttons.appendChild(
-    editButton
-  );
-
-  buttons.appendChild(
-    removeButton
-  );
-
-
-  div.appendChild(
-    buttons
-  );
-
-
-  container.appendChild(
-    div
-  );
-
-}
-
-
-/* =====================================
-   MODIFICA ESERCIZIO ASSEGNATO
-===================================== */
-
-function showAssignmentEditor(
-  item,
-  parent
-) {
-
-  const oldEditor =
-    parent.querySelector(
-      ".exercise-editor"
-    );
-
-
-  if(oldEditor) {
-
-    oldEditor.remove();
-
-    return;
-
-  }
-
-
-  const editor =
-    document.createElement(
-      "div"
-    );
-
-
-  editor.className =
-    "exercise-editor";
-
-
-  editor.innerHTML = `
-
-    <label>
-      Serie
-    </label>
-
-    <input
-      class="edit-sets"
-      type="number"
-      min="0"
-      value="${item.sets ?? ""}"
-    >
-
-
-    <label>
-      Ripetizioni
-    </label>
-
-    <input
-      class="edit-reps"
-      type="number"
-      min="0"
-      value="${item.reps ?? ""}"
-    >
-
-
-    <label>
-      Durata (secondi)
-    </label>
-
-    <input
-      class="edit-duration"
-      type="number"
-      min="0"
-      value="${item.duration ?? ""}"
-    >
-
-
-    <label>
-      Recupero (secondi)
-    </label>
-
-    <input
-      class="edit-rest"
-      type="number"
-      min="0"
-      value="${item.rest ?? ""}"
-    >
-
-
-    <label>
-      Note
-    </label>
-
-    <textarea
-      class="edit-notes"
-    >${item.notes ?? ""}</textarea>
-
-
-    <br><br>
-
-    <div class="actions">
-
-      <button
-        class="primary save-assignment"
-      >
-        💾 Salva modifiche
-      </button>
-
-      <button
-        class="secondary cancel-assignment"
-      >
-        Annulla
-      </button>
-
-    </div>
-
-    <div
-      class="message edit-message hidden"
-    ></div>
-
-  `;
-
-
-  parent.appendChild(
-    editor
-  );
-
-
-  editor
-    .querySelector(
-      ".cancel-assignment"
-    )
-    .addEventListener(
-      "click",
-      function() {
-
-        editor.remove();
-
-      }
-    );
-
-
-  editor
-    .querySelector(
-      ".save-assignment"
-    )
-    .addEventListener(
-      "click",
-      async function() {
-
-        await saveAssignmentChanges(
-          item.id,
-          editor
-        );
-
-      }
-    );
-
-}
-
-
-/* =====================================
-   SALVA MODIFICA ASSEGNAZIONE
-===================================== */
-
-async function saveAssignmentChanges(
-  id,
-  editor
-) {
-
-  const sets =
-    editor
-      .querySelector(".edit-sets")
-      .value;
-
-
-  const reps =
-    editor
-      .querySelector(".edit-reps")
-      .value;
-
-
-  const duration =
-    editor
-      .querySelector(".edit-duration")
-      .value;
-
-
-  const rest =
-    editor
-      .querySelector(".edit-rest")
-      .value;
-
-
-  const notes =
-    editor
-      .querySelector(".edit-notes")
-      .value
-      .trim();
-
-
-  const result =
-    await db
-      .from("patient_exercises")
-      .update({
-
-        sets:
-          sets === ""
-            ? null
-            : parseInt(sets),
-
-        reps:
-          reps === ""
-            ? null
-            : parseInt(reps),
-
-        duration:
-          duration === ""
-            ? null
-            : parseInt(duration),
-
-        rest:
-          rest === ""
-            ? null
-            : parseInt(rest),
-
-        notes:
-          notes || null
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error) {
-
-    const message =
-      editor.querySelector(
-        ".edit-message"
-      );
-
-
-    showInlineMessage(
-      message,
-      result.error.message,
-      "error"
-    );
-
-
-    console.error(
-      result.error
-    );
-
-    return;
-
-  }
-
-
-  await loadPatientExercises();
-
-}
-
-
-/* =====================================
-   ELIMINA ESERCIZIO ASSEGNATO
-===================================== */
-
-async function deletePatientExercise(id) {
-
-  const confirmed =
-    confirm(
-      "Vuoi davvero rimuovere questo esercizio dal programma del paziente?"
-    );
-
-
-  if(!confirmed) {
-
-    return;
-
-  }
-
-
-  const result =
-    await db
-      .from("patient_exercises")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error) {
-
-    alert(
-      "Errore nella rimozione: " +
-      result.error.message
-    );
-
-    console.error(
-      result.error
-    );
-
-    return;
-
-  }
-
-
-  await loadPatientExercises();
-
-}
-
-
-/* =====================================
-   PORTALE PAZIENTE
-===================================== */
-
-async function loadPatientPortal() {
-
-  const container =
-    document.getElementById(
-      "patientPortalExercises"
-    );
-
-
-  container.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("patient_exercises")
-      .select(`
-        id,
-        sets,
-        reps,
-        duration,
-        rest,
-        notes,
-        completed,
-        exercises (
-          name,
-          description,
-          video_url
-        )
-      `)
-      .eq(
-        "patient_id",
-        currentPatient.id
-      );
-
-
-  if(result.error) {
-
-    container.innerHTML =
-      result.error.message;
-
-    return;
-
-  }
-
-
-  if(!result.data || result.data.length === 0) {
-
-    container.innerHTML =
-      "Non hai ancora esercizi assegnati.";
-
-    return;
-
-  }
-
-
-  container.innerHTML = "";
-
-
-  result.data.forEach(
-    function(item) {
-
       const div =
         document.createElement(
           "div"
@@ -2137,6 +2077,15 @@ async function loadPatientPortal() {
         "exercise";
 
 
+      if(item.completed) {
+
+        div.classList.add(
+          "completed"
+        );
+
+      }
+
+
       const title =
         document.createElement(
           "h3"
@@ -2144,7 +2093,8 @@ async function loadPatientPortal() {
 
 
       title.innerText =
-        item.exercises.name;
+        item.exercises?.name ||
+        "Esercizio";
 
 
       div.appendChild(
@@ -2167,7 +2117,7 @@ async function loadPatientPortal() {
       if(item.reps !== null && item.reps !== undefined) {
 
         info.push(
-          item.reps + " ripetizioni"
+          item.reps + " rip"
         );
 
       }
@@ -2176,7 +2126,7 @@ async function loadPatientPortal() {
       if(item.duration !== null && item.duration !== undefined) {
 
         info.push(
-          item.duration + " secondi"
+          item.duration + " sec"
         );
 
       }
@@ -2195,24 +2145,22 @@ async function loadPatientPortal() {
 
       if(info.length > 0) {
 
-        const infoParagraph =
+        const p =
           document.createElement(
             "p"
           );
 
-
-        infoParagraph.innerText =
+        p.innerText =
           info.join(" · ");
 
-
         div.appendChild(
-          infoParagraph
+          p
         );
 
       }
 
 
-      if(item.exercises.description) {
+      if(item.exercises?.description) {
 
         const description =
           document.createElement(
@@ -2231,7 +2179,7 @@ async function loadPatientPortal() {
       }
 
 
-      if(item.exercises.video_url) {
+      if(item.exercises?.video_url) {
 
         const video =
           document.createElement(
@@ -2313,16 +2261,18 @@ async function loadPatientPortal() {
         "checkbox";
 
 
-      completion.className =
-        "portalCompletion";
+      completion.checked =
+        !!item.completed;
+
+
+      completion.addEventListener(
+        "change",
+        updateCompletion
+      );
 
 
       completion.dataset.id =
         item.id;
-
-
-      completion.checked =
-        !!item.completed;
 
 
       completionLabel.appendChild(
@@ -2332,13 +2282,97 @@ async function loadPatientPortal() {
 
       completionLabel.appendChild(
         document.createTextNode(
-          " Ho completato questo esercizio"
+          " Completato"
         )
       );
 
 
       div.appendChild(
         completionLabel
+      );
+
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+
+      actions.className =
+        "actions";
+
+
+      const editButton =
+        document.createElement(
+          "button"
+        );
+
+
+      editButton.className =
+        "secondary";
+
+
+      editButton.innerText =
+        "✏️ Modifica";
+
+
+      editButton.addEventListener(
+        "click",
+        function() {
+
+          showPatientExerciseEdit(
+            div,
+            item
+          );
+
+        }
+      );
+
+
+      const removeButton =
+        document.createElement(
+          "button"
+        );
+
+
+      removeButton.className =
+        "danger";
+
+
+      removeButton.innerText =
+        "🗑️ Rimuovi";
+
+
+      removeButton.addEventListener(
+        "click",
+        function() {
+
+          deletePatientExercise(
+            item.id
+          );
+
+        }
+      );
+
+
+      actions.appendChild(
+        editButton
+      );
+
+      actions.appendChild(
+        removeButton
+      );
+
+
+      div.appendChild(
+        document.createElement(
+          "br"
+        )
+      );
+
+
+      div.appendChild(
+        actions
       );
 
 
@@ -2349,21 +2383,270 @@ async function loadPatientPortal() {
     }
   );
 
+}
 
-  document
-    .querySelectorAll(
-      ".portalCompletion"
-    )
-    .forEach(
-      function(box) {
 
-        box.addEventListener(
-          "change",
-          updateCompletion
+/* =====================================
+   MODIFICA ASSEGNAZIONE
+===================================== */
+
+function showPatientExerciseEdit(
+  container,
+  item
+) {
+
+  const box =
+    document.createElement(
+      "div"
+    );
+
+
+  box.className =
+    "editBox";
+
+
+  box.innerHTML = `
+
+    <label>Serie</label>
+
+    <input
+      class="editSets"
+      type="number"
+      min="0"
+    >
+
+    <label>Ripetizioni</label>
+
+    <input
+      class="editReps"
+      type="number"
+      min="0"
+    >
+
+    <label>Durata (secondi)</label>
+
+    <input
+      class="editDuration"
+      type="number"
+      min="0"
+    >
+
+    <label>Recupero (secondi)</label>
+
+    <input
+      class="editRest"
+      type="number"
+      min="0"
+    >
+
+    <label>Note</label>
+
+    <textarea
+      class="editNotes"
+    ></textarea>
+
+    <br><br>
+
+    <div class="actions">
+
+      <button class="primary saveAssignment">
+        Salva modifiche
+      </button>
+
+      <button class="secondary cancelAssignment">
+        Annulla
+      </button>
+
+    </div>
+
+    <div class="message hidden assignmentMessage"></div>
+
+  `;
+
+
+  box.querySelector(
+    ".editSets"
+  ).value =
+    item.sets ?? "";
+
+
+  box.querySelector(
+    ".editReps"
+  ).value =
+    item.reps ?? "";
+
+
+  box.querySelector(
+    ".editDuration"
+  ).value =
+    item.duration ?? "";
+
+
+  box.querySelector(
+    ".editRest"
+  ).value =
+    item.rest ?? "";
+
+
+  box.querySelector(
+    ".editNotes"
+  ).value =
+    item.notes ?? "";
+
+
+  container.appendChild(
+    box
+  );
+
+
+  box.querySelector(
+    ".cancelAssignment"
+  ).addEventListener(
+    "click",
+    function() {
+
+      box.remove();
+
+    }
+  );
+
+
+  box.querySelector(
+    ".saveAssignment"
+  ).addEventListener(
+    "click",
+    async function() {
+
+      const setsValue =
+        box.querySelector(
+          ".editSets"
+        ).value;
+
+
+      const repsValue =
+        box.querySelector(
+          ".editReps"
+        ).value;
+
+
+      const durationValue =
+        box.querySelector(
+          ".editDuration"
+        ).value;
+
+
+      const restValue =
+        box.querySelector(
+          ".editRest"
+        ).value;
+
+
+      const notesValue =
+        box.querySelector(
+          ".editNotes"
+        ).value.trim();
+
+
+      const result =
+        await db
+          .from("patient_exercises")
+          .update({
+
+            sets:
+              setsValue
+                ? parseInt(setsValue)
+                : null,
+
+            reps:
+              repsValue
+                ? parseInt(repsValue)
+                : null,
+
+            duration:
+              durationValue
+                ? parseInt(durationValue)
+                : null,
+
+            rest:
+              restValue
+                ? parseInt(restValue)
+                : null,
+
+            notes:
+              notesValue || null
+
+          })
+          .eq(
+            "id",
+            item.id
+          );
+
+
+      if(result.error) {
+
+        showMessage(
+          box.querySelector(
+            ".assignmentMessage"
+          ),
+          result.error.message,
+          "error"
         );
 
+        return;
+
       }
+
+
+      await loadPatientExercises();
+
+    }
+  );
+
+}
+
+
+/* =====================================
+   RIMUOVI ASSEGNAZIONE
+===================================== */
+
+async function deletePatientExercise(id) {
+
+  const confirmed =
+    confirm(
+      "Vuoi davvero rimuovere questo esercizio dal programma del paziente?"
     );
+
+
+  if(!confirmed) {
+
+    return;
+
+  }
+
+
+  const result =
+    await db
+      .from("patient_exercises")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error) {
+
+    alert(
+      "Errore nella rimozione: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadPatientExercises();
 
 }
 
@@ -2386,7 +2669,10 @@ async function updateCompletion(event) {
     await db
       .from("patient_exercises")
       .update({
-        completed: completed
+
+        completed:
+          completed
+
       })
       .eq(
         "id",
@@ -2721,7 +3007,7 @@ document
 
         showMessage(
           "patientMessage",
-          "Paziente creato correttamente.",
+          "Paziente creato correttamente. È stata inviata l'email di accesso.",
           "success"
         );
 
@@ -2736,15 +3022,17 @@ document
         ).value = "";
 
 
-        setTimeout(
-          async function() {
+        await loadPatients();
 
-            await startTherapist();
+
+        setTimeout(
+          function() {
+
+            startTherapist();
 
           },
           700
         );
-
 
       } catch(error) {
 
@@ -2881,6 +3169,11 @@ document
       ).value = "";
 
 
+      await loadExerciseLibrary();
+
+      await loadExercises();
+
+
       setTimeout(
         function() {
 
@@ -2895,30 +3188,192 @@ document
 
 
 /* =====================================
-   LIBRERIA ESERCIZI
+   UPLOAD PDF
 ===================================== */
 
 document
-  .getElementById("exerciseLibraryButton")
+  .getElementById("uploadDocumentButton")
   .addEventListener(
     "click",
-    async function() {
-
-      showPage(
-        "exerciseLibraryPage"
-      );
-
-      await loadExerciseLibrary();
-
-    }
+    uploadDocument
   );
 
 
-async function loadExerciseLibrary() {
+async function uploadDocument() {
+
+  if(!currentPatient) {
+
+    return;
+
+  }
+
+
+  const file =
+    document
+      .getElementById("documentFile")
+      .files[0];
+
+
+  if(!file) {
+
+    showMessage(
+      "documentMessage",
+      "Seleziona un PDF.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const isPdf =
+    file.type === "application/pdf" ||
+    file.name.toLowerCase().endsWith(".pdf");
+
+
+  if(!isPdf) {
+
+    showMessage(
+      "documentMessage",
+      "Puoi caricare solamente file PDF.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "documentMessage",
+    "Caricamento PDF...",
+    "success"
+  );
+
+
+  const safeName =
+    file.name
+      .replace(
+        /[^a-zA-Z0-9._-]/g,
+        "_"
+      );
+
+
+  const uniqueName =
+    Date.now() +
+    "_" +
+    safeName;
+
+
+  const filePath =
+    currentPatient.id +
+    "/" +
+    uniqueName;
+
+
+  const uploadResult =
+    await db.storage
+      .from(DOCUMENT_BUCKET)
+      .upload(
+        filePath,
+        file,
+        {
+          contentType:
+            "application/pdf",
+
+          upsert:
+            false
+        }
+      );
+
+
+  if(uploadResult.error) {
+
+    showMessage(
+      "documentMessage",
+      "Errore upload: " +
+      uploadResult.error.message,
+      "error"
+    );
+
+    console.error(
+      uploadResult.error
+    );
+
+    return;
+
+  }
+
+
+  const databaseResult =
+    await db
+      .from("patient_documents")
+      .insert({
+
+        patient_id:
+          currentPatient.id,
+
+        file_name:
+          file.name,
+
+        file_path:
+          filePath
+
+      });
+
+
+  if(databaseResult.error) {
+
+    await db.storage
+      .from(DOCUMENT_BUCKET)
+      .remove([
+        filePath
+      ]);
+
+
+    showMessage(
+      "documentMessage",
+      "Errore nel salvataggio del documento: " +
+      databaseResult.error.message,
+      "error"
+    );
+
+    console.error(
+      databaseResult.error
+    );
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("documentFile")
+    .value = "";
+
+
+  showMessage(
+    "documentMessage",
+    "PDF caricato correttamente.",
+    "success"
+  );
+
+
+  await loadPatientDocuments();
+
+}
+
+
+/* =====================================
+   CARICA DOCUMENTI DEL PAZIENTE
+===================================== */
+
+async function loadPatientDocuments() {
 
   const container =
     document.getElementById(
-      "exerciseLibraryList"
+      "patientDocuments"
     );
 
 
@@ -2928,12 +3383,18 @@ async function loadExerciseLibrary() {
 
   const result =
     await db
-      .from("exercises")
-      .select("*")
+      .from("patient_documents")
+      .select(
+        "id, patient_id, file_name, file_path, created_at"
+      )
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
       .order(
-        "name",
+        "created_at",
         {
-          ascending: true
+          ascending: false
         }
       );
 
@@ -2955,7 +3416,7 @@ async function loadExerciseLibrary() {
   if(!result.data || result.data.length === 0) {
 
     container.innerText =
-      "Nessun esercizio presente.";
+      "Nessun documento caricato.";
 
     return;
 
@@ -2966,479 +3427,157 @@ async function loadExerciseLibrary() {
 
 
   result.data.forEach(
-    function(exercise) {
+    function(documentItem) {
 
-      renderLibraryExercise(
-        exercise,
-        container
-      );
-
-    }
-  );
-
-}
+      const div =
+        document.createElement(
+          "div"
+        );
 
 
-/* =====================================
-   RENDER LIBRERIA
-===================================== */
-
-function renderLibraryExercise(
-  exercise,
-  container
-) {
-
-  const div =
-    document.createElement(
-      "div"
-    );
+      div.className =
+        "document";
 
 
-  div.className =
-    "library-exercise";
+      const title =
+        document.createElement(
+          "h3"
+        );
 
 
-  const title =
-    document.createElement(
-      "h3"
-    );
+      title.innerText =
+        "📄 " +
+        documentItem.file_name;
 
 
-  title.innerText =
-    exercise.name;
-
-
-  div.appendChild(
-    title
-  );
-
-
-  if(exercise.description) {
-
-    const description =
-      document.createElement(
-        "p"
+      div.appendChild(
+        title
       );
 
 
-    description.innerText =
-      exercise.description;
+      const date =
+        document.createElement(
+          "small"
+        );
 
 
-    div.appendChild(
-      description
-    );
+      date.innerText =
+        formatDate(
+          documentItem.created_at
+        );
 
-  }
 
-
-  if(exercise.video_url) {
-
-    const video =
-      document.createElement(
-        "div"
+      div.appendChild(
+        date
       );
 
 
-    video.className =
-      "video";
+      const actions =
+        document.createElement(
+          "div"
+        );
 
 
-    const link =
-      document.createElement(
-        "a"
+      actions.className =
+        "document-actions";
+
+
+      const openButton =
+        document.createElement(
+          "button"
+        );
+
+
+      openButton.className =
+        "secondary";
+
+
+      openButton.innerText =
+        "👁️ Apri PDF";
+
+
+      openButton.addEventListener(
+        "click",
+        function() {
+
+          openDocument(
+            documentItem
+          );
+
+        }
       );
 
 
-    link.href =
-      exercise.video_url;
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
 
 
-    link.target =
-      "_blank";
+      deleteButton.className =
+        "danger";
 
 
-    link.rel =
-      "noopener";
+      deleteButton.innerText =
+        "🗑️ Elimina";
 
 
-    link.innerText =
-      "🎥 Guarda video";
+      deleteButton.addEventListener(
+        "click",
+        function() {
+
+          deleteDocument(
+            documentItem
+          );
+
+        }
+      );
 
 
-    video.appendChild(
-      link
-    );
+      actions.appendChild(
+        openButton
+      );
+
+      actions.appendChild(
+        deleteButton
+      );
 
 
-    div.appendChild(
-      video
-    );
-
-  }
+      div.appendChild(
+        actions
+      );
 
 
-  const buttons =
-    document.createElement(
-      "div"
-    );
-
-
-  buttons.className =
-    "actions";
-
-
-  buttons.style.marginTop =
-    "12px";
-
-
-  const editButton =
-    document.createElement(
-      "button"
-    );
-
-
-  editButton.className =
-    "secondary";
-
-
-  editButton.innerText =
-    "✏️ Modifica";
-
-
-  editButton.addEventListener(
-    "click",
-    function() {
-
-      showLibraryEditor(
-        exercise,
+      container.appendChild(
         div
       );
 
     }
   );
 
-
-  const deleteButton =
-    document.createElement(
-      "button"
-    );
-
-
-  deleteButton.className =
-    "danger";
-
-
-  deleteButton.innerText =
-    "🗑 Elimina";
-
-
-  deleteButton.addEventListener(
-    "click",
-    function() {
-
-      deleteLibraryExercise(
-        exercise.id
-      );
-
-    }
-  );
-
-
-  buttons.appendChild(
-    editButton
-  );
-
-  buttons.appendChild(
-    deleteButton
-  );
-
-
-  div.appendChild(
-    buttons
-  );
-
-
-  container.appendChild(
-    div
-  );
-
 }
 
 
 /* =====================================
-   MODIFICA ESERCIZIO LIBRERIA
+   APRI PDF
 ===================================== */
 
-function showLibraryEditor(
-  exercise,
-  parent
-) {
-
-  const oldEditor =
-    parent.querySelector(
-      ".exercise-editor"
-    );
-
-
-  if(oldEditor) {
-
-    oldEditor.remove();
-
-    return;
-
-  }
-
-
-  const editor =
-    document.createElement(
-      "div"
-    );
-
-
-  editor.className =
-    "exercise-editor";
-
-
-  editor.innerHTML = `
-
-    <label>
-      Nome
-    </label>
-
-    <input
-      class="library-edit-name"
-      value="${escapeHtmlAttribute(exercise.name)}"
-    >
-
-
-    <label>
-      Descrizione
-    </label>
-
-    <textarea
-      class="library-edit-description"
-    >${escapeHtml(exercise.description || "")}</textarea>
-
-
-    <label>
-      Video URL
-    </label>
-
-    <input
-      class="library-edit-video"
-      type="url"
-      value="${escapeHtmlAttribute(exercise.video_url || "")}"
-    >
-
-
-    <br><br>
-
-    <div class="actions">
-
-      <button
-        class="primary save-library-exercise"
-      >
-        💾 Salva
-      </button>
-
-      <button
-        class="secondary cancel-library-exercise"
-      >
-        Annulla
-      </button>
-
-    </div>
-
-    <div
-      class="message library-edit-message hidden"
-    ></div>
-
-  `;
-
-
-  parent.appendChild(
-    editor
-  );
-
-
-  editor
-    .querySelector(
-      ".cancel-library-exercise"
-    )
-    .addEventListener(
-      "click",
-      function() {
-
-        editor.remove();
-
-      }
-    );
-
-
-  editor
-    .querySelector(
-      ".save-library-exercise"
-    )
-    .addEventListener(
-      "click",
-      async function() {
-
-        await saveLibraryExercise(
-          exercise.id,
-          editor
-        );
-
-      }
-    );
-
-}
-
-
-/* =====================================
-   SALVA ESERCIZIO LIBRERIA
-===================================== */
-
-async function saveLibraryExercise(
-  id,
-  editor
-) {
-
-  const name =
-    editor
-      .querySelector(
-        ".library-edit-name"
-      )
-      .value
-      .trim();
-
-
-  const description =
-    editor
-      .querySelector(
-        ".library-edit-description"
-      )
-      .value
-      .trim();
-
-
-  const video =
-    editor
-      .querySelector(
-        ".library-edit-video"
-      )
-      .value
-      .trim();
-
-
-  if(!name) {
-
-    const message =
-      editor.querySelector(
-        ".library-edit-message"
-      );
-
-
-    showInlineMessage(
-      message,
-      "Inserisci il nome dell'esercizio.",
-      "error"
-    );
-
-
-    return;
-
-  }
-
+async function openDocument(documentItem) {
 
   const result =
-    await db
-      .from("exercises")
-      .update({
-
-        name:
-          name,
-
-        description:
-          description || null,
-
-        video_url:
-          video || null
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error) {
-
-    const message =
-      editor.querySelector(
-        ".library-edit-message"
-      );
-
-
-    showInlineMessage(
-      message,
-      result.error.message,
-      "error"
-    );
-
-
-    console.error(
-      result.error
-    );
-
-    return;
-
-  }
-
-
-  await loadExerciseLibrary();
-
-}
-
-
-/* =====================================
-   ELIMINA ESERCIZIO LIBRERIA
-===================================== */
-
-async function deleteLibraryExercise(id) {
-
-  const confirmed =
-    confirm(
-      "Vuoi davvero eliminare questo esercizio dalla libreria?"
-    );
-
-
-  if(!confirmed) {
-
-    return;
-
-  }
-
-
-  const result =
-    await db
-      .from("exercises")
-      .delete()
-      .eq(
-        "id",
-        id
+    await db.storage
+      .from(DOCUMENT_BUCKET)
+      .createSignedUrl(
+        documentItem.file_path,
+        3600
       );
 
 
   if(result.error) {
 
     alert(
-      "Errore nell'eliminazione: " +
+      "Non riesco ad aprire il PDF: " +
       result.error.message
-    );
-
-    console.error(
-      result.error
     );
 
     return;
@@ -3446,23 +3585,23 @@ async function deleteLibraryExercise(id) {
   }
 
 
-  await loadExerciseLibrary();
+  window.open(
+    result.data.signedUrl,
+    "_blank"
+  );
 
 }
 
 
 /* =====================================
-   ELIMINA PAZIENTE
+   ELIMINA PDF
 ===================================== */
 
-async function deletePatient(patient) {
+async function deleteDocument(documentItem) {
 
   const confirmed =
     confirm(
-      "Vuoi davvero eliminare " +
-      patient.name +
-      "?\n\n" +
-      "Verranno eliminati anche gli esercizi assegnati e l'account del paziente."
+      "Vuoi davvero eliminare questo documento?"
     );
 
 
@@ -3473,100 +3612,543 @@ async function deletePatient(patient) {
   }
 
 
-  try {
+  const storageResult =
+    await db.storage
+      .from(DOCUMENT_BUCKET)
+      .remove([
+        documentItem.file_path
+      ]);
 
-    const sessionResult =
-      await db.auth.getSession();
+
+  if(storageResult.error) {
+
+    alert(
+      "Errore eliminazione file: " +
+      storageResult.error.message
+    );
+
+    return;
+
+  }
 
 
-    if(
-      sessionResult.error ||
-      !sessionResult.data.session
-    ) {
-
-      alert(
-        "Sessione non valida. Effettua nuovamente il login."
+  const databaseResult =
+    await db
+      .from("patient_documents")
+      .delete()
+      .eq(
+        "id",
+        documentItem.id
       );
 
-      return;
+
+  if(databaseResult.error) {
+
+    alert(
+      "Il PDF è stato rimosso dallo Storage, ma non dal database: " +
+      databaseResult.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadPatientDocuments();
+
+}
+
+
+/* =====================================
+   PORTALE PAZIENTE
+===================================== */
+
+async function loadPatientPortal() {
+
+  await loadPatientPortalExercises();
+
+  await loadPatientPortalDocuments();
+
+}
+
+
+/* =====================================
+   ESERCIZI PORTALE PAZIENTE
+===================================== */
+
+async function loadPatientPortalExercises() {
+
+  const container =
+    document.getElementById(
+      "patientPortalExercises"
+    );
+
+
+  container.innerHTML =
+    "Caricamento...";
+
+
+  const result =
+    await db
+      .from("patient_exercises")
+      .select(`
+        id,
+        sets,
+        reps,
+        duration,
+        rest,
+        notes,
+        completed,
+        exercises (
+          name,
+          description,
+          video_url
+        )
+      `)
+      .eq(
+        "patient_id",
+        currentPatient.id
+      );
+
+
+  if(result.error) {
+
+    container.innerText =
+      result.error.message;
+
+    return;
+
+  }
+
+
+  if(!result.data || result.data.length === 0) {
+
+    container.innerText =
+      "Non hai ancora esercizi assegnati.";
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  result.data.forEach(
+    function(item) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "exercise";
+
+
+      if(item.completed) {
+
+        div.classList.add(
+          "completed"
+        );
+
+      }
+
+
+      const title =
+        document.createElement(
+          "h3"
+        );
+
+
+      title.innerText =
+        item.exercises?.name ||
+        "Esercizio";
+
+
+      div.appendChild(
+        title
+      );
+
+
+      let info = [];
+
+
+      if(item.sets !== null && item.sets !== undefined) {
+
+        info.push(
+          item.sets + " serie"
+        );
+
+      }
+
+
+      if(item.reps !== null && item.reps !== undefined) {
+
+        info.push(
+          item.reps + " ripetizioni"
+        );
+
+      }
+
+
+      if(item.duration !== null && item.duration !== undefined) {
+
+        info.push(
+          item.duration + " secondi"
+        );
+
+      }
+
+
+      if(item.rest !== null && item.rest !== undefined) {
+
+        info.push(
+          "recupero " +
+          item.rest +
+          "\""
+        );
+
+      }
+
+
+      if(info.length > 0) {
+
+        const p =
+          document.createElement(
+            "p"
+          );
+
+
+        p.innerText =
+          info.join(" · ");
+
+
+        div.appendChild(
+          p
+        );
+
+      }
+
+
+      if(item.exercises?.description) {
+
+        const description =
+          document.createElement(
+            "p"
+          );
+
+
+        description.innerText =
+          item.exercises.description;
+
+
+        div.appendChild(
+          description
+        );
+
+      }
+
+
+      if(item.exercises?.video_url) {
+
+        const video =
+          document.createElement(
+            "div"
+          );
+
+
+        video.className =
+          "video";
+
+
+        const link =
+          document.createElement(
+            "a"
+          );
+
+
+        link.href =
+          item.exercises.video_url;
+
+
+        link.target =
+          "_blank";
+
+
+        link.rel =
+          "noopener";
+
+
+        link.innerText =
+          "🎥 Guarda video";
+
+
+        video.appendChild(
+          link
+        );
+
+
+        div.appendChild(
+          video
+        );
+
+      }
+
+
+      if(item.notes) {
+
+        const notes =
+          document.createElement(
+            "p"
+          );
+
+
+        notes.innerText =
+          "📝 " +
+          item.notes;
+
+
+        div.appendChild(
+          notes
+        );
+
+      }
+
+
+      const completionLabel =
+        document.createElement(
+          "label"
+        );
+
+
+      const completion =
+        document.createElement(
+          "input"
+        );
+
+
+      completion.type =
+        "checkbox";
+
+
+      completion.checked =
+        !!item.completed;
+
+
+      completion.dataset.id =
+        item.id;
+
+
+      completion.addEventListener(
+        "change",
+        updateCompletion
+      );
+
+
+      completionLabel.appendChild(
+        completion
+      );
+
+
+      completionLabel.appendChild(
+        document.createTextNode(
+          " Ho completato questo esercizio"
+        )
+      );
+
+
+      div.appendChild(
+        completionLabel
+      );
+
+
+      container.appendChild(
+        div
+      );
 
     }
+  );
+
+}
 
 
-    const response =
-      await fetch(
-        SUPABASE_URL +
-        "/functions/v1/delete-patient",
+/* =====================================
+   DOCUMENTI PORTALE PAZIENTE
+===================================== */
+
+async function loadPatientPortalDocuments() {
+
+  const container =
+    document.getElementById(
+      "patientPortalDocuments"
+    );
+
+
+  container.innerHTML =
+    "Caricamento...";
+
+
+  const result =
+    await db
+      .from("patient_documents")
+      .select(
+        "id, file_name, file_path, created_at"
+      )
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
         {
+          ascending: false
+        }
+      );
 
-          method: "POST",
 
-          headers: {
+  if(result.error) {
 
-            "Content-Type":
-              "application/json",
+    container.innerText =
+      result.error.message;
 
-            "Authorization":
-              "Bearer " +
-              sessionResult.data.session.access_token,
+    return;
 
-            "apikey":
-              SUPABASE_KEY
+  }
 
-          },
 
-          body:
-            JSON.stringify({
+  if(!result.data || result.data.length === 0) {
 
-              patient_id:
-                patient.id
+    container.innerText =
+      "Non hai ancora report o documenti.";
 
-            })
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  result.data.forEach(
+    function(documentItem) {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "document";
+
+
+      const title =
+        document.createElement(
+          "h3"
+        );
+
+
+      title.innerText =
+        "📄 " +
+        documentItem.file_name;
+
+
+      div.appendChild(
+        title
+      );
+
+
+      const date =
+        document.createElement(
+          "small"
+        );
+
+
+      date.innerText =
+        formatDate(
+          documentItem.created_at
+        );
+
+
+      div.appendChild(
+        date
+      );
+
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.className =
+        "primary";
+
+
+      button.style.marginTop =
+        "12px";
+
+
+      button.innerText =
+        "👁️ Apri PDF";
+
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          openDocument(
+            documentItem
+          );
 
         }
       );
 
 
-    const data =
-      await response.json();
-
-
-    if(!response.ok) {
-
-      alert(
-        data.error ||
-        "Errore durante l'eliminazione del paziente."
+      div.appendChild(
+        button
       );
 
-      console.error(
-        data
-      );
 
-      return;
+      container.appendChild(
+        div
+      );
 
     }
+  );
+
+}
 
 
-    alert(
-      "Paziente eliminato correttamente."
-    );
+/* =====================================
+   DATA
+===================================== */
 
+function formatDate(dateString) {
 
-    await loadPatients();
+  if(!dateString) {
 
-
-  } catch(error) {
-
-    console.error(
-      error
-    );
-
-
-    alert(
-      "Errore di connessione."
-    );
+    return "";
 
   }
+
+
+  const date =
+    new Date(
+      dateString
+    );
+
+
+  return date.toLocaleDateString(
+    "it-IT",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    }
+  );
 
 }
 
@@ -3599,78 +4181,69 @@ document
   );
 
 
-document
-  .getElementById("backLibraryButton")
-  .addEventListener(
-    "click",
-    startTherapist
-  );
+/* =====================================
+   CONTROLLO SESSIONE ALL'AVVIO
+===================================== */
+
+(async function() {
+
+  const recovery =
+    await checkRecoverySession();
+
+
+  if(recovery) {
+
+    return;
+
+  }
+
+
+  const result =
+    await db.auth.getSession();
+
+
+  if(
+    result.data &&
+    result.data.session
+  ) {
+
+    await startApp();
+
+  } else {
+
+    showPage(
+      "loginPage"
+    );
+
+  }
+
+})();
 
 
 /* =====================================
-   UTILITY
+   AUTH STATE CHANGE
 ===================================== */
 
-function showInlineMessage(
-  element,
-  text,
-  type
-) {
+db.auth.onAuthStateChange(
+  async function(event, session) {
 
-  element.innerText =
-    text;
+    if(
+      event === "PASSWORD_RECOVERY" &&
+      session
+    ) {
 
-  element.className =
-    "message " + type;
-
-}
+      currentUser =
+        session.user;
 
 
-function escapeHtml(value) {
-
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-}
-
-
-function escapeHtmlAttribute(value) {
-
-  return escapeHtml(value);
-
-}
-
-
-/* =====================================
-   CONTROLLO SESSIONE
-===================================== */
-
-db.auth
-  .getSession()
-  .then(
-    async function(result) {
-
-      if(
-        result.data &&
-        result.data.session
-      ) {
-
-        await startApp();
-
-      } else {
-
-        showPage(
-          "loginPage"
-        );
-
-      }
+      showPage(
+        "setPasswordPage"
+      );
 
     }
-  );
+
+  }
+);
 
 
 </script>

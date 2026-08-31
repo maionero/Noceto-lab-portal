@@ -631,6 +631,7 @@
       const el = document.getElementById(id);
       el.innerText = text;
       el.className = "message " + type;
+      el.classList.remove("hidden");
     }
 
     /* =====================================
@@ -735,12 +736,238 @@
       await loadRunningPlans();
     }
 
+    /* GESTIONE ESERCIZI LIBRERIA & ASSEGNAZIONE */
+    async function loadExerciseLibrary() {
+      const lib = document.getElementById("exerciseLibrary");
+      lib.innerHTML = "Caricamento...";
+      const res = await db.from("exercises").select("*").order("name");
+      if (res.error) return lib.innerHTML = res.error.message;
+      if (!res.data.length) return lib.innerHTML = "Nessun esercizio nella libreria.";
+
+      lib.innerHTML = "";
+      res.data.forEach(ex => {
+        const div = document.createElement("div");
+        div.className = "exercise";
+        div.innerHTML = `
+          <h3>${ex.name}</h3>
+          <p>${ex.description || ""}</p>
+          ${ex.video_url ? `<div class="video"><a href="${ex.video_url}" target="_blank">📺 Guarda video</a></div>` : ""}
+          <br>
+          <button class="danger" onclick="deleteLibraryExercise('${ex.id}')">Elimina</button>
+        `;
+        lib.appendChild(div);
+      });
+    }
+
+    async function deleteLibraryExercise(id) {
+      if (!confirm("Sicuro di voler eliminare questo esercizio dalla libreria?")) return;
+      await db.from("exercises").delete().eq("id", id);
+      await loadExerciseLibrary();
+    }
+
+    async function loadExercises() {
+      const select = document.getElementById("exerciseSelect");
+      select.innerHTML = '<option value="">Seleziona esercizio</option>';
+      const res = await db.from("exercises").select("*").order("name");
+      if (res.data) {
+        res.data.forEach(e => {
+          const opt = document.createElement("option");
+          opt.value = e.id;
+          opt.textContent = e.name;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    document.getElementById("assignButton").addEventListener("click", async () => {
+      const exerciseId = document.getElementById("exerciseSelect").value;
+      if (!exerciseId || !currentPatient) return showMessage("assignMessage", "Seleziona un esercizio.", "error");
+
+      const sets = parseInt(document.getElementById("sets").value) || null;
+      const reps = parseInt(document.getElementById("reps").value) || null;
+      const duration = parseInt(document.getElementById("duration").value) || null;
+      const rest = parseInt(document.getElementById("rest").value) || null;
+      const notes = document.getElementById("notes").value.trim();
+
+      const { error } = await db.from("patient_exercises").insert([{
+        patient_id: currentPatient.id,
+        exercise_id: exerciseId,
+        sets, reps, duration, rest, notes
+      }]);
+
+      if (error) showMessage("assignMessage", error.message, "error");
+      else {
+        showMessage("assignMessage", "Esercizio assegnato!", "success");
+        await loadPatientExercises();
+      }
+    });
+
+    async function loadPatientExercises() {
+      const list = document.getElementById("patientExercises");
+      list.innerHTML = "Caricamento...";
+      const res = await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id", currentPatient.id);
+      if (res.error) return list.innerHTML = res.error.message;
+      if (!res.data.length) return list.innerHTML = "Nessun esercizio assegnato.";
+
+      list.innerHTML = "";
+      res.data.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "exercise";
+        div.innerHTML = `
+          <h3>${item.exercises.name}</h3>
+          <p>${item.exercises.description || ""}</p>
+          <p>
+            ${item.sets ? `Serie: <strong>${item.sets}</strong> ` : ""}
+            ${item.reps ? `| Reps: <strong>${item.reps}</strong> ` : ""}
+            ${item.duration ? `| Durata: <strong>${item.duration}s</strong> ` : ""}
+            ${item.rest ? `| Recupero: <strong>${item.rest}s</strong>` : ""}
+          </p>
+          ${item.notes ? `<p><em>Note: ${item.notes}</em></p>` : ""}
+          ${item.exercises.video_url ? `<div class="video"><a href="${item.exercises.video_url}" target="_blank">📺 Guarda video</a></div><br>` : ""}
+          <button class="danger" onclick="removePatientExercise('${item.id}')">Rimuovi</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function removePatientExercise(id) {
+      if (!confirm("Rimuovere esercizio dal programma?")) return;
+      await db.from("patient_exercises").delete().eq("id", id);
+      await loadPatientExercises();
+    }
+
+    /* MODALI CREAZIONE UTENTE ED ESERCIZIO */
+    document.getElementById("newPatientButton").addEventListener("click", () => showPage("newPatientPage"));
+    document.getElementById("cancelPatient").addEventListener("click", () => showPage("therapistPage"));
+    document.getElementById("newExerciseButton").addEventListener("click", () => showPage("newExercisePage"));
+    document.getElementById("cancelExercise").addEventListener("click", () => showPage("therapistPage"));
+
+    document.getElementById("savePatient").addEventListener("click", async () => {
+      const name = document.getElementById("newPatientName").value.trim();
+      const email = document.getElementById("newPatientEmail").value.trim();
+      if (!name || !email) return showMessage("patientMessage", "Compila tutti i campi.", "error");
+
+      const res = await db.from("patients").insert([{ name, email }]);
+      if (res.error) showMessage("patientMessage", res.error.message, "error");
+      else {
+        showPage("therapistPage");
+        await loadPatients();
+      }
+    });
+
+    document.getElementById("saveExercise").addEventListener("click", async () => {
+      const name = document.getElementById("exerciseName").value.trim();
+      const description = document.getElementById("exerciseDescription").value.trim();
+      const video_url = document.getElementById("exerciseVideo").value.trim();
+      if (!name) return showMessage("exerciseMessage", "Inserisci il nome.", "error");
+
+      const res = await db.from("exercises").insert([{ name, description, video_url }]);
+      if (res.error) showMessage("exerciseMessage", res.error.message, "error");
+      else {
+        showPage("therapistPage");
+        await loadExerciseLibrary();
+      }
+    });
+
+    /* DOCUMENTI & NOTE */
+    document.getElementById("uploadDocumentButton").addEventListener("click", async () => {
+      const fileInput = document.getElementById("documentFile");
+      if (!fileInput.files.length || !currentPatient) return showMessage("documentMessage", "Seleziona un file PDF.", "error");
+
+      const file = fileInput.files[0];
+      const filePath = `${currentPatient.id}/${Date.now()}_${file.name}`;
+      const uploadRes = await db.storage.from(DOCUMENT_BUCKET).upload(filePath, file);
+
+      if (uploadRes.error) return showMessage("documentMessage", uploadRes.error.message, "error");
+
+      const { data } = db.storage.from(DOCUMENT_BUCKET).getPublicUrl(filePath);
+      await db.from("patient_documents").insert([{
+        patient_id: currentPatient.id,
+        name: file.name,
+        file_url: data.publicUrl
+      }]);
+
+      showMessage("documentMessage", "Documento caricato!", "success");
+      await loadPatientDocuments();
+    });
+
+    async function loadPatientDocuments() {
+      const list = document.getElementById("patientDocuments");
+      list.innerHTML = "Caricamento...";
+      const res = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+      if (res.error || !res.data.length) return list.innerHTML = "Nessun documento caricato.";
+
+      list.innerHTML = "";
+      res.data.forEach(doc => {
+        const div = document.createElement("div");
+        div.className = "document";
+        div.innerHTML = `
+          <h3>📄 ${doc.name}</h3>
+          <a href="${doc.file_url}" target="_blank">Apri PDF</a><br><br>
+          <button class="danger" onclick="deleteDocument('${doc.id}')">Elimina</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function deleteDocument(id) {
+      if (!confirm("Eliminare documento?")) return;
+      await db.from("patient_documents").delete().eq("id", id);
+      await loadPatientDocuments();
+    }
+
+    document.getElementById("savePatientNoteButton").addEventListener("click", async () => {
+      const title = document.getElementById("patientNoteTitle").value.trim();
+      const content = document.getElementById("patientNoteContent").value.trim();
+      if (!content || !currentPatient) return showMessage("patientNoteMessage", "Inserisci il contenuto della nota.", "error");
+
+      const res = await db.from("patient_notes").insert([{
+        patient_id: currentPatient.id,
+        title, content
+      }]);
+
+      if (res.error) showMessage("patientNoteMessage", res.error.message, "error");
+      else {
+        showMessage("patientNoteMessage", "Nota salvata!", "success");
+        document.getElementById("patientNoteTitle").value = "";
+        document.getElementById("patientNoteContent").value = "";
+        await loadPatientNotes();
+      }
+    });
+
+    async function loadPatientNotes() {
+      const list = document.getElementById("patientNotesList");
+      list.innerHTML = "Caricamento...";
+      const res = await db.from("patient_notes").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+      if (res.error || !res.data.length) return list.innerHTML = "Nessuna nota salvata.";
+
+      list.innerHTML = "";
+      res.data.forEach(note => {
+        const div = document.createElement("div");
+        div.className = "note-card";
+        div.innerHTML = `
+          <h4>${note.title || "Nota"}</h4>
+          <p>${note.content}</p>
+          <button class="danger" onclick="deleteNote('${note.id}')">Elimina</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function deleteNote(id) {
+      if (!confirm("Eliminare nota?")) return;
+      await db.from("patient_notes").delete().eq("id", id);
+      await loadPatientNotes();
+    }
+
     /* =====================================
-       PROGRAMMA CORSA (OTTIMIZZATO)
+       PROGRAMMA CORSA (CORRETTO E DEDICATO)
     ===================================== */
     document.getElementById("generateRunningPlanButton").addEventListener("click", generateRunningPlanner);
 
-    // Gestione visibilità selettore "Ripetute"
+    // Gestore per mostrare/nascondere la modalità Lenta/Veloce solo su Ripetute
     function togglePaceSelector(selectEl) {
       const tr = selectEl.closest("tr");
       const paceSelect = tr.querySelector(".run-pace-type");
@@ -841,7 +1068,7 @@
       if (error) showMessage("runningMessage", error.message, "error");
       else {
         showMessage("runningMessage", "Programma salvato con successo!", "success");
-        loadRunningPlans();
+        await loadRunningPlans();
       }
     });
 
@@ -852,7 +1079,7 @@
 
       if (res.error || !res.data.length) return container.innerHTML = "Nessun programma corsa salvato.";
 
-      const plan = res.data[0].plan_data; // Mostra l'ultimo salvato
+      const plan = res.data[0].plan_data;
       let html = `<table class="running-table">
         <thead>
           <tr>
@@ -886,12 +1113,12 @@
     document.getElementById("deleteRunningProgramButton").addEventListener("click", async () => {
       if (!currentPatient || !confirm("Eliminare il programma di corsa attuale?")) return;
       await db.from("running_plans").delete().eq("patient_id", currentPatient.id);
-      loadRunningPlans();
+      await loadRunningPlans();
       document.getElementById("runningPlanner").innerHTML = "";
     });
 
     /* =====================================
-       PORTALE PAZIENTE LOGIC
+       PORTALE PAZIENTE REAL LOAD
     ===================================== */
     async function startPatient() {
       const res = await db.from("patients").select("*").eq("user_id", currentUser.id).maybeSingle();
@@ -903,10 +1130,74 @@
     }
 
     async function loadPatientPortal() {
-      loadPatientPortalExercises();
-      loadPatientPortalDocuments();
-      loadPatientPortalNotes();
-      loadPatientPortalRunning();
+      await loadPatientPortalExercises();
+      await loadPatientPortalDocuments();
+      await loadPatientPortalNotes();
+      await loadPatientPortalRunning();
+    }
+
+    async function loadPatientPortalExercises() {
+      const container = document.getElementById("patientPortalExercises");
+      container.innerHTML = "Caricamento...";
+      const res = await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id", currentPatient.id);
+      if (res.error || !res.data.length) return container.innerHTML = "Nessun esercizio assegnato.";
+
+      container.innerHTML = "";
+      res.data.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "exercise";
+        div.innerHTML = `
+          <h3>${item.exercises.name}</h3>
+          <p>${item.exercises.description || ""}</p>
+          <p>
+            ${item.sets ? `Serie: <strong>${item.sets}</strong> ` : ""}
+            ${item.reps ? `| Reps: <strong>${item.reps}</strong> ` : ""}
+            ${item.duration ? `| Durata: <strong>${item.duration}s</strong> ` : ""}
+            ${item.rest ? `| Recupero: <strong>${item.rest}s</strong>` : ""}
+          </p>
+          ${item.notes ? `<p><em>Note: ${item.notes}</em></p>` : ""}
+          ${item.exercises.video_url ? `<div class="video"><a href="${item.exercises.video_url}" target="_blank">📺 Guarda video</a></div>` : ""}
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function loadPatientPortalDocuments() {
+      const container = document.getElementById("patientPortalDocuments");
+      container.innerHTML = "Caricamento...";
+      const res = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+      if (res.error || !res.data.length) return container.innerHTML = "Nessun report presente.";
+
+      container.innerHTML = "";
+      res.data.forEach(doc => {
+        const div = document.createElement("div");
+        div.className = "document";
+        div.innerHTML = `
+          <h3>📄 ${doc.name}</h3>
+          <a href="${doc.file_url}" target="_blank">Apri o Scarica PDF</a>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function loadPatientPortalNotes() {
+      const container = document.getElementById("patientPortalNotes");
+      container.innerHTML = "Caricamento...";
+      const res = await db.from("patient_notes").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+      if (res.error || !res.data.length) return container.innerHTML = "Nessuna nota presente.";
+
+      container.innerHTML = "";
+      res.data.forEach(note => {
+        const div = document.createElement("div");
+        div.className = "note-card";
+        div.innerHTML = `
+          <h4>${note.title || "Nota"}</h4>
+          <p>${note.content}</p>
+        `;
+        container.appendChild(div);
+      });
     }
 
     async function loadPatientPortalRunning() {
@@ -947,15 +1238,13 @@
       container.innerHTML = html;
     }
 
-    /* Standard stubs per libreria / note / documentazione */
-    async function loadExercises() {}
-    async function loadExerciseLibrary() {}
-    async function loadPatientExercises() {}
-    async function loadPatientDocuments() {}
-    async function loadPatientNotes() {}
-    async function loadPatientPortalExercises() {}
-    async function loadPatientPortalDocuments() {}
-    async function loadPatientPortalNotes() {}
+    /* STAMPA ESERCIZI */
+    document.getElementById("printExerciseSheetButton").addEventListener("click", printSheet);
+    document.getElementById("patientPrintExerciseSheetButton").addEventListener("click", printSheet);
+
+    function printSheet() {
+      window.print();
+    }
 
     // Init App
     checkRecoverySession().then(hasSession => {

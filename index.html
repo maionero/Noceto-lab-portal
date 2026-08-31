@@ -711,7 +711,7 @@ hr {
       <h2>🏃 Programma di corsa</h2>
     </div>
 
-    <p>Costruisci una programmazione settimanale personalizzata. Di default puoi scegliere da 2 a 5 allenamenti a settimana e il numero di settimane.</p>
+    <p>Costruisci una programmazione settimanale personalizzata. Scegli da 2 a 5 allenamenti a settimana e il numero di settimane. La settimana viene mostrata come intestazione, non ripetuta in ogni riga.</p>
 
     <div class="grid">
       <div>
@@ -4380,36 +4380,124 @@ function generateRunningPlan() {
 function renderRunningPlanner() {
   const container = document.getElementById("runningPlanner");
   if(!container) return;
-  if(!generatedRunningRows.length) { container.innerHTML = "Genera una tabella per iniziare."; return; }
-  const table = document.createElement("table");
-  table.className = "planner-table";
-  table.innerHTML = `<thead><tr><th>Settimana</th><th>Giorno</th><th>Tipo</th><th>Titolo</th><th>Km</th><th>Durata</th><th>Ritmo</th><th>Allenamento</th><th>Note</th></tr></thead>`;
-  const tbody = document.createElement("tbody");
-  generatedRunningRows.forEach((row,index) => {
-    const tr=document.createElement("tr");
-    const vals=[row.week,row.day];
-    vals.forEach(v=>{ const td=document.createElement("td"); td.innerText=v; tr.appendChild(td); });
-    const fields=[
-      ["type","select"],["title","input"],["distance","input"],["duration","input"],["pace","input"],["workout","textarea"],["notes","textarea"]
+
+  if(!generatedRunningRows.length) {
+    container.innerHTML = "Genera una tabella per iniziare.";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  let currentWeek = 0;
+  let table = null;
+  let tbody = null;
+
+  generatedRunningRows.forEach((row) => {
+
+    if(row.week !== currentWeek) {
+      currentWeek = row.week;
+
+      const weekTitle = document.createElement("h3");
+      weekTitle.innerText = "Settimana " + currentWeek;
+      weekTitle.style.marginTop = currentWeek === 1 ? "0" : "28px";
+      container.appendChild(weekTitle);
+
+      table = document.createElement("table");
+      table.className = "planner-table";
+
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Giorno</th>
+            <th>Tipo</th>
+            <th>Titolo</th>
+            <th>Km</th>
+            <th>Durata</th>
+            <th>Ritmo</th>
+            <th>Allenamento</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+      `;
+
+      tbody = document.createElement("tbody");
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    const tr = document.createElement("tr");
+
+    const dayTd = document.createElement("td");
+    dayTd.innerText = row.day;
+    tr.appendChild(dayTd);
+
+    const fields = [
+      ["type", "select"],
+      ["title", "input"],
+      ["distance", "input"],
+      ["duration", "input"],
+      ["pace", "input"],
+      ["workout", "textarea"],
+      ["notes", "textarea"]
     ];
-    fields.forEach(([key,kind])=>{
-      const td=document.createElement("td");
+
+    fields.forEach(([key, kind]) => {
+      const td = document.createElement("td");
       let el;
-      if(kind==="select") {
-        el=document.createElement("select");
-        ["","Corsa facile","Lungo","Ripetute","Tempo","Progressivo","Salite","Recupero","Test","Altro"].forEach(opt=>{ const o=document.createElement("option"); o.value=opt; o.textContent=opt||"Seleziona"; el.appendChild(o); });
+
+      if(kind === "select") {
+        el = document.createElement("select");
+
+        [
+          "",
+          "Corsa facile",
+          "Lungo",
+          "Ripetute",
+          "Tempo",
+          "Progressivo",
+          "Salite",
+          "Recupero",
+          "Test",
+          "Altro"
+        ].forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt || "Seleziona";
+          el.appendChild(o);
+        });
       } else {
-        el=document.createElement(kind);
-        if(key==="distance") { el.type="number"; el.step="0.1"; el.min="0"; }
-        if(key==="duration") { el.type="number"; el.min="0"; }
+        el = document.createElement(kind);
+
+        if(key === "distance") {
+          el.type = "number";
+          el.step = "0.1";
+          el.min = "0";
+          el.placeholder = "Km";
+        }
+
+        if(key === "duration") {
+          el.type = "number";
+          el.min = "0";
+          el.placeholder = "Min";
+        }
+
+        if(key === "pace") {
+          el.placeholder = "es. 5:00/km";
+        }
       }
-      el.value=row[key]||"";
-      el.addEventListener("input",()=>{ row[key]=el.value; });
-      td.appendChild(el); tr.appendChild(td);
+
+      el.value = row[key] || "";
+
+      el.addEventListener("input", () => {
+        row[key] = el.value;
+      });
+
+      td.appendChild(el);
+      tr.appendChild(td);
     });
+
     tbody.appendChild(tr);
   });
-  table.appendChild(tbody); container.innerHTML=""; container.appendChild(table);
 }
 
 async function saveRunningProgram() {

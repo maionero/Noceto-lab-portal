@@ -1058,8 +1058,17 @@ async function deletePatientNote(id) {
 function toggleIntervalInputs(w, s) {
   const typeVal = document.getElementById(`run_type_${w}_${s}`).value;
   const intervalBox = document.getElementById(`interval_box_${w}_${s}`);
+  const labelFast = document.getElementById(`label_fast_${w}_${s}`);
+  const labelSlow = document.getElementById(`label_slow_${w}_${s}`);
+
   if(typeVal === "Ripetute") {
     intervalBox.classList.remove("hidden");
+    labelFast.innerText = "Corsa Veloce (sec/min)";
+    labelSlow.innerText = "Corsa Lenta / Recupero";
+  } else if(typeVal === "Corsa + Camminata") {
+    intervalBox.classList.remove("hidden");
+    labelFast.innerText = "Tempo Corsa (sec/min)";
+    labelSlow.innerText = "Tempo Camminata (sec/min)";
   } else {
     intervalBox.classList.add("hidden");
   }
@@ -1084,21 +1093,22 @@ document.getElementById("generateRunningPlanButton").addEventListener("click", (
           <label>Tipo di Corsa</label>
           <select id="run_type_${w}_${s}" onchange="toggleIntervalInputs(${w}, ${s})">
             <option value="Corsa Continua">Corsa Continua</option>
+            <option value="Corsa + Camminata">Corsa + Camminata (Interval)</option>
             <option value="Ripetute">Ripetute</option>
             <option value="Fartlek">Fartlek</option>
             <option value="Camminata">Camminata / Passo</option>
             <option value="Riscaldamento">Riscaldamento / Defaticamento</option>
           </select>
 
-          <label>Durata (Minuti)</label>
-          <input type="number" id="run_dur_${w}_${s}" placeholder="Es. 45" min="1">
+          <label>Durata Totale (Minuti)</label>
+          <input type="number" id="run_dur_${w}_${s}" placeholder="Es. 30" min="1">
 
           <div id="interval_box_${w}_${s}" class="interval-box hidden">
-            <label>Corsa Veloce (sec/min)</label>
-            <input type="text" id="run_fast_${w}_${s}" placeholder="Es. 1 min o 400m">
+            <label id="label_fast_${w}_${s}">Tempo Corsa (sec/min)</label>
+            <input type="text" id="run_fast_${w}_${s}" placeholder="Es. 30 sec oppure 2 min">
 
-            <label>Corsa Lenta / Recupero</label>
-            <input type="text" id="run_slow_${w}_${s}" placeholder="Es. 2 min o 200m">
+            <label id="label_slow_${w}_${s}">Tempo Camminata (sec/min)</label>
+            <input type="text" id="run_slow_${w}_${s}" placeholder="Es. 30 sec oppure 1 min">
           </div>
 
           <label>Difficoltà (RPE 1-10)</label>
@@ -1141,8 +1151,8 @@ document.getElementById("saveRunningProgramButton").addEventListener("click", as
       weekSessions.push({
         type,
         duration,
-        fast: type === "Ripetute" ? fast : "",
-        slow: type === "Ripetute" ? slow : "",
+        fast: (type === "Ripetute" || type === "Corsa + Camminata") ? fast : "",
+        slow: (type === "Ripetute" || type === "Corsa + Camminata") ? slow : "",
         rpe,
         notes
       });
@@ -1194,6 +1204,9 @@ async function loadRunningPlans() {
         if(sess.type === "Ripetute") {
           if(sess.fast) sessionContent += `<br>⚡ Veloce: ${sess.fast}`;
           if(sess.slow) sessionContent += `<br>🐢 Lenta/Recupero: ${sess.slow}`;
+        } else if(sess.type === "Corsa + Camminata") {
+          if(sess.fast) sessionContent += `<br>🏃 Corsa: ${sess.fast}`;
+          if(sess.slow) sessionContent += `<br>🚶 Camminata: ${sess.slow}`;
         }
         if(sess.rpe) sessionContent += `<br>📊 Difficoltà: ${sess.rpe}`;
         if(sess.notes) sessionContent += `<br>📝 <em>${sess.notes}</em>`;
@@ -1308,6 +1321,9 @@ async function loadPatientPortal() {
           if(sess.type === "Ripetute") {
             if(sess.fast) sessionContent += `<br>⚡ Veloce: ${sess.fast}`;
             if(sess.slow) sessionContent += `<br>🐢 Lenta: ${sess.slow}`;
+          } else if(sess.type === "Corsa + Camminata") {
+            if(sess.fast) sessionContent += `<br>🏃 Corsa: ${sess.fast}`;
+            if(sess.slow) sessionContent += `<br>🚶 Camminata: ${sess.slow}`;
           }
           if(sess.rpe) sessionContent += `<br>📊 Difficoltà: ${sess.rpe}`;
           if(sess.notes) sessionContent += `<br>📝 <em>${sess.notes}</em>`;

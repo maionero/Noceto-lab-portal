@@ -1,1 +1,1791 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Noceto Lab Exercise</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #111;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px #0001;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .primary {
+      background: #111;
+      color: white;
+    }
+
+    .secondary {
+      background: #ddd;
+    }
+
+    .danger {
+      background: #c62828;
+      color: white;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 11px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: bold;
+    }
+
+    .patients {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .patient {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      cursor: pointer;
+    }
+
+    .patient:hover {
+      background: #eee;
+    }
+
+    .patient-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .exercise {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: white;
+    }
+
+    .exercise h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    .exercise-info {
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .exercise-note {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .video {
+      margin-top: 10px;
+    }
+
+    .video a {
+      color: #0645ad;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .message {
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .error {
+      background: #ffe5e5;
+      color: #900;
+    }
+
+    .success {
+      background: #e5f7e5;
+      color: #176b17;
+    }
+
+    .back {
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 650px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏥 Noceto Lab Exercise</h1>
+
+  <button
+    class="secondary"
+    id="homeButton"
+  >
+    Pazienti
+  </button>
+</header>
+
+
+<div class="container">
+
+
+  <!-- =========================
+       PAGINA PAZIENTI
+  ========================== -->
+
+  <section id="patientsPage">
+
+    <div class="card">
+
+      <div class="top-actions">
+
+        <button
+          class="primary"
+          id="newPatientButton"
+        >
+          ＋ Nuovo paziente
+        </button>
+
+        <button
+          class="secondary"
+          id="newExerciseButton"
+        >
+          ＋ Nuovo esercizio
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>👤 Pazienti</h2>
+
+      <div
+        id="patientsList"
+        class="patients"
+      >
+        Caricamento...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       PAGINA PAZIENTE
+  ========================== -->
+
+  <section
+    id="patientPage"
+    class="hidden"
+  >
+
+    <button
+      class="secondary back"
+      id="backButton"
+    >
+      ← Torna ai pazienti
+    </button>
+
+
+    <div class="card">
+
+      <h2 id="patientTitle">
+        Paziente
+      </h2>
+
+      <p>
+        Programma esercizi
+      </p>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>🏋️ Esercizi assegnati</h2>
+
+      <div id="patientExercises">
+        Nessun esercizio assegnato.
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>＋ Assegna esercizio</h2>
+
+      <label>
+        Esercizio
+      </label>
+
+      <select id="exerciseSelect">
+        <option value="">
+          Seleziona esercizio
+        </option>
+      </select>
+
+
+      <div class="form-grid">
+
+        <div>
+
+          <label>
+            Serie
+          </label>
+
+          <input
+            id="setsInput"
+            type="number"
+            min="0"
+            placeholder="3"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Ripetizioni
+          </label>
+
+          <input
+            id="repsInput"
+            type="number"
+            min="0"
+            placeholder="10"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Durata (secondi)
+          </label>
+
+          <input
+            id="durationInput"
+            type="number"
+            min="0"
+            placeholder="30"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Recupero (secondi)
+          </label>
+
+          <input
+            id="restInput"
+            type="number"
+            min="0"
+            placeholder="60"
+          >
+
+        </div>
+
+      </div>
+
+
+      <label>
+        Note
+      </label>
+
+      <textarea
+        id="assignmentNotes"
+        placeholder="Indicazioni per il paziente..."
+      ></textarea>
+
+
+      <br><br>
+
+      <button
+        class="primary"
+        id="assignButton"
+      >
+        Assegna esercizio
+      </button>
+
+
+      <div
+        id="assignmentMessage"
+        class="message"
+      ></div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       NUOVO PAZIENTE
+  ========================== -->
+
+  <section
+    id="newPatientPage"
+    class="hidden"
+  >
+
+    <div class="card">
+
+      <h2>👤 Nuovo paziente</h2>
+
+      <label>
+        Nome
+      </label>
+
+      <input
+        id="patientName"
+        type="text"
+        placeholder="Nome del paziente"
+      >
+
+      <br><br>
+
+      <button
+        class="primary"
+        id="savePatientButton"
+      >
+        Salva paziente
+      </button>
+
+      <button
+        class="secondary"
+        id="cancelPatientButton"
+      >
+        Annulla
+      </button>
+
+      <div
+        id="patientMessage"
+        class="message"
+      ></div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       NUOVO ESERCIZIO
+  ========================== -->
+
+  <section
+    id="newExercisePage"
+    class="hidden"
+  >
+
+    <div class="card">
+
+      <h2>🏋️ Nuovo esercizio</h2>
+
+
+      <label>
+        Nome esercizio
+      </label>
+
+      <input
+        id="exerciseName"
+        type="text"
+        placeholder="Es. Squat"
+      >
+
+
+      <label>
+        Descrizione
+      </label>
+
+      <textarea
+        id="exerciseDescription"
+        placeholder="Descrizione dell'esercizio..."
+      ></textarea>
+
+
+      <label>
+        Video
+      </label>
+
+      <input
+        id="exerciseVideo"
+        type="url"
+        placeholder="https://..."
+      >
+
+
+      <br><br>
+
+      <button
+        class="primary"
+        id="saveExerciseButton"
+      >
+        Salva esercizio
+      </button>
+
+
+      <button
+        class="secondary"
+        id="cancelExerciseButton"
+      >
+        Annulla
+      </button>
+
+
+      <div
+        id="exerciseMessage"
+        class="message"
+      ></div>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+  "https://eutcpxmnrzisssddefau.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_C2DPlnqwDgOkEC1FrdGDhg_XQ8m3KLz";
+
+
+const database =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =====================================================
+   VARIABILI
+===================================================== */
+
+let currentPatient = null;
+
+
+/* =====================================================
+   PAGINE
+===================================================== */
+
+const patientsPage =
+  document.getElementById(
+    "patientsPage"
+  );
+
+const patientPage =
+  document.getElementById(
+    "patientPage"
+  );
+
+const newPatientPage =
+  document.getElementById(
+    "newPatientPage"
+  );
+
+const newExercisePage =
+  document.getElementById(
+    "newExercisePage"
+  );
+
+
+function showPage(page) {
+
+  patientsPage.classList.add(
+    "hidden"
+  );
+
+  patientPage.classList.add(
+    "hidden"
+  );
+
+  newPatientPage.classList.add(
+    "hidden"
+  );
+
+  newExercisePage.classList.add(
+    "hidden"
+  );
+
+
+  page.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+/* =====================================================
+   CARICA PAZIENTI
+===================================================== */
+
+async function loadPatients() {
+
+  const list =
+    document.getElementById(
+      "patientsList"
+    );
+
+
+  list.innerHTML =
+    "Caricamento...";
+
+
+  const result =
+    await database
+
+      .from("patients")
+
+      .select("*")
+
+      .order(
+        "name",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (result.error) {
+
+    list.innerHTML =
+      "Errore: " +
+      result.error.message;
+
+    return;
+
+  }
+
+
+  if (!result.data.length) {
+
+    list.innerHTML =
+      "Nessun paziente presente.";
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  result.data.forEach(
+    function(patient) {
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "patient";
+
+
+      card.innerHTML = `
+
+        <div class="patient-name">
+
+          👤 ${escapeHTML(
+            patient.name
+          )}
+
+        </div>
+
+        <br>
+
+        <small>
+          Apri scheda →
+        </small>
+
+      `;
+
+
+      card.addEventListener(
+        "click",
+        function() {
+
+          openPatient(
+            patient
+          );
+
+        }
+      );
+
+
+      list.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   APRI PAZIENTE
+===================================================== */
+
+async function openPatient(patient) {
+
+  currentPatient =
+    patient;
+
+
+  document.getElementById(
+    "patientTitle"
+  ).innerText =
+
+    "👤 " +
+    patient.name;
+
+
+  showPage(
+    patientPage
+  );
+
+
+  await loadExercises();
+
+
+  await loadPatientExercises();
+
+}
+
+
+/* =====================================================
+   CARICA LIBRERIA ESERCIZI
+===================================================== */
+
+async function loadExercises() {
+
+  const select =
+    document.getElementById(
+      "exerciseSelect"
+    );
+
+
+  select.innerHTML =
+
+    `
+    <option value="">
+      Seleziona esercizio
+    </option>
+    `;
+
+
+  const result =
+    await database
+
+      .from("exercises")
+
+      .select("*")
+
+      .order(
+        "name",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (result.error) {
+
+    console.error(
+      result.error
+    );
+
+    return;
+
+  }
+
+
+  result.data.forEach(
+    function(exercise) {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        exercise.id;
+
+
+      option.textContent =
+        exercise.name;
+
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   CARICA ESERCIZI PAZIENTE
+===================================================== */
+
+async function loadPatientExercises() {
+
+  const container =
+    document.getElementById(
+      "patientExercises"
+    );
+
+
+  container.innerHTML =
+    "Caricamento...";
+
+
+  const result =
+    await database
+
+      .from("patient_exercises")
+
+      .select(`
+
+        id,
+
+        sets,
+
+        reps,
+
+        duration,
+
+        rest,
+
+        notes,
+
+        completed,
+
+        exercises (
+          id,
+          name,
+          description,
+          video_url
+        )
+
+      `)
+
+      .eq(
+        "patient_id",
+        currentPatient.id
+      );
+
+
+  if (result.error) {
+
+    container.innerHTML =
+      "Errore: " +
+      result.error.message;
+
+    return;
+
+  }
+
+
+  if (!result.data.length) {
+
+    container.innerHTML =
+      "Nessun esercizio assegnato.";
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  result.data.forEach(
+    function(item) {
+
+      const exercise =
+        item.exercises;
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "exercise";
+
+
+      let details = "";
+
+
+      if (item.sets) {
+
+        details +=
+          item.sets +
+          " serie";
+
+      }
+
+
+      if (item.reps) {
+
+        if (details)
+          details +=
+            " × ";
+
+        details +=
+          item.reps +
+          " ripetizioni";
+
+      }
+
+
+      if (item.duration) {
+
+        if (details)
+          details +=
+            " · ";
+
+        details +=
+          item.duration +
+          " secondi";
+
+      }
+
+
+      if (item.rest) {
+
+        details +=
+          " · recupero " +
+          item.rest +
+          "\"";
+
+      }
+
+
+      let videoHTML = "";
+
+
+      if (exercise.video_url) {
+
+        videoHTML = `
+
+          <div class="video">
+
+            🎥
+
+            <a
+              href="${escapeAttribute(
+                exercise.video_url
+              )}"
+              target="_blank"
+              rel="noopener"
+            >
+
+              Guarda video
+
+            </a>
+
+          </div>
+
+        `;
+
+      }
+
+
+      let noteHTML = "";
+
+
+      if (item.notes) {
+
+        noteHTML = `
+
+          <div class="exercise-note">
+
+            📝 ${escapeHTML(
+              item.notes
+            )}
+
+          </div>
+
+        `;
+
+      }
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${escapeHTML(
+            exercise.name
+          )}
+
+        </h3>
+
+
+        <div class="exercise-info">
+
+          ${escapeHTML(
+            details
+          )}
+
+        </div>
+
+
+        ${
+          exercise.description
+            ? `<div>
+                ${escapeHTML(
+                  exercise.description
+                )}
+              </div>`
+            : ""
+        }
+
+
+        ${videoHTML}
+
+
+        ${noteHTML}
+
+
+        <br>
+
+
+        <label>
+
+          <input
+            type="checkbox"
+            class="complete-checkbox"
+            data-id="${item.id}"
+            ${
+              item.completed
+                ? "checked"
+                : ""
+            }
+          >
+
+          Esercizio completato
+
+        </label>
+
+
+        <br>
+
+
+        <button
+          class="danger delete-assignment"
+          data-id="${item.id}"
+        >
+
+          Elimina
+
+        </button>
+
+      `;
+
+
+      container.appendChild(
+        card
+      );
+
+    }
+  );
+
+
+  document
+    .querySelectorAll(
+      ".complete-checkbox"
+    )
+    .forEach(
+      function(checkbox) {
+
+        checkbox.addEventListener(
+          "change",
+          updateCompletion
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".delete-assignment"
+    )
+    .forEach(
+      function(button) {
+
+        button.addEventListener(
+          "click",
+          deleteAssignment
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   ASSEGNA ESERCIZIO
+===================================================== */
+
+document
+  .getElementById(
+    "assignButton"
+  )
+  .addEventListener(
+    "click",
+    async function() {
+
+      if (!currentPatient)
+        return;
+
+
+      const exerciseId =
+        document.getElementById(
+          "exerciseSelect"
+        ).value;
+
+
+      const sets =
+        parseInt(
+          document.getElementById(
+            "setsInput"
+          ).value
+        ) || null;
+
+
+      const reps =
+        parseInt(
+          document.getElementById(
+            "repsInput"
+          ).value
+        ) || null;
+
+
+      const duration =
+        parseInt(
+          document.getElementById(
+            "durationInput"
+          ).value
+        ) || null;
+
+
+      const rest =
+        parseInt(
+          document.getElementById(
+            "restInput"
+          ).value
+        ) || null;
+
+
+      const notes =
+        document.getElementById(
+          "assignmentNotes"
+        ).value.trim();
+
+
+      if (!exerciseId) {
+
+        showMessage(
+          "assignmentMessage",
+          "Seleziona un esercizio.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const result =
+        await database
+
+          .from("patient_exercises")
+
+          .insert({
+
+            patient_id:
+              currentPatient.id,
+
+            exercise_id:
+              exerciseId,
+
+            sets:
+              sets,
+
+            reps:
+              reps,
+
+            duration:
+              duration,
+
+            rest:
+              rest,
+
+            notes:
+              notes || null
+
+          });
+
+
+      if (result.error) {
+
+        showMessage(
+          "assignmentMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "setsInput"
+      ).value = "";
+
+
+      document.getElementById(
+        "repsInput"
+      ).value = "";
+
+
+      document.getElementById(
+        "durationInput"
+      ).value = "";
+
+
+      document.getElementById(
+        "restInput"
+      ).value = "";
+
+
+      document.getElementById(
+        "assignmentNotes"
+      ).value = "";
+
+
+      document.getElementById(
+        "exerciseSelect"
+      ).value = "";
+
+
+      showMessage(
+        "assignmentMessage",
+        "Esercizio assegnato!",
+        "success"
+      );
+
+
+      await loadPatientExercises();
+
+    }
+  );
+
+
+/* =====================================================
+   COMPLETATO
+===================================================== */
+
+async function updateCompletion(event) {
+
+  const id =
+    event.target.dataset.id;
+
+
+  const completed =
+    event.target.checked;
+
+
+  const result =
+    await database
+
+      .from("patient_exercises")
+
+      .update({
+
+        completed:
+          completed
+
+      })
+
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (result.error) {
+
+    alert(
+      result.error.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   ELIMINA ASSEGNAZIONE
+===================================================== */
+
+async function deleteAssignment(event) {
+
+  const id =
+    event.target.dataset.id;
+
+
+  if (
+    !confirm(
+      "Eliminare questo esercizio dal programma?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const result =
+    await database
+
+      .from("patient_exercises")
+
+      .delete()
+
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadPatientExercises();
+
+}
+
+
+/* =====================================================
+   NUOVO PAZIENTE
+===================================================== */
+
+document
+  .getElementById(
+    "newPatientButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      document.getElementById(
+        "patientName"
+      ).value = "";
+
+
+      showPage(
+        newPatientPage
+      );
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "savePatientButton"
+  )
+  .addEventListener(
+    "click",
+    async function() {
+
+      const name =
+        document.getElementById(
+          "patientName"
+        ).value.trim();
+
+
+      if (!name) {
+
+        showMessage(
+          "patientMessage",
+          "Inserisci il nome.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const result =
+        await database
+
+          .from("patients")
+
+          .insert({
+
+            name:
+              name
+
+          });
+
+
+      if (result.error) {
+
+        showMessage(
+          "patientMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      showMessage(
+        "patientMessage",
+        "Paziente creato!",
+        "success"
+      );
+
+
+      setTimeout(
+        function() {
+
+          showPage(
+            patientsPage
+          );
+
+          loadPatients();
+
+        },
+        600
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   NUOVO ESERCIZIO
+===================================================== */
+
+document
+  .getElementById(
+    "newExerciseButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      document.getElementById(
+        "exerciseName"
+      ).value = "";
+
+
+      document.getElementById(
+        "exerciseDescription"
+      ).value = "";
+
+
+      document.getElementById(
+        "exerciseVideo"
+      ).value = "";
+
+
+      showPage(
+        newExercisePage
+      );
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "saveExerciseButton"
+  )
+  .addEventListener(
+    "click",
+    async function() {
+
+      const name =
+        document.getElementById(
+          "exerciseName"
+        ).value.trim();
+
+
+      const description =
+        document.getElementById(
+          "exerciseDescription"
+        ).value.trim();
+
+
+      const video =
+        document.getElementById(
+          "exerciseVideo"
+        ).value.trim();
+
+
+      if (!name) {
+
+        showMessage(
+          "exerciseMessage",
+          "Inserisci il nome dell'esercizio.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const result =
+        await database
+
+          .from("exercises")
+
+          .insert({
+
+            name:
+              name,
+
+            description:
+              description || null,
+
+            video_url:
+              video || null
+
+          });
+
+
+      if (result.error) {
+
+        showMessage(
+          "exerciseMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      showMessage(
+        "exerciseMessage",
+        "Esercizio creato!",
+        "success"
+      );
+
+
+      setTimeout(
+        function() {
+
+          showPage(
+            patientsPage
+          );
+
+        },
+        600
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   NAVIGAZIONE
+===================================================== */
+
+document
+  .getElementById(
+    "homeButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      showPage(
+        patientsPage
+      );
+
+      loadPatients();
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "backButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      showPage(
+        patientsPage
+      );
+
+      loadPatients();
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "cancelPatientButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      showPage(
+        patientsPage
+      );
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "cancelExerciseButton"
+  )
+  .addEventListener(
+    "click",
+    function() {
+
+      showPage(
+        patientsPage
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   FUNZIONI UTILI
+===================================================== */
+
+function showMessage(
+  elementId,
+  message,
+  type
+) {
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  element.innerText =
+    message;
+
+
+  element.className =
+    "message " +
+    type;
+
+
+  element.style.display =
+    "block";
+
+}
+
+
+function escapeHTML(text) {
+
+  return String(text || "")
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function escapeAttribute(text) {
+
+  return String(text || "")
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    );
+
+}
+
+
+/* =====================================================
+   AVVIO
+===================================================== */
+
+loadPatients();
+
+</script>
+
+</body>
+</html>

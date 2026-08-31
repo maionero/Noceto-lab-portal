@@ -4395,12 +4395,10 @@ function generateRunningPlan() {
         week,
         day,
         type: "",
-        title: "",
         duration: "",
         effort: "",
         fast: "",
         slow: "",
-        total: "",
         workout: "",
         notes: ""
       });
@@ -4446,18 +4444,7 @@ function renderRunningPlanner() {
       table.className = "planner-table";
 
       table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Allenamento</th>
-            <th>Tipo</th>
-            <th>Titolo</th>
-            <th>Tempo</th>
-            <th>Fatica 1-10</th>
-            <th>Corsa veloce</th>
-            <th>Corsa lenta</th>
-            <th>Totale seduta</th>
-            <th>Descrizione</th>
-            <th>Note</th>
+        <thead><tr><th>Giorno</th><th>Tipo</th><th>Tempo</th><th>Fatica 1-10</th><th>Corsa veloce</th><th>Corsa lenta</th><th>Descrizione</th><th>Note</th>
           </tr>
         </thead>
       `;
@@ -4475,12 +4462,11 @@ function renderRunningPlanner() {
 
     const fields = [
       ["type", "select"],
-      ["title", "input"],
       ["duration", "input"],
       ["effort", "input"],
-      ["fast", "input"],
-      ["slow", "input"],
-      ["total", "input"],
+      ...(row.type === "Ripetute"
+        ? [["fast", "input"], ["slow", "input"]]
+        : []),
       ["workout", "textarea"],
       ["notes", "textarea"]
     ];
@@ -4532,9 +4518,6 @@ function renderRunningPlanner() {
           el.placeholder = "es. 30''";
         }
 
-        if(key === "total") {
-          el.placeholder = "es. 40'";
-        }
       }
 
       el.value = row[key] || "";
@@ -4562,12 +4545,10 @@ async function saveRunningProgram() {
     week_number:row.week,
     day_number:row.day,
     workout_type:row.type||null,
-    title:row.title||`Allenamento ${row.day}`,
     duration_min:row.duration ? Number(String(row.duration).replace(/[^0-9.]/g, "")) : null,
     effort:row.effort ? Number(row.effort) : null,
     fast_duration:row.fast||null,
     slow_duration:row.slow||null,
-    total_duration:row.total||null,
     workout:row.workout||null,
     notes:row.notes||null
   }));
@@ -4596,7 +4577,7 @@ async function loadRunningPlans() {
       table=document.createElement("table"); table.className="running-table"; table.innerHTML=`<thead><tr><th>Giorno</th><th>Tipo</th><th>Allenamento</th><th>Tempo</th><th>Fatica 1-10</th><th>Corsa veloce</th><th>Corsa lenta</th><th>Totale seduta</th><th>Descrizione</th><th>Note</th></tr></thead>`; tbody=document.createElement("tbody"); table.appendChild(tbody); wrap.appendChild(table);
     }
     const tr=document.createElement("tr");
-    ["day_number","workout_type","title","duration_min","effort","fast_duration","slow_duration","total_duration","workout","notes"].forEach(key=>{const td=document.createElement("td"); td.innerText=key==="duration_min"&&item[key]!=null?item[key]+" min":key==="effort"&&item[key]!=null?item[key]+"/10":item[key]||"—";tr.appendChild(td);});
+    ["day_number","workout_type","title","duration_min","effort","fast_duration","slow_duration","workout","notes"].forEach(key=>{const td=document.createElement("td"); td.innerText=key==="duration_min"&&item[key]!=null?item[key]+" min":key==="effort"&&item[key]!=null?item[key]+"/10":item[key]||"—";tr.appendChild(td);});
     tbody.appendChild(tr);
   });
   container.innerHTML=""; container.appendChild(wrap);
@@ -4772,9 +4753,12 @@ async function printExerciseSheet() {
         <strong>Paziente:</strong> ${esc(currentPatient.name || "")}
       </div>
       ${rows}
+      <div class="print-actions">
+        <button onclick="window.print()">📄 Stampa / Salva come PDF</button>
+      </div>
       <script>
         window.onload = function() {
-          window.print();
+          setTimeout(() => window.print(), 300);
         };
       <\/script>
     </body>

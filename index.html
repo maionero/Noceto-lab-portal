@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="it">
 
 <head>
@@ -7,9 +6,8 @@
 <meta charset="UTF-8">
 
 <meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
 >
 
 <title>Noceto Lab</title>
@@ -96,7 +94,7 @@ button {
 }
 
 .edit {
-  background: #e0e0e0;
+  background: #e8e8e8;
   color: #111;
 }
 
@@ -128,10 +126,6 @@ button {
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 12px;
-}
-
-.exercise.completed {
-  opacity: .6;
 }
 
 .exercise h3 {
@@ -181,23 +175,23 @@ button {
   margin-top: 15px;
 }
 
-.edit-box {
-  margin-top: 15px;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 10px;
-}
-
-.edit-box label {
-  margin-top: 10px;
-}
-
 .back {
   margin-bottom: 10px;
 }
 
 small {
   color: #666;
+}
+
+.edit-box {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.edit-box label {
+  margin-top: 10px;
 }
 
 @media(max-width:600px) {
@@ -210,33 +204,36 @@ small {
     padding: 16px;
   }
 
+  .exercise-actions button {
+    width: 100%;
+  }
+
 }
 
 </style>
 
 </head>
 
+
 <body>
+
 
 <header>
 
   <h1>🏥 Noceto Lab</h1>
 
-<button
-id="logoutButton"
-class="secondary hidden"
-
->
-
-```
-Esci
-```
-
+  <button
+    id="logoutButton"
+    class="secondary hidden"
+  >
+    Esci
   </button>
 
 </header>
 
+
 <div class="container">
+
 
 <!-- =====================================
      LOGIN
@@ -249,47 +246,46 @@ Esci
 
   <div class="card">
 
-```
-<h2>Accedi</h2>
+    <h2>Accedi</h2>
 
-<label>
-  Email
-</label>
+    <label>
+      Email
+    </label>
 
-<input
-  id="email"
-  type="email"
-  placeholder="La tua email"
->
+    <input
+      id="email"
+      type="email"
+      placeholder="La tua email"
+    >
 
-<label>
-  Password
-</label>
+    <label>
+      Password
+    </label>
 
-<input
-  id="password"
-  type="password"
-  placeholder="Password"
->
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
 
-<br><br>
+    <br><br>
 
-<button
-  id="loginButton"
-  class="primary"
->
-  Accedi
-</button>
+    <button
+      id="loginButton"
+      class="primary"
+    >
+      Accedi
+    </button>
 
-<div
-  id="loginMessage"
-  class="message hidden"
-></div>
-```
+    <div
+      id="loginMessage"
+      class="message hidden"
+    ></div>
 
   </div>
 
 </section>
+
 
 <!-- =====================================
      DASHBOARD FISIOTERAPISTA
@@ -302,50 +298,48 @@ Esci
 
   <div class="card">
 
-```
-<h2>👨‍⚕️ Dashboard</h2>
+    <h2>👨‍⚕️ Dashboard</h2>
 
-<p>
-  Gestisci pazienti e programmi di esercizio.
-</p>
+    <p>
+      Gestisci pazienti e programmi di esercizio.
+    </p>
 
-<div class="actions">
+    <div class="actions">
 
-  <button
-    id="newPatientButton"
-    class="primary"
-  >
-    ＋ Nuovo paziente
-  </button>
+      <button
+        id="newPatientButton"
+        class="primary"
+      >
+        ＋ Nuovo paziente
+      </button>
 
-  <button
-    id="newExerciseButton"
-    class="secondary"
-  >
-    ＋ Nuovo esercizio
-  </button>
+      <button
+        id="newExerciseButton"
+        class="secondary"
+      >
+        ＋ Nuovo esercizio
+      </button>
 
-</div>
-```
+    </div>
 
   </div>
 
+
   <div class="card">
 
-```
-<h2>👥 Pazienti</h2>
+    <h2>👥 Pazienti</h2>
 
-<div
-  id="patientsList"
-  class="grid"
->
-  Caricamento...
-</div>
-```
+    <div
+      id="patientsList"
+      class="grid"
+    >
+      Caricamento...
+    </div>
 
   </div>
 
 </section>
+
 
 <!-- =====================================
      SCHEDA PAZIENTE
@@ -356,133 +350,130 @@ Esci
   class="hidden"
 >
 
-<button
-id="backButton"
-class="secondary back"
-
->
-
-```
-← Pazienti
-```
-
+  <button
+    id="backButton"
+    class="secondary back"
+  >
+    ← Pazienti
   </button>
 
+
   <div class="card">
 
-```
-<h2 id="patientTitle">
-  Paziente
-</h2>
-```
+    <h2 id="patientTitle">
+      Paziente
+    </h2>
 
   </div>
 
+
   <div class="card">
 
-```
-<h2>📋 Programma</h2>
+    <h2>📋 Programma</h2>
 
-<div id="patientExercises">
-  Caricamento...
-</div>
-```
+    <div id="patientExercises">
+      Caricamento...
+    </div>
 
   </div>
 
+
+  <!-- =====================================
+       ASSEGNA ESERCIZIO
+  ===================================== -->
+
   <div class="card">
 
-```
-<h2>＋ Assegna esercizio</h2>
+    <h2>＋ Assegna esercizio</h2>
 
-<label>
-  Esercizio
-</label>
+    <label>
+      Esercizio
+    </label>
 
-<select id="exerciseSelect">
+    <select id="exerciseSelect">
 
-  <option value="">
-    Seleziona esercizio
-  </option>
+      <option value="">
+        Seleziona esercizio
+      </option>
 
-</select>
-
-
-<label>
-  Serie
-</label>
-
-<input
-  id="sets"
-  type="number"
-  min="0"
-  placeholder="3"
->
+    </select>
 
 
-<label>
-  Ripetizioni
-</label>
+    <label>
+      Serie
+    </label>
 
-<input
-  id="reps"
-  type="number"
-  min="0"
-  placeholder="10"
->
-
-
-<label>
-  Durata (secondi)
-</label>
-
-<input
-  id="duration"
-  type="number"
-  min="0"
-  placeholder="30"
->
+    <input
+      id="sets"
+      type="number"
+      min="0"
+      placeholder="3"
+    >
 
 
-<label>
-  Recupero (secondi)
-</label>
+    <label>
+      Ripetizioni
+    </label>
 
-<input
-  id="rest"
-  type="number"
-  min="0"
-  placeholder="60"
->
+    <input
+      id="reps"
+      type="number"
+      min="0"
+      placeholder="10"
+    >
 
 
-<label>
-  Note
-</label>
+    <label>
+      Durata (secondi)
+    </label>
 
-<textarea
-  id="notes"
-  placeholder="Indicazioni per il paziente..."
-></textarea>
+    <input
+      id="duration"
+      type="number"
+      min="0"
+      placeholder="30"
+    >
 
-<br><br>
 
-<button
-  id="assignButton"
-  class="primary"
->
-  Assegna esercizio
-</button>
+    <label>
+      Recupero (secondi)
+    </label>
 
-<div
-  id="assignMessage"
-  class="message hidden"
-></div>
-```
+    <input
+      id="rest"
+      type="number"
+      min="0"
+      placeholder="60"
+    >
+
+
+    <label>
+      Note
+    </label>
+
+    <textarea
+      id="notes"
+      placeholder="Indicazioni per il paziente..."
+    ></textarea>
+
+    <br><br>
+
+    <button
+      id="assignButton"
+      class="primary"
+    >
+      Assegna esercizio
+    </button>
+
+    <div
+      id="assignMessage"
+      class="message hidden"
+    ></div>
 
   </div>
 
 </section>
+
 
 <!-- =====================================
      NUOVO PAZIENTE
@@ -495,53 +486,52 @@ class="secondary back"
 
   <div class="card">
 
-```
-<h2>👤 Nuovo paziente</h2>
+    <h2>👤 Nuovo paziente</h2>
 
-<label>
-  Nome
-</label>
+    <label>
+      Nome
+    </label>
 
-<input
-  id="newPatientName"
-  placeholder="Nome paziente"
->
+    <input
+      id="newPatientName"
+      placeholder="Nome paziente"
+    >
 
-<label>
-  Email account paziente
-</label>
+    <label>
+      Email account paziente
+    </label>
 
-<input
-  id="newPatientEmail"
-  type="email"
-  placeholder="email@esempio.it"
->
+    <input
+      id="newPatientEmail"
+      type="email"
+      placeholder="email@esempio.it"
+    >
 
-<br><br>
+    <br><br>
 
-<button
-  id="savePatient"
-  class="primary"
->
-  Salva
-</button>
+    <button
+      id="savePatient"
+      class="primary"
+    >
+      Salva
+    </button>
 
-<button
-  id="cancelPatient"
-  class="secondary"
->
-  Annulla
-</button>
+    <button
+      id="cancelPatient"
+      class="secondary"
+    >
+      Annulla
+    </button>
 
-<div
-  id="patientMessage"
-  class="message hidden"
-></div>
-```
+    <div
+      id="patientMessage"
+      class="message hidden"
+    ></div>
 
   </div>
 
 </section>
+
 
 <!-- =====================================
      NUOVO ESERCIZIO
@@ -554,64 +544,63 @@ class="secondary back"
 
   <div class="card">
 
-```
-<h2>🏋️ Nuovo esercizio</h2>
+    <h2>🏋️ Nuovo esercizio</h2>
 
-<label>
-  Nome
-</label>
+    <label>
+      Nome
+    </label>
 
-<input
-  id="exerciseName"
-  placeholder="Es. Squat"
->
-
-
-<label>
-  Descrizione
-</label>
-
-<textarea
-  id="exerciseDescription"
-  placeholder="Descrizione dell'esercizio..."
-></textarea>
+    <input
+      id="exerciseName"
+      placeholder="Es. Squat"
+    >
 
 
-<label>
-  Video URL
-</label>
+    <label>
+      Descrizione
+    </label>
 
-<input
-  id="exerciseVideo"
-  type="url"
-  placeholder="https://..."
->
+    <textarea
+      id="exerciseDescription"
+      placeholder="Descrizione dell'esercizio..."
+    ></textarea>
 
-<br><br>
 
-<button
-  id="saveExercise"
-  class="primary"
->
-  Salva esercizio
-</button>
+    <label>
+      Video URL
+    </label>
 
-<button
-  id="cancelExercise"
-  class="secondary"
->
-  Annulla
-</button>
+    <input
+      id="exerciseVideo"
+      type="url"
+      placeholder="https://..."
+    >
 
-<div
-  id="exerciseMessage"
-  class="message hidden"
-></div>
-```
+    <br><br>
+
+    <button
+      id="saveExercise"
+      class="primary"
+    >
+      Salva esercizio
+    </button>
+
+    <button
+      id="cancelExercise"
+      class="secondary"
+    >
+      Annulla
+    </button>
+
+    <div
+      id="exerciseMessage"
+      class="message hidden"
+    ></div>
 
   </div>
 
 </section>
+
 
 <!-- =====================================
      PORTALE PAZIENTE
@@ -624,33 +613,32 @@ class="secondary back"
 
   <div class="card">
 
-```
-<h2 id="patientWelcome">
-  Ciao 👋
-</h2>
+    <h2 id="patientWelcome">
+      Ciao 👋
+    </h2>
 
-<p>
-  Questo è il tuo programma di esercizi.
-</p>
-```
+    <p>
+      Questo è il tuo programma di esercizi.
+    </p>
 
   </div>
 
+
   <div class="card">
 
-```
-<h2>🏋️ I tuoi esercizi</h2>
+    <h2>🏋️ I tuoi esercizi</h2>
 
-<div id="patientPortalExercises">
-  Caricamento...
-</div>
-```
+    <div id="patientPortalExercises">
+      Caricamento...
+    </div>
 
   </div>
 
 </section>
 
+
 </div>
+
 
 <!-- =====================================
      SUPABASE
@@ -659,6 +647,7 @@ class="secondary back"
 <script
   src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
 ></script>
+
 
 <script>
 
@@ -1086,6 +1075,7 @@ async function loadPatients() {
           "strong"
         );
 
+
       strong.innerText =
         "👤 " +
         patient.name;
@@ -1108,6 +1098,7 @@ async function loadPatients() {
           "small"
         );
 
+
       small.innerText =
         "Apri scheda →";
 
@@ -1116,13 +1107,16 @@ async function loadPatients() {
         strong
       );
 
+
       div.appendChild(
         br
       );
 
+
       div.appendChild(
         br2
       );
+
 
       div.appendChild(
         small
@@ -1367,17 +1361,12 @@ async function loadPatientExercises() {
       ============================ */
 
       const info =
-        document.createElement(
-          "p"
-        );
-
-
-      const infoParts = [];
+        [];
 
 
       if(item.sets) {
 
-        infoParts.push(
+        info.push(
           item.sets + " serie"
         );
 
@@ -1386,7 +1375,7 @@ async function loadPatientExercises() {
 
       if(item.reps) {
 
-        infoParts.push(
+        info.push(
           item.reps + " rip"
         );
 
@@ -1395,7 +1384,7 @@ async function loadPatientExercises() {
 
       if(item.duration) {
 
-        infoParts.push(
+        info.push(
           item.duration + " sec"
         );
 
@@ -1404,7 +1393,7 @@ async function loadPatientExercises() {
 
       if(item.rest) {
 
-        infoParts.push(
+        info.push(
           "recupero " +
           item.rest +
           "\""
@@ -1413,14 +1402,20 @@ async function loadPatientExercises() {
       }
 
 
-      info.innerText =
-        infoParts.join(" · ");
+      if(info.length > 0) {
+
+        const infoParagraph =
+          document.createElement(
+            "p"
+          );
 
 
-      if(infoParts.length > 0) {
+        infoParagraph.innerText =
+          info.join(" · ");
+
 
         div.appendChild(
-          info
+          infoParagraph
         );
 
       }
@@ -1586,6 +1581,8 @@ async function loadPatientExercises() {
         "exercise-actions";
 
 
+      /* MODIFICA */
+
       const editButton =
         document.createElement(
           "button"
@@ -1604,7 +1601,7 @@ async function loadPatientExercises() {
         "click",
         function() {
 
-          toggleEditExercise(
+          showEditExercise(
             item,
             div
           );
@@ -1618,6 +1615,8 @@ async function loadPatientExercises() {
       );
 
 
+      /* ELIMINA */
+
       const removeButton =
         document.createElement(
           "button"
@@ -1629,7 +1628,7 @@ async function loadPatientExercises() {
 
 
       removeButton.innerText =
-        "🗑️ Elimina";
+        "🗑 Rimuovi";
 
 
       removeButton.addEventListener(
@@ -1681,23 +1680,23 @@ async function loadPatientExercises() {
 
 
 /* =====================================
-   MODIFICA ESERCIZIO ASSEGNATO
+   MODIFICA ESERCIZIO
 ===================================== */
 
-function toggleEditExercise(
+function showEditExercise(
   item,
-  container
+  exerciseDiv
 ) {
 
-  const existing =
-    container.querySelector(
+  const oldBox =
+    exerciseDiv.querySelector(
       ".edit-box"
     );
 
 
-  if(existing) {
+  if(oldBox) {
 
-    existing.remove();
+    oldBox.remove();
 
     return;
 
@@ -1721,6 +1720,7 @@ function toggleEditExercise(
       "label"
     );
 
+
   setsLabel.innerText =
     "Serie";
 
@@ -1730,11 +1730,14 @@ function toggleEditExercise(
       "input"
     );
 
+
   setsInput.type =
     "number";
 
+
   setsInput.min =
     "0";
+
 
   setsInput.value =
     item.sets ?? "";
@@ -1757,6 +1760,7 @@ function toggleEditExercise(
       "label"
     );
 
+
   repsLabel.innerText =
     "Ripetizioni";
 
@@ -1766,11 +1770,14 @@ function toggleEditExercise(
       "input"
     );
 
+
   repsInput.type =
     "number";
 
+
   repsInput.min =
     "0";
+
 
   repsInput.value =
     item.reps ?? "";
@@ -1793,6 +1800,7 @@ function toggleEditExercise(
       "label"
     );
 
+
   durationLabel.innerText =
     "Durata (secondi)";
 
@@ -1802,11 +1810,14 @@ function toggleEditExercise(
       "input"
     );
 
+
   durationInput.type =
     "number";
 
+
   durationInput.min =
     "0";
+
 
   durationInput.value =
     item.duration ?? "";
@@ -1829,6 +1840,7 @@ function toggleEditExercise(
       "label"
     );
 
+
   restLabel.innerText =
     "Recupero (secondi)";
 
@@ -1838,11 +1850,14 @@ function toggleEditExercise(
       "input"
     );
 
+
   restInput.type =
     "number";
 
+
   restInput.min =
     "0";
+
 
   restInput.value =
     item.rest ?? "";
@@ -1865,6 +1880,7 @@ function toggleEditExercise(
       "label"
     );
 
+
   notesLabel.innerText =
     "Note";
 
@@ -1873,6 +1889,7 @@ function toggleEditExercise(
     document.createElement(
       "textarea"
     );
+
 
   notesInput.value =
     item.notes ?? "";
@@ -1888,17 +1905,20 @@ function toggleEditExercise(
   );
 
 
-  /* BOTTONI */
+  /* SPAZIO */
 
-  const actions =
+  const br =
     document.createElement(
-      "div"
+      "br"
     );
 
 
-  actions.className =
-    "exercise-actions";
+  editBox.appendChild(
+    br
+  );
 
+
+  /* SALVA */
 
   const saveButton =
     document.createElement(
@@ -1911,7 +1931,7 @@ function toggleEditExercise(
 
 
   saveButton.innerText =
-    "💾 Salva";
+    "💾 Salva modifiche";
 
 
   saveButton.addEventListener(
@@ -1919,22 +1939,31 @@ function toggleEditExercise(
     async function() {
 
       await updatePatientExercise(
+
         item.id,
+
         setsInput.value,
+
         repsInput.value,
+
         durationInput.value,
+
         restInput.value,
+
         notesInput.value
+
       );
 
     }
   );
 
 
-  actions.appendChild(
+  editBox.appendChild(
     saveButton
   );
 
+
+  /* ANNULLA */
 
   const cancelButton =
     document.createElement(
@@ -1950,6 +1979,10 @@ function toggleEditExercise(
     "Annulla";
 
 
+  cancelButton.style.marginLeft =
+    "8px";
+
+
   cancelButton.addEventListener(
     "click",
     function() {
@@ -1960,17 +1993,12 @@ function toggleEditExercise(
   );
 
 
-  actions.appendChild(
+  editBox.appendChild(
     cancelButton
   );
 
 
-  editBox.appendChild(
-    actions
-  );
-
-
-  container.appendChild(
+  exerciseDiv.appendChild(
     editBox
   );
 
@@ -1978,16 +2006,18 @@ function toggleEditExercise(
 
 
 /* =====================================
-   SALVA MODIFICA ESERCIZIO
+   SALVA MODIFICA
 ===================================== */
 
 async function updatePatientExercise(
+
   id,
   sets,
   reps,
   duration,
   rest,
   notes
+
 ) {
 
   const result =
@@ -2016,9 +2046,7 @@ async function updatePatientExercise(
             : null,
 
         notes:
-          notes.trim()
-            ? notes.trim()
-            : null
+          notes.trim() || null
 
       })
       .eq(
@@ -2188,7 +2216,8 @@ async function loadPatientPortal() {
       );
 
 
-      let info = [];
+      const info =
+        [];
 
 
       if(item.sets) {
@@ -2422,7 +2451,10 @@ async function updateCompletion(event) {
     await db
       .from("patient_exercises")
       .update({
-        completed: completed
+
+        completed:
+          completed
+
       })
       .eq(
         "id",
@@ -2727,9 +2759,11 @@ document
               body:
                 JSON.stringify({
 
-                  name: name,
+                  name:
+                    name,
 
-                  email: email
+                  email:
+                    email
 
                 })
 
@@ -2917,9 +2951,6 @@ document
       document.getElementById(
         "exerciseVideo"
       ).value = "";
-
-
-      await loadExercises();
 
 
       setTimeout(

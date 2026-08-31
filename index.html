@@ -1,3 +1,11 @@
+Ecco il codice completo aggiornato.
+
+### Modifiche apportate:
+
+1. **Risolto il PDF bianco**: Corretta la funzione `triggerPrint` rimuovendo `display: none` dal contenitore `#printSheet` durante la stampa e formattando il foglio A4 con margini puliti.
+2. **Aggiunta la Stampa PDF per la Corsa**: Inserito il pulsante **🖨️ Stampa / Salva PDF Corsa** sia nella scheda Fisioterapista che nel Portale Paziente per esportare la tabella salvata.
+
+```html
 <!DOCTYPE html>
 <html lang="it">
 
@@ -240,7 +248,11 @@ hr {
   display: none !important;
 }
 
-/* REGOLAZIONE STAMPA / PDF */
+/* REGOLAZIONE STAMPA / PDF FIX */
+.print-sheet {
+  display: none;
+}
+
 @media print {
   body * {
     visibility: hidden;
@@ -249,21 +261,18 @@ hr {
     visibility: visible;
   }
   #printSheet {
+    display: block !important;
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     background: white;
     color: black;
-    padding: 20px;
+    padding: 10px;
   }
   .no-print {
     display: none !important;
   }
-}
-
-.print-sheet {
-  display: none;
 }
 
 /* STRUTTURA TABELLA CORSA */
@@ -275,7 +284,7 @@ hr {
   width: 100%;
   border-collapse: collapse;
   margin-top: 12px;
-  min-width: 700px;
+  min-width: 600px;
 }
 
 .running-table th,
@@ -338,7 +347,6 @@ hr {
 
 <div class="container">
 
-<!-- LOGIN -->
 <section id="loginPage" class="login">
   <div class="card">
     <h2>Accedi</h2>
@@ -352,7 +360,6 @@ hr {
   </div>
 </section>
 
-<!-- IMPOSTAZIONE PASSWORD -->
 <section id="setPasswordPage" class="login hidden">
   <div class="card">
     <h2>🔐 Imposta la tua password</h2>
@@ -367,7 +374,6 @@ hr {
   </div>
 </section>
 
-<!-- DASHBOARD FISIOTERAPISTA -->
 <section id="therapistPage" class="hidden">
   <div class="card">
     <h2>👨‍⚕️ Dashboard</h2>
@@ -391,7 +397,6 @@ hr {
   </div>
 </section>
 
-<!-- SCHEDA PAZIENTE -->
 <section id="patientPage" class="hidden">
   <button id="backButton" class="secondary back">← Pazienti</button>
 
@@ -406,7 +411,6 @@ hr {
     <h2 id="patientTitle">Paziente</h2>
   </div>
 
-  <!-- PROGRAMMA ESERCIZI -->
   <div class="card tab-panel" id="therapistTabProgram">
     <div class="section-title">
       <h2>📋 Programma Esercizi</h2>
@@ -415,7 +419,6 @@ hr {
     <div id="patientExercises">Caricamento...</div>
   </div>
 
-  <!-- ASSEGNA ESERCIZIO -->
   <div class="card tab-panel" id="therapistTabProgramAssign">
     <h2>＋ Assegna esercizio</h2>
     <label>Esercizio</label>
@@ -437,7 +440,6 @@ hr {
     <div id="assignMessage" class="message hidden"></div>
   </div>
 
-  <!-- REPORT E DOCUMENTI -->
   <div class="card tab-panel" id="therapistTabDocuments">
     <div class="section-title">
       <h2>📄 Report e documenti</h2>
@@ -451,7 +453,6 @@ hr {
     <div id="patientDocuments">Caricamento...</div>
   </div>
 
-  <!-- NOTE E COMUNICAZIONI -->
   <div class="card tab-panel" id="therapistTabNotes">
     <div class="section-title">
       <h2>📝 Note e comunicazioni</h2>
@@ -467,7 +468,6 @@ hr {
     <div id="patientNotesList">Caricamento...</div>
   </div>
 
-  <!-- ALLENAMENTO CORSA -->
   <div class="card tab-panel" id="therapistTabRunning">
     <div class="section-title">
       <h2>🏃 Programma di Corsa Dettagliato</h2>
@@ -501,13 +501,15 @@ hr {
     <hr>
     <div id="runningPlanner" class="running-planner"></div>
     <hr>
-    <h3>Programma Attualmente Salvato</h3>
+    <div class="section-title">
+      <h3>Programma Attualmente Salvato</h3>
+      <button id="printRunningSheetButton" class="secondary">🖨️ Stampa / Salva PDF Corsa</button>
+    </div>
     <div id="runningPlansList">Caricamento...</div>
   </div>
 
 </section>
 
-<!-- NUOVO PAZIENTE -->
 <section id="newPatientPage" class="hidden">
   <div class="card">
     <h2>👤 Nuovo paziente</h2>
@@ -522,7 +524,6 @@ hr {
   </div>
 </section>
 
-<!-- NUOVO ESERCIZIO -->
 <section id="newExercisePage" class="hidden">
   <div class="card">
     <h2>🏋️ Nuovo esercizio</h2>
@@ -539,7 +540,6 @@ hr {
   </div>
 </section>
 
-<!-- PORTALE PAZIENTE -->
 <section id="patientPortal" class="hidden">
 
   <div class="section-tabs" id="patientPortalTabs">
@@ -584,10 +584,8 @@ hr {
 
 </div>
 
-<!-- CONTENITORE STAMPA PDF GENERATO -->
 <div id="printSheet" class="print-sheet"></div>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -1338,20 +1336,21 @@ async function loadPatientPortal() {
   }
 }
 
-/* GESTIONE STAMPA E GENERAZIONE PDF COMPATIBILE */
+/* GESTIONE STAMPA E GENERAZIONE PDF FIX */
 function triggerPrint(patientName, containerId, documentTitle) {
   const container = document.getElementById(containerId);
   const printSheet = document.getElementById("printSheet");
 
-  // Creazione clone senza elementi no-print per pulizia stampa
+  if(!container) return;
+
   const clone = container.cloneNode(true);
   clone.querySelectorAll(".no-print").forEach(el => el.remove());
 
   printSheet.innerHTML = `
-    <div>
-      <h1 style="margin-bottom:4px;">🏥 Noceto Lab</h1>
-      <h2 style="margin-top:0;">${documentTitle}: ${patientName || ""}</h2>
-      <hr style="border:0; border-top:1px solid #000; margin-bottom:20px;">
+    <div style="font-family: Arial, sans-serif; padding: 10px;">
+      <h1 style="margin-bottom:4px; font-size:20px;">🏥 Noceto Lab</h1>
+      <h2 style="margin-top:0; font-size:16px;">${documentTitle}: ${patientName || ""}</h2>
+      <hr style="border:0; border-top:1px solid #000; margin-bottom:15px;">
       ${clone.innerHTML}
     </div>
   `;
@@ -1359,12 +1358,18 @@ function triggerPrint(patientName, containerId, documentTitle) {
   window.print();
 }
 
+// Event Listeners Stampa Esercizi
 document.getElementById("printExerciseSheetButton").addEventListener("click", () => {
   triggerPrint(currentPatient ? currentPatient.name : "", "patientExercises", "Scheda Esercizi");
 });
 
 document.getElementById("patientPrintExerciseSheetButton").addEventListener("click", () => {
   triggerPrint(currentPatient ? currentPatient.name : "", "patientPortalExercises", "Scheda Esercizi");
+});
+
+// Event Listeners Stampa Corsa
+document.getElementById("printRunningSheetButton").addEventListener("click", () => {
+  triggerPrint(currentPatient ? currentPatient.name : "", "runningPlansList", "Programma di Corsa");
 });
 
 document.getElementById("patientPrintRunningButton").addEventListener("click", () => {
@@ -1383,3 +1388,5 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 </body>
 </html>
+
+```

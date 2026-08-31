@@ -876,55 +876,85 @@ async function login() {
       .value
       .trim();
 
-
   const password =
     document
       .getElementById("password")
       .value;
 
-
   if(!email || !password) {
-
     showMessage(
       "loginMessage",
       "Inserisci email e password.",
       "error"
     );
-
     return;
-
   }
-
 
   const result =
     await db.auth.signInWithPassword({
-
       email: email,
       password: password
-
     });
 
-
   if(result.error) {
-
     showMessage(
       "loginMessage",
       result.error.message,
       "error"
     );
-
     return;
-
   }
-
 
   currentUser =
     result.data.user;
 
+  const profileResult =
+    await db
+      .from("profiles")
+      .select("role, must_change_password")
+      .eq("id", currentUser.id)
+      .maybeSingle();
+
+  if(profileResult.error) {
+    console.error(
+      "Errore caricamento profilo:",
+      profileResult.error
+    );
+
+    await db.auth.signOut();
+    currentUser = null;
+
+    showMessage(
+      "loginMessage",
+      "Errore nel caricamento del profilo.",
+      "error"
+    );
+    return;
+  }
+
+  if(!profileResult.data) {
+    await db.auth.signOut();
+    currentUser = null;
+
+    showMessage(
+      "loginMessage",
+      "Profilo utente non trovato.",
+      "error"
+    );
+    return;
+  }
+
+  if(
+    profileResult.data.role === "patient" &&
+    profileResult.data.must_change_password === true
+  ) {
+    showPage("setPasswordPage");
+    return;
+  }
 
   await startApp();
-
 }
+
 
 
 /* =====================================
@@ -993,72 +1023,75 @@ async function saveNewPassword() {
       .getElementById("newPassword")
       .value;
 
-
   const confirmation =
     document
       .getElementById("confirmPassword")
       .value;
 
-
   if(!password || !confirmation) {
-
     showMessage(
       "passwordMessage",
       "Inserisci e conferma la password.",
       "error"
     );
-
     return;
-
   }
 
-
   if(password.length < 6) {
-
     showMessage(
       "passwordMessage",
       "La password deve contenere almeno 6 caratteri.",
       "error"
     );
-
     return;
-
   }
 
-
   if(password !== confirmation) {
-
     showMessage(
       "passwordMessage",
       "Le password non coincidono.",
       "error"
     );
-
     return;
-
   }
-
 
   const result =
     await db.auth.updateUser({
-
       password: password
-
     });
 
-
   if(result.error) {
-
     showMessage(
       "passwordMessage",
       result.error.message,
       "error"
     );
-
     return;
-
   }
 
+  currentUser = result.data.user;
+
+  const profileUpdate =
+    await db
+      .from("profiles")
+      .update({
+        must_change_password: false
+      })
+      .eq("id", currentUser.id);
+
+  if(profileUpdate.error) {
+    console.error(
+      "Errore aggiornamento profilo:",
+      profileUpdate.error
+    );
+
+    showMessage(
+      "passwordMessage",
+      "Password modificata, ma non riesco a completare il profilo. Riprova.",
+      "error"
+    );
+    return;
+  }
 
   showMessage(
     "passwordMessage",
@@ -1066,6 +1099,8 @@ async function saveNewPassword() {
     "success"
   );
 
+  document.getElementById("newPassword").value = "";
+  document.getElementById("confirmPassword").value = "";
 
   window.history.replaceState(
     {},
@@ -1073,22 +1108,13 @@ async function saveNewPassword() {
     window.location.pathname
   );
 
-
-  currentUser =
-    result.data.user;
-
-
   setTimeout(
     async function() {
-
       await startApp();
-
     },
     700
   );
-
 }
-
 
 /* =====================================
    AVVIO APP
@@ -1122,7 +1148,7 @@ async function startApp() {
   const profileResult =
     await db
       .from("profiles")
-      .select("role")
+      .select("role, must_change_password")
       .eq(
         "id",
         currentUser.id
@@ -1148,6 +1174,13 @@ async function startApp() {
   const role =
     profileResult.data.role;
 
+  if(
+    role === "patient" &&
+    profileResult.data.must_change_password === true
+  ) {
+    showPage("setPasswordPage");
+    return;
+  }
 
   if(role === "therapist") {
 

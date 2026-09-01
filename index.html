@@ -2,495 +2,1362 @@
 <html lang="it">
 
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>Noceto Lab | Fisioterapia & Performance</title>
 
-<link rel="icon" id="favicon" type="image/png">
+<link
+  rel="icon"
+  id="favicon"
+  type="image/png"
+>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+>
+
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
 
 <style>
 
+/* =========================================================
+   VARIABILI
+========================================================= */
+
 :root {
+
   --primary: #0b192c;
+
   --accent: #0075ff;
+
   --accent-light: #e6f0ff;
+
   --accent-hover: #0056b3;
+
   --bg-color: #f4f7fa;
+
   --card-bg: #ffffff;
+
   --text-main: #0f172a;
+
   --text-muted: #64748b;
+
   --border-color: #e2e8f0;
+
   --danger: #ef4444;
+
   --success: #10b981;
+
+  --warning: #f59e0b;
+
   --radius: 12px;
-  --shadow: 0 4px 20px -2px rgba(11, 25, 44, 0.06);
-  --shadow-hover: 0 10px 25px -5px rgba(0, 117, 255, 0.15);
+
+  --shadow:
+    0 4px 20px -2px
+    rgba(11,25,44,0.06);
+
+  --shadow-hover:
+    0 10px 25px -5px
+    rgba(0,117,255,0.15);
+
 }
+
+
+/* =========================================================
+   RESET
+========================================================= */
 
 * {
   box-sizing: border-box;
 }
 
 body {
+
   margin: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-main);
-  -webkit-font-smoothing: antialiased;
+
+  font-family:
+    'Plus Jakarta Sans',
+    system-ui,
+    -apple-system,
+    sans-serif;
+
+  background:
+    var(--bg-color);
+
+  color:
+    var(--text-main);
+
+  -webkit-font-smoothing:
+    antialiased;
+
 }
 
+
+/* =========================================================
+   HEADER
+========================================================= */
+
 header {
-  background: var(--primary);
-  color: #ffffff;
-  padding: 14px 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+
+  background:
+    var(--primary);
+
+  color:
+    #ffffff;
+
+  padding:
+    14px 28px;
+
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  box-shadow:
+    0 4px 15px
+    rgba(0,0,0,0.15);
+
+  position:
+    sticky;
+
+  top:
+    0;
+
+  z-index:
+    100;
+
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    14px;
+
 }
 
 .logo {
-  height: 44px;
-  width: auto;
-  max-width: 180px;
-  object-fit: contain;
-  background: #ffffff;
-  padding: 4px 8px;
-  border-radius: 8px;
+
+  height:
+    44px;
+
+  width:
+    auto;
+
+  max-width:
+    180px;
+
+  object-fit:
+    contain;
+
+  background:
+    #ffffff;
+
+  padding:
+    4px 8px;
+
+  border-radius:
+    8px;
+
 }
 
 .brand-text h1 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: #ffffff;
-  text-transform: uppercase;
+
+  margin:
+    0;
+
+  font-size:
+    20px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    -0.5px;
+
+  color:
+    #ffffff;
+
+  text-transform:
+    uppercase;
+
 }
 
 .brand-text p {
-  margin: 0;
-  font-size: 11px;
-  color: #94a3b8;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+
+  margin:
+    0;
+
+  font-size:
+    11px;
+
+  color:
+    #94a3b8;
+
+  font-weight:
+    600;
+
+  letter-spacing:
+    0.5px;
+
+  text-transform:
+    uppercase;
+
 }
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
 
 .container {
-  max-width: 1050px;
-  margin: 24px auto;
-  padding: 0 20px;
+
+  max-width:
+    1100px;
+
+  margin:
+    24px auto;
+
+  padding:
+    0 20px;
+
 }
+
+
+/* =========================================================
+   CARD
+========================================================= */
 
 .card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
+
+  background:
+    var(--card-bg);
+
+  border-radius:
+    var(--radius);
+
+  padding:
+    24px;
+
+  margin-bottom:
+    24px;
+
+  box-shadow:
+    var(--shadow);
+
+  border:
+    1px solid
+    var(--border-color);
+
 }
 
+
+/* =========================================================
+   TITOLI
+========================================================= */
+
 h2 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-top: 0;
-  margin-bottom: 16px;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+
+  font-size:
+    18px;
+
+  font-weight:
+    700;
+
+  margin-top:
+    0;
+
+  margin-bottom:
+    16px;
+
+  color:
+    var(--primary);
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
 }
+
+h3 {
+
+  color:
+    var(--primary);
+
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
 
 input,
 textarea,
 select {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  margin-top: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  background: #f8fafc;
-  color: var(--text-main);
-  transition: border-color 0.2s, background 0.2s;
+
+  width:
+    100%;
+
+  padding:
+    12px 14px;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    8px;
+
+  margin-top:
+    6px;
+
+  font-size:
+    14px;
+
+  font-family:
+    inherit;
+
+  background:
+    #f8fafc;
+
+  color:
+    var(--text-main);
+
+  transition:
+    border-color .2s,
+    background .2s;
+
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  outline: none;
-  border-color: var(--accent);
-  background: #ffffff;
+
+  outline:
+    none;
+
+  border-color:
+    var(--accent);
+
+  background:
+    #ffffff;
+
 }
+
+textarea {
+
+  min-height:
+    100px;
+
+  resize:
+    vertical;
+
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
 
 label {
-  display: block;
-  margin-top: 14px;
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
+
+  display:
+    block;
+
+  margin-top:
+    14px;
+
+  font-weight:
+    600;
+
+  font-size:
+    12px;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .5px;
+
+  color:
+    var(--text-muted);
+
 }
 
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
 button {
-  border: 0;
-  border-radius: 8px;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 13px;
-  font-family: inherit;
-  letter-spacing: 0.3px;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+
+  border:
+    0;
+
+  border-radius:
+    8px;
+
+  padding:
+    12px 20px;
+
+  cursor:
+    pointer;
+
+  font-weight:
+    700;
+
+  font-size:
+    13px;
+
+  font-family:
+    inherit;
+
+  letter-spacing:
+    .3px;
+
+  transition:
+    all .2s;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+
 }
 
 button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+
+  opacity:
+    .5;
+
+  cursor:
+    not-allowed;
+
 }
 
 .primary {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 117, 255, 0.25);
+
+  background:
+    var(--accent);
+
+  color:
+    white;
+
+  box-shadow:
+    0 4px 12px
+    rgba(0,117,255,.25);
+
 }
 
 .primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+
+  background:
+    var(--accent-hover);
+
+  transform:
+    translateY(-1px);
+
 }
 
 .secondary {
-  background: #f1f5f9;
-  color: var(--primary);
-  border: 1px solid var(--border-color);
+
+  background:
+    #f1f5f9;
+
+  color:
+    var(--primary);
+
+  border:
+    1px solid
+    var(--border-color);
+
 }
 
 .secondary:hover {
-  background: #e2e8f0;
+
+  background:
+    #e2e8f0;
+
 }
 
 .danger {
-  background: #fef2f2;
-  color: var(--danger);
-  border: 1px solid #fecaca;
+
+  background:
+    #fef2f2;
+
+  color:
+    var(--danger);
+
+  border:
+    1px solid
+    #fecaca;
+
 }
 
 .danger:hover {
-  background: var(--danger);
-  color: white;
+
+  background:
+    var(--danger);
+
+  color:
+    white;
+
 }
 
 .edit {
-  background: #eff6ff;
-  color: var(--accent);
-  border: 1px solid #bfdbfe;
+
+  background:
+    #eff6ff;
+
+  color:
+    var(--accent);
+
+  border:
+    1px solid
+    #bfdbfe;
+
 }
 
 .edit:hover {
-  background: var(--accent);
-  color: white;
+
+  background:
+    var(--accent);
+
+  color:
+    white;
+
 }
 
+.warning {
+
+  background:
+    #fffbeb;
+
+  color:
+    #b45309;
+
+  border:
+    1px solid
+    #fde68a;
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
 .hidden {
-  display: none !important;
+
+  display:
+    none !important;
+
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(240px,1fr)
+    );
+
+  gap:
+    16px;
+
 }
 
+.actions {
+
+  display:
+    flex;
+
+  gap:
+    10px;
+
+  flex-wrap:
+    wrap;
+
+}
+
+.back {
+
+  margin-bottom:
+    14px;
+
+}
+
+small {
+
+  color:
+    var(--text-muted);
+
+}
+
+
+/* =========================================================
+   PAZIENTE
+========================================================= */
+
 .patient {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 18px;
-  cursor: pointer;
-  background: var(--card-bg);
-  transition: all 0.2s;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    var(--radius);
+
+  padding:
+    18px;
+
+  cursor:
+    pointer;
+
+  background:
+    var(--card-bg);
+
+  transition:
+    all .2s;
+
 }
 
 .patient:hover {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+
+  border-color:
+    var(--accent);
+
+  box-shadow:
+    var(--shadow-hover);
+
+  transform:
+    translateY(-2px);
+
 }
+
+
+/* =========================================================
+   ESERCIZIO
+========================================================= */
 
 .exercise,
 .document {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 18px;
-  margin-bottom: 14px;
-  background: #ffffff;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    var(--radius);
+
+  padding:
+    18px;
+
+  margin-bottom:
+    14px;
+
+  background:
+    #ffffff;
+
 }
 
 .exercise h3,
 .document h3 {
-  margin-top: 0;
-  font-size: 16px;
-  color: var(--primary);
+
+  margin-top:
+    0;
+
+  font-size:
+    16px;
+
+  color:
+    var(--primary);
+
 }
 
 .video a,
 .document a {
-  color: var(--accent);
-  font-weight: 700;
-  text-decoration: none;
+
+  color:
+    var(--accent);
+
+  font-weight:
+    700;
+
+  text-decoration:
+    none;
+
 }
 
 .video a:hover,
 .document a:hover {
-  text-decoration: underline;
+
+  text-decoration:
+    underline;
+
 }
 
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
 .message {
-  margin-top: 14px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+
+  margin-top:
+    14px;
+
+  padding:
+    12px 16px;
+
+  border-radius:
+    8px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    600;
+
 }
 
 .error {
-  background: #fef2f2;
-  color: var(--danger);
-  border: 1px solid #fecaca;
+
+  background:
+    #fef2f2;
+
+  color:
+    var(--danger);
+
+  border:
+    1px solid
+    #fecaca;
+
 }
 
 .success {
-  background: #ecfdf5;
-  color: var(--success);
-  border: 1px solid #a7f3d0;
+
+  background:
+    #ecfdf5;
+
+  color:
+    var(--success);
+
+  border:
+    1px solid
+    #a7f3d0;
+
 }
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
 
 .login {
-  max-width: 420px;
-  margin: 60px auto;
+
+  max-width:
+    420px;
+
+  margin:
+    60px auto;
+
 }
 
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
 
-.back {
-  margin-bottom: 14px;
-}
-
-small {
-  color: var(--text-muted);
-}
+/* =========================================================
+   SECTION TITLE
+========================================================= */
 
 .section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  flex-wrap:
+    wrap;
+
 }
 
 hr {
-  border: 0;
-  border-top: 1px solid var(--border-color);
-  margin: 24px 0;
+
+  border:
+    0;
+
+  border-top:
+    1px solid
+    var(--border-color);
+
+  margin:
+    24px 0;
+
 }
+
+
+/* =========================================================
+   NOTE
+========================================================= */
 
 .note-card {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-  background: #fafafa;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    var(--radius);
+
+  padding:
+    16px;
+
+  margin-bottom:
+    12px;
+
+  background:
+    #fafafa;
+
 }
 
+.private-note {
+
+  background:
+    #fff7ed;
+
+  border-color:
+    #fed7aa;
+
+}
+
+.public-note {
+
+  background:
+    #f0fdf4;
+
+  border-color:
+    #bbf7d0;
+
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
 .section-tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-  position: sticky;
-  top: 72px;
-  z-index: 10;
-  background: var(--bg-color);
-  padding: 10px 0;
+
+  display:
+    flex;
+
+  gap:
+    8px;
+
+  flex-wrap:
+    wrap;
+
+  margin-bottom:
+    16px;
+
+  position:
+    sticky;
+
+  top:
+    72px;
+
+  z-index:
+    10;
+
+  background:
+    var(--bg-color);
+
+  padding:
+    10px 0;
+
 }
 
 .section-tab {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  border-radius: 30px;
-  padding: 8px 18px;
-  font-size: 13px;
+
+  background:
+    var(--card-bg);
+
+  border:
+    1px solid
+    var(--border-color);
+
+  color:
+    var(--text-muted);
+
+  border-radius:
+    30px;
+
+  padding:
+    8px 18px;
+
+  font-size:
+    13px;
+
 }
 
 .section-tab.active {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
+
+  background:
+    var(--primary);
+
+  color:
+    #ffffff;
+
+  border-color:
+    var(--primary);
+
 }
 
 .tab-panel.hidden-panel {
-  display: none !important;
+
+  display:
+    none !important;
+
 }
+
+
+/* =========================================================
+   EDIT BOX
+========================================================= */
 
 .edit-box {
-  background: #f8fafc;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 16px;
-  margin-top: 12px;
+
+  background:
+    #f8fafc;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    10px;
+
+  padding:
+    16px;
+
+  margin-top:
+    12px;
+
 }
 
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard-stats {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px,1fr)
+    );
+
+  gap:
+    16px;
+
+  margin-bottom:
+    24px;
+
+}
+
+.stat-card {
+
+  background:
+    #ffffff;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    var(--radius);
+
+  padding:
+    20px;
+
+  box-shadow:
+    var(--shadow);
+
+}
+
+.stat-label {
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .5px;
+
+}
+
+.stat-number {
+
+  color:
+    var(--primary);
+
+  font-size:
+    30px;
+
+  font-weight:
+    800;
+
+  margin-top:
+    6px;
+
+}
+
+
+/* =========================================================
+   RUNNING
+========================================================= */
+
 .running-planner {
-  width: 100%;
-  overflow-x: auto;
+
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+
 }
 
 .running-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin-top: 14px;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
+
+  width:
+    100%;
+
+  border-collapse:
+    separate;
+
+  border-spacing:
+    0;
+
+  margin-top:
+    14px;
+
+  border-radius:
+    var(--radius);
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--border-color);
+
 }
 
 .running-table th,
 .running-table td {
-  border-bottom: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color);
-  padding: 12px;
-  text-align: left;
-  vertical-align: top;
-  background: #ffffff;
+
+  border-bottom:
+    1px solid
+    var(--border-color);
+
+  border-right:
+    1px solid
+    var(--border-color);
+
+  padding:
+    12px;
+
+  text-align:
+    left;
+
+  vertical-align:
+    top;
+
+  background:
+    #ffffff;
+
 }
 
 .running-table th {
-  background: #f8fafc;
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 13px;
-  text-transform: uppercase;
+
+  background:
+    #f8fafc;
+
+  color:
+    var(--primary);
+
+  font-weight:
+    700;
+
+  font-size:
+    13px;
+
+  text-transform:
+    uppercase;
+
 }
 
 .session-box {
-  background: #f8fafc;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 8px;
+
+  background:
+    #f8fafc;
+
+  border:
+    1px solid
+    var(--border-color);
+
+  border-radius:
+    8px;
+
+  padding:
+    12px;
+
+  margin-bottom:
+    8px;
+
 }
 
 .session-box label {
-  margin-top: 8px;
-  font-size: 10px;
+
+  margin-top:
+    8px;
+
+  font-size:
+    10px;
+
 }
 
 .interval-box {
-  background: var(--accent-light);
-  border-left: 3px solid var(--accent);
-  padding: 8px;
-  margin-top: 8px;
-  border-radius: 6px;
+
+  background:
+    var(--accent-light);
+
+  border-left:
+    3px solid
+    var(--accent);
+
+  padding:
+    8px;
+
+  margin-top:
+    8px;
+
+  border-radius:
+    6px;
+
 }
 
+
+/* =========================================================
+   PRINT
+========================================================= */
+
 .print-sheet {
-  display: none;
+
+  display:
+    none;
+
 }
 
 @media print {
 
   body * {
-    visibility: hidden;
+
+    visibility:
+      hidden;
+
   }
 
   #printSheet,
   #printSheet * {
-    visibility: visible;
+
+    visibility:
+      visible;
+
   }
 
   #printSheet {
-    display: block !important;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    background: white;
-    color: black;
-    padding: 10px;
+
+    display:
+      block !important;
+
+    position:
+      absolute;
+
+    left:
+      0;
+
+    top:
+      0;
+
+    width:
+      100%;
+
+    background:
+      white;
+
+    color:
+      black;
+
+    padding:
+      10px;
+
   }
 
   .no-print {
-    display: none !important;
+
+    display:
+      none !important;
+
   }
+
 }
 
-@media screen and (max-width: 768px) {
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media screen and (max-width:768px) {
 
   .running-table,
   .running-table tbody,
   .running-table tr,
   .running-table td {
-    display: block;
-    width: 100%;
+
+    display:
+      block;
+
+    width:
+      100%;
+
   }
 
   .running-table thead {
-    display: none;
+
+    display:
+      none;
+
   }
 
   .running-table tr {
-    margin-bottom: 20px;
-    border: 2px solid var(--accent);
-    border-radius: var(--radius);
-    background: #fff;
-    padding: 14px;
+
+    margin-bottom:
+      20px;
+
+    border:
+      2px solid
+      var(--accent);
+
+    border-radius:
+      var(--radius);
+
+    background:
+      #fff;
+
+    padding:
+      14px;
+
   }
 
   .running-table td {
-    border: none;
-    padding: 8px 0;
-    border-bottom: 1px dashed var(--border-color);
+
+    border:
+      none;
+
+    padding:
+      8px 0;
+
+    border-bottom:
+      1px dashed
+      var(--border-color);
+
   }
 
   .running-table td:first-child {
-    font-size: 1.1em;
-    background: var(--primary);
-    color: #fff;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-bottom: 12px;
+
+    font-size:
+      1.1em;
+
+    background:
+      var(--primary);
+
+    color:
+      #fff;
+
+    padding:
+      10px 14px;
+
+    border-radius:
+      8px;
+
+    margin-bottom:
+      12px;
+
   }
 
   .running-table td:last-child {
-    border-bottom: none;
+
+    border-bottom:
+      none;
+
   }
 
 }
@@ -498,21 +1365,58 @@ hr {
 @media(max-width:600px) {
 
   header {
-    padding: 12px 16px;
+
+    padding:
+      12px 16px;
+
   }
 
   .container {
-    padding: 10px;
-    margin: 10px auto;
+
+    padding:
+      10px;
+
+    margin:
+      10px auto;
+
   }
 
   .card {
-    padding: 16px;
+
+    padding:
+      16px;
+
   }
 
   .brand-text {
-    display: none;
+
+    display:
+      none;
+
   }
+
+}
+
+
+/* =========================================================
+   DANGER ZONE
+========================================================= */
+
+.danger-zone {
+
+  border:
+    1px solid
+    #fecaca;
+
+  background:
+    #fffafa;
+
+}
+
+.danger-zone h2 {
+
+  color:
+    var(--danger);
 
 }
 
@@ -520,7 +1424,13 @@ hr {
 
 </head>
 
+
 <body>
+
+
+<!-- =======================================================
+     HEADER
+======================================================= -->
 
 <header>
 
@@ -534,13 +1444,24 @@ hr {
     >
 
     <div class="brand-text">
-      <h1>Noceto Lab</h1>
-      <p>Fisioterapia & Performance</p>
+
+      <h1>
+        Noceto Lab
+      </h1>
+
+      <p>
+        Fisioterapia & Performance
+      </p>
+
     </div>
 
   </div>
 
-  <button id="logoutButton" class="secondary hidden">
+
+  <button
+    id="logoutButton"
+    class="secondary hidden"
+  >
     Esci
   </button>
 
@@ -550,15 +1471,24 @@ hr {
 <div class="container">
 
 
-<!-- LOGIN -->
+<!-- =======================================================
+     LOGIN
+======================================================= -->
 
-<section id="loginPage" class="login">
+<section
+  id="loginPage"
+  class="login"
+>
 
   <div class="card">
 
-    <h2>🔐 Accedi al Portale</h2>
+    <h2>
+      🔐 Accedi al Portale
+    </h2>
 
-    <label>Email</label>
+    <label>
+      Email
+    </label>
 
     <input
       id="email"
@@ -566,7 +1496,9 @@ hr {
       placeholder="La tua email"
     >
 
-    <label>Password</label>
+    <label>
+      Password
+    </label>
 
     <input
       id="password"
@@ -594,7 +1526,9 @@ hr {
 </section>
 
 
-<!-- CAMBIO PASSWORD -->
+<!-- =======================================================
+     CAMBIO PASSWORD
+======================================================= -->
 
 <section
   id="setPasswordPage"
@@ -603,13 +1537,18 @@ hr {
 
   <div class="card">
 
-    <h2>🔑 Imposta Password</h2>
+    <h2>
+      🔑 Imposta Password
+    </h2>
 
     <p>
-      Scegli una nuova password personale per accedere al tuo programma.
+      Scegli una nuova password personale
+      per accedere al tuo programma.
     </p>
 
-    <label>Nuova password</label>
+    <label>
+      Nuova password
+    </label>
 
     <input
       id="newPassword"
@@ -617,7 +1556,9 @@ hr {
       placeholder="Nuova password"
     >
 
-    <label>Conferma password</label>
+    <label>
+      Conferma password
+    </label>
 
     <input
       id="confirmPassword"
@@ -645,18 +1586,28 @@ hr {
 </section>
 
 
-<!-- DASHBOARD TERAPISTA -->
+<!-- =======================================================
+     DASHBOARD TERAPISTA
+======================================================= -->
 
 <section
   id="therapistPage"
   class="hidden"
 >
 
+
   <div class="card">
 
-    <h2>👨‍⚕️ Dashboard Clinica</h2>
+    <h2>
+      👨‍⚕️ Dashboard Clinica
+    </h2>
 
-    <p style="color:var(--text-muted); margin-top:0;">
+    <p
+      style="
+        color:var(--text-muted);
+        margin-top:0;
+      "
+    >
       Gestisci pazienti, esercizi e programmi.
     </p>
 
@@ -681,9 +1632,83 @@ hr {
   </div>
 
 
+  <!-- STATISTICHE -->
+
+  <div class="dashboard-stats">
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        👥 Pazienti
+      </div>
+
+      <div
+        id="dashboardPatientsCount"
+        class="stat-number"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        🏋️ Esercizi
+      </div>
+
+      <div
+        id="dashboardExercisesCount"
+        class="stat-number"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        🏃 Programmi corsa
+      </div>
+
+      <div
+        id="dashboardRunningCount"
+        class="stat-number"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-label">
+        📝 Note
+      </div>
+
+      <div
+        id="dashboardNotesCount"
+        class="stat-number"
+      >
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- REGISTRO PAZIENTI -->
+
   <div class="card">
 
-    <h2>👥 Registro Pazienti</h2>
+    <h2>
+      👥 Registro Pazienti
+    </h2>
 
     <div
       id="patientsList"
@@ -695,11 +1720,15 @@ hr {
   </div>
 
 
+  <!-- LIBRERIA ESERCIZI -->
+
   <div class="card">
 
     <div class="section-title">
 
-      <h2>🏋️ Libreria Esercizi</h2>
+      <h2>
+        🏋️ Libreria Esercizi
+      </h2>
 
     </div>
 
@@ -712,25 +1741,26 @@ hr {
 </section>
 
 
-<!-- SCHEDA PAZIENTE -->
+<!-- =======================================================
+     SCHEDA PAZIENTE
+======================================================= -->
 
 <section
   id="patientPage"
   class="hidden"
 >
 
+
   <button
     id="backButton"
     class="secondary back"
   >
-    ← Torna ai Pazienti
+    ← Torna alla Dashboard
   </button>
 
 
-  <div
-    class="section-tabs"
-    id="therapistPatientTabs"
-  >
+  <div class="section-tabs"
+       id="therapistPatientTabs">
 
     <button
       class="section-tab active"
@@ -760,6 +1790,13 @@ hr {
       🏃 Scheda Corsa
     </button>
 
+    <button
+      class="section-tab"
+      data-target="therapistTabDanger"
+    >
+      ⚠️ Gestione
+    </button>
+
   </div>
 
 
@@ -772,7 +1809,9 @@ hr {
   </div>
 
 
-  <!-- ESERCIZI -->
+  <!-- =====================================================
+       ESERCIZI
+  ====================================================== -->
 
   <div
     class="card tab-panel"
@@ -781,7 +1820,9 @@ hr {
 
     <div class="section-title">
 
-      <h2>📋 Scheda Esercizi Assegnati</h2>
+      <h2>
+        📋 Scheda Esercizi Assegnati
+      </h2>
 
       <button
         id="printExerciseSheetButton"
@@ -806,9 +1847,13 @@ hr {
     id="therapistTabProgramAssign"
   >
 
-    <h2>＋ Assegna Esercizio</h2>
+    <h2>
+      ＋ Assegna Esercizio
+    </h2>
 
-    <label>Esercizio</label>
+    <label>
+      Esercizio
+    </label>
 
     <select id="exerciseSelect">
 
@@ -821,12 +1866,20 @@ hr {
 
     <div
       class="grid"
-      style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));"
+      style="
+        grid-template-columns:
+        repeat(
+          auto-fit,
+          minmax(130px,1fr)
+        );
+      "
     >
 
       <div>
 
-        <label>Serie</label>
+        <label>
+          Serie
+        </label>
 
         <input
           id="sets"
@@ -837,9 +1890,12 @@ hr {
 
       </div>
 
+
       <div>
 
-        <label>Ripetizioni</label>
+        <label>
+          Ripetizioni
+        </label>
 
         <input
           id="reps"
@@ -850,9 +1906,12 @@ hr {
 
       </div>
 
+
       <div>
 
-        <label>Durata (sec)</label>
+        <label>
+          Durata (sec)
+        </label>
 
         <input
           id="duration"
@@ -863,9 +1922,12 @@ hr {
 
       </div>
 
+
       <div>
 
-        <label>Recupero (sec)</label>
+        <label>
+          Recupero (sec)
+        </label>
 
         <input
           id="rest"
@@ -905,7 +1967,9 @@ hr {
   </div>
 
 
-  <!-- DOCUMENTI -->
+  <!-- =====================================================
+       DOCUMENTI
+  ====================================================== -->
 
   <div
     class="card tab-panel"
@@ -914,12 +1978,20 @@ hr {
 
     <div class="section-title">
 
-      <h2>📄 Clinical Report & PDF</h2>
+      <h2>
+        📄 Clinical Report & PDF
+      </h2>
 
     </div>
 
-    <p style="color:var(--text-muted);font-size:13px;">
-      Carica report, referti o schede aggiuntive in formato PDF.
+    <p
+      style="
+        color:var(--text-muted);
+        font-size:13px;
+      "
+    >
+      Carica report, referti o schede aggiuntive
+      in formato PDF.
     </p>
 
     <input
@@ -951,7 +2023,9 @@ hr {
   </div>
 
 
-  <!-- NOTE -->
+  <!-- =====================================================
+       NOTE
+  ====================================================== -->
 
   <div
     class="card tab-panel"
@@ -960,23 +2034,49 @@ hr {
 
     <div class="section-title">
 
-      <h2>📝 Diario & Comunicazioni</h2>
+      <h2>
+        📝 Diario & Comunicazioni
+      </h2>
 
     </div>
 
-    <label>Oggetto</label>
+
+    <label>
+      Oggetto
+    </label>
 
     <input
       id="patientNoteTitle"
       placeholder="Es. Indicazioni sulla fase di scarico"
     >
 
-    <label>Contenuto della Nota</label>
+
+    <label>
+      Visibilità
+    </label>
+
+    <select id="patientNoteVisibility">
+
+      <option value="false">
+        📢 Comunicazione al paziente
+      </option>
+
+      <option value="true">
+        🔒 Nota privata
+      </option>
+
+    </select>
+
+
+    <label>
+      Contenuto della Nota
+    </label>
 
     <textarea
       id="patientNoteContent"
       placeholder="Aggiorna le indicazioni cliniche o atletiche..."
     ></textarea>
+
 
     <br><br>
 
@@ -984,15 +2084,18 @@ hr {
       id="savePatientNoteButton"
       class="primary"
     >
-      ＋ Pubblica Nota
+      ＋ Salva Nota
     </button>
+
 
     <div
       id="patientNoteMessage"
       class="message hidden"
     ></div>
 
+
     <hr>
+
 
     <div id="patientNotesList">
       Caricamento...
@@ -1001,7 +2104,9 @@ hr {
   </div>
 
 
-  <!-- CORSA -->
+  <!-- =====================================================
+       CORSA
+  ====================================================== -->
 
   <div
     class="card tab-panel"
@@ -1010,11 +2115,19 @@ hr {
 
     <div class="section-title">
 
-      <h2>🏃 Programmazione Corsa & Performance</h2>
+      <h2>
+        🏃 Programmazione Corsa & Performance
+      </h2>
 
     </div>
 
-    <p style="color:var(--text-muted);font-size:13px;">
+
+    <p
+      style="
+        color:var(--text-muted);
+        font-size:13px;
+      "
+    >
       Configura la struttura del microciclo di corsa.
     </p>
 
@@ -1023,7 +2136,9 @@ hr {
 
       <div>
 
-        <label>Numero di settimane</label>
+        <label>
+          Numero di settimane
+        </label>
 
         <input
           id="runningWeeks"
@@ -1038,7 +2153,9 @@ hr {
 
       <div>
 
-        <label>Frequenza settimanale</label>
+        <label>
+          Frequenza settimanale
+        </label>
 
         <select id="runningSessionsPerWeek">
 
@@ -1070,6 +2187,7 @@ hr {
 
     <br>
 
+
     <div class="actions">
 
       <button
@@ -1079,11 +2197,20 @@ hr {
         ⚡ Genera Griglia Allenamenti
       </button>
 
+
       <button
         id="saveRunningProgramButton"
         class="primary hidden"
       >
         💾 Salva Scheda Corsa
+      </button>
+
+
+      <button
+        id="cancelRunningEditButton"
+        class="secondary hidden"
+      >
+        Annulla Modifica
       </button>
 
     </div>
@@ -1094,14 +2221,18 @@ hr {
       class="message hidden"
     ></div>
 
+
     <hr>
+
 
     <div
       id="runningPlanner"
       class="running-planner"
     ></div>
 
+
     <hr>
+
 
     <div class="section-title">
 
@@ -1118,34 +2249,97 @@ hr {
 
     </div>
 
+
     <div id="runningPlansList">
       Caricamento...
     </div>
 
   </div>
 
+
+  <!-- =====================================================
+       GESTIONE / ELIMINA PAZIENTE
+  ====================================================== -->
+
+  <div
+    class="card tab-panel danger-zone"
+    id="therapistTabDanger"
+  >
+
+    <h2>
+      ⚠️ Gestione Paziente
+    </h2>
+
+    <p>
+      Questa area contiene operazioni definitive.
+    </p>
+
+    <p
+      style="
+        color:var(--text-muted);
+        font-size:13px;
+      "
+    >
+      L'eliminazione del paziente può comportare
+      la cancellazione dei dati clinici collegati.
+    </p>
+
+    <hr>
+
+    <button
+      id="deletePatientButton"
+      class="danger"
+    >
+      🗑️ Elimina definitivamente paziente
+    </button>
+
+    <div
+      id="deletePatientMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
 </section>
 
 
-<!-- NUOVO PAZIENTE -->
+<!-- =======================================================
+     NUOVO PAZIENTE
+======================================================= -->
 
 <section
   id="newPatientPage"
   class="hidden"
 >
 
+  <button
+    id="backFromNewPatientButton"
+    class="secondary back"
+  >
+    ← Torna alla Dashboard
+  </button>
+
+
   <div class="card">
 
-    <h2>👤 Anagrafica Nuovo Paziente</h2>
+    <h2>
+      👤 Anagrafica Nuovo Paziente
+    </h2>
 
-    <label>Nome e Cognome</label>
+
+    <label>
+      Nome e Cognome
+    </label>
 
     <input
       id="newPatientName"
       placeholder="Es. Mario Rossi"
     >
 
-    <label>Email</label>
+
+    <label>
+      Email
+    </label>
 
     <input
       id="newPatientEmail"
@@ -1153,7 +2347,10 @@ hr {
       placeholder="mario.rossi@email.it"
     >
 
-    <label>Password temporanea</label>
+
+    <label>
+      Password temporanea
+    </label>
 
     <input
       id="newPatientPassword"
@@ -1161,11 +2358,20 @@ hr {
       value="Nocetolab22"
     >
 
-    <p style="font-size:12px;color:var(--text-muted);">
-      Il paziente utilizzerà questa password al primo accesso e sarà obbligato a cambiarla.
+
+    <p
+      style="
+        font-size:12px;
+        color:var(--text-muted);
+      "
+    >
+      Il paziente utilizzerà questa password
+      al primo accesso e sarà obbligato a cambiarla.
     </p>
 
+
     <br>
+
 
     <button
       id="savePatient"
@@ -1174,12 +2380,6 @@ hr {
       Registra Paziente
     </button>
 
-    <button
-      id="cancelPatient"
-      class="secondary"
-    >
-      Annulla
-    </button>
 
     <div
       id="patientMessage"
@@ -1191,12 +2391,22 @@ hr {
 </section>
 
 
-<!-- NUOVO ESERCIZIO -->
+<!-- =======================================================
+     NUOVO ESERCIZIO
+======================================================= -->
 
 <section
   id="newExercisePage"
   class="hidden"
 >
+
+  <button
+    id="backFromNewExerciseButton"
+    class="secondary back"
+  >
+    ← Torna alla Dashboard
+  </button>
+
 
   <div class="card">
 
@@ -1204,21 +2414,30 @@ hr {
       🏋️ Registra Esercizio in Libreria
     </h2>
 
-    <label>Nome Esercizio</label>
+
+    <label>
+      Nome Esercizio
+    </label>
 
     <input
       id="exerciseName"
       placeholder="Es. Bulgarian Split Squat"
     >
 
-    <label>Descrizione & Focus Tecnico</label>
+
+    <label>
+      Descrizione & Focus Tecnico
+    </label>
 
     <textarea
       id="exerciseDescription"
       placeholder="Fasi di esecuzione, biomeccanica e raccomandazioni..."
     ></textarea>
 
-    <label>Link Video</label>
+
+    <label>
+      Link Video
+    </label>
 
     <input
       id="exerciseVideo"
@@ -1226,7 +2445,9 @@ hr {
       placeholder="https://..."
     >
 
+
     <br><br>
+
 
     <button
       id="saveExercise"
@@ -1235,12 +2456,6 @@ hr {
       Salva Esercizio
     </button>
 
-    <button
-      id="cancelExercise"
-      class="secondary"
-    >
-      Annulla
-    </button>
 
     <div
       id="exerciseMessage"
@@ -1252,12 +2467,15 @@ hr {
 </section>
 
 
-<!-- PORTALE PAZIENTE -->
+<!-- =======================================================
+     PORTALE PAZIENTE
+======================================================= -->
 
 <section
   id="patientPortal"
   class="hidden"
 >
+
 
   <div
     class="section-tabs"
@@ -1297,22 +2515,41 @@ hr {
 
   <div
     class="card"
-    style="background:linear-gradient(135deg,var(--primary) 0%,#1e3a8a 100%);color:white;"
+    style="
+      background:
+      linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        #1e3a8a 100%
+      );
+      color:white;
+    "
   >
 
     <h2
       id="patientWelcome"
-      style="color:white;font-size:22px;"
+      style="
+        color:white;
+        font-size:22px;
+      "
     >
       Ciao 👋
     </h2>
 
-    <p style="margin:0;opacity:.85;">
-      Benvenuto nella tua area riservata di Noceto Lab.
+    <p
+      style="
+        margin:0;
+        opacity:.85;
+      "
+    >
+      Benvenuto nella tua area riservata
+      di Noceto Lab.
     </p>
 
   </div>
 
+
+  <!-- ESERCIZI PAZIENTE -->
 
   <div
     class="card tab-panel"
@@ -1321,7 +2558,9 @@ hr {
 
     <div class="section-title">
 
-      <h2>🏋️ Scheda Esercizi</h2>
+      <h2>
+        🏋️ Scheda Esercizi
+      </h2>
 
       <button
         id="patientPrintExerciseSheetButton"
@@ -1339,6 +2578,8 @@ hr {
   </div>
 
 
+  <!-- DOCUMENTI PAZIENTE -->
+
   <div
     class="card tab-panel"
     id="portalDocuments"
@@ -1354,6 +2595,8 @@ hr {
 
   </div>
 
+
+  <!-- NOTE PAZIENTE -->
 
   <div
     class="card tab-panel"
@@ -1371,6 +2614,8 @@ hr {
   </div>
 
 
+  <!-- CORSA PAZIENTE -->
+
   <div
     class="card tab-panel"
     id="portalRunning"
@@ -1378,7 +2623,9 @@ hr {
 
     <div class="section-title">
 
-      <h2>🏃 Tabella di Corsa</h2>
+      <h2>
+        🏃 Tabella di Corsa
+      </h2>
 
       <button
         id="patientPrintRunningButton"
@@ -1401,17 +2648,22 @@ hr {
 </div>
 
 
+<!-- =======================================================
+     PRINT
+======================================================= -->
+
 <div
   id="printSheet"
   class="print-sheet"
 ></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
 
 
 <script>
-
 
 /* =========================================================
    SUPABASE
@@ -1429,20 +2681,24 @@ const db =
     SUPABASE_KEY
   );
 
+
 const DOCUMENT_BUCKET =
   "patient-documents";
+
 
 const LOGO_PATH =
   "logo-noceto-lab.PNG";
 
 
 /* =========================================================
-   VARIABILI GLOBALI
+   GLOBALI
 ========================================================= */
 
 let currentUser = null;
 
 let currentPatient = null;
+
+let editingRunningPlanId = null;
 
 
 /* =========================================================
@@ -1450,13 +2706,21 @@ let currentPatient = null;
 ========================================================= */
 
 const pages = [
+
   "loginPage",
+
   "setPasswordPage",
+
   "therapistPage",
+
   "patientPage",
+
   "newPatientPage",
+
   "newExercisePage",
+
   "patientPortal"
+
 ];
 
 
@@ -1475,6 +2739,7 @@ async function getLogoUrl() {
         3600
       );
 
+
   if(result.error) {
 
     console.error(
@@ -1486,6 +2751,7 @@ async function getLogoUrl() {
 
   }
 
+
   return result.data.signedUrl;
 
 }
@@ -1496,21 +2762,31 @@ async function loadLogo() {
   const logoUrl =
     await getLogoUrl();
 
-  if(!logoUrl) return;
+
+  if(!logoUrl)
+    return;
+
 
   const logo =
-    document.getElementById("siteLogo");
+    document.getElementById(
+      "siteLogo"
+    );
 
-  if(logo) {
-    logo.src = logoUrl;
-  }
+
+  if(logo)
+    logo.src =
+      logoUrl;
+
 
   const favicon =
-    document.getElementById("favicon");
+    document.getElementById(
+      "favicon"
+    );
 
-  if(favicon) {
-    favicon.href = logoUrl;
-  }
+
+  if(favicon)
+    favicon.href =
+      logoUrl;
 
 }
 
@@ -1519,85 +2795,115 @@ async function loadLogo() {
    TABS
 ========================================================= */
 
-function setupSectionTabs(containerId) {
+function setupSectionTabs(
+  containerId
+) {
 
   const container =
-    document.getElementById(containerId);
+    document.getElementById(
+      containerId
+    );
 
-  if(!container) return;
+
+  if(!container)
+    return;
+
 
   const buttons =
-    container.querySelectorAll(".section-tab");
+    container.querySelectorAll(
+      ".section-tab"
+    );
 
-  buttons.forEach(button => {
 
-    button.addEventListener(
-      "click",
-      () => {
+  buttons.forEach(
+    button => {
 
-        buttons.forEach(
-          b =>
-            b.classList.remove("active")
-        );
+      button.addEventListener(
+        "click",
+        () => {
 
-        button.classList.add("active");
-
-        const targetId =
-          button.dataset.target;
-
-        const section =
-          document.getElementById(
-            targetId
-          );
-
-        if(!section) return;
-
-        const root =
-          container.closest("section");
-
-        root
-          .querySelectorAll(".tab-panel")
-          .forEach(
-            panel =>
-              panel.classList.add(
-                "hidden-panel"
+          buttons.forEach(
+            b =>
+              b.classList.remove(
+                "active"
               )
           );
 
-        section.classList.remove(
-          "hidden-panel"
-        );
 
-        if(
-          containerId ===
-          "therapistPatientTabs"
-        ) {
+          button.classList.add(
+            "active"
+          );
 
-          const assignPanel =
+
+          const targetId =
+            button.dataset.target;
+
+
+          const section =
             document.getElementById(
-              "therapistTabProgramAssign"
+              targetId
             );
 
-          if(assignPanel) {
 
-            assignPanel.classList.toggle(
-              "hidden-panel",
-              targetId !==
-              "therapistTabProgram"
+          if(!section)
+            return;
+
+
+          const root =
+            container.closest(
+              "section"
             );
+
+
+          root
+            .querySelectorAll(
+              ".tab-panel"
+            )
+            .forEach(
+              panel =>
+                panel.classList.add(
+                  "hidden-panel"
+                )
+            );
+
+
+          section.classList.remove(
+            "hidden-panel"
+          );
+
+
+          if(
+            containerId ===
+            "therapistPatientTabs"
+          ) {
+
+            const assignPanel =
+              document.getElementById(
+                "therapistTabProgramAssign"
+              );
+
+
+            if(assignPanel) {
+
+              assignPanel.classList.toggle(
+                "hidden-panel",
+                targetId !==
+                "therapistTabProgram"
+              );
+
+            }
 
           }
 
         }
+      );
 
-      }
-    );
+    }
+  );
 
-  });
 
-  if(buttons[0]) {
+  if(buttons[0])
     buttons[0].click();
-  }
 
 }
 
@@ -1605,6 +2911,7 @@ function setupSectionTabs(containerId) {
 setupSectionTabs(
   "therapistPatientTabs"
 );
+
 
 setupSectionTabs(
   "patientPortalTabs"
@@ -1615,22 +2922,38 @@ setupSectionTabs(
    UI
 ========================================================= */
 
-function showPage(pageId) {
+function showPage(
+  pageId
+) {
 
-  pages.forEach(id => {
+  pages.forEach(
+    id => {
 
-    const element =
-      document.getElementById(id);
+      const element =
+        document.getElementById(
+          id
+        );
 
-    if(element) {
-      element.classList.add("hidden");
+
+      if(element)
+        element.classList.add(
+          "hidden"
+        );
+
     }
+  );
 
-  });
 
-  document
-    .getElementById(pageId)
-    .classList.remove("hidden");
+  const page =
+    document.getElementById(
+      pageId
+    );
+
+
+  if(page)
+    page.classList.remove(
+      "hidden"
+    );
 
 }
 
@@ -1642,14 +2965,22 @@ function showMessage(
 ) {
 
   const element =
-    document.getElementById(id);
+    document.getElementById(
+      id
+    );
 
-  if(!element) return;
 
-  element.innerText = text;
+  if(!element)
+    return;
+
+
+  element.innerText =
+    text;
+
 
   element.className =
-    "message " + type;
+    "message " +
+    type;
 
 }
 
@@ -1659,7 +2990,9 @@ function showMessage(
 ========================================================= */
 
 document
-  .getElementById("loginButton")
+  .getElementById(
+    "loginButton"
+  )
   .addEventListener(
     "click",
     login
@@ -1670,16 +3003,25 @@ async function login() {
 
   const email =
     document
-      .getElementById("email")
+      .getElementById(
+        "email"
+      )
       .value
       .trim();
 
+
   const password =
     document
-      .getElementById("password")
+      .getElementById(
+        "password"
+      )
       .value;
 
-  if(!email || !password) {
+
+  if(
+    !email ||
+    !password
+  ) {
 
     showMessage(
       "loginMessage",
@@ -1691,11 +3033,16 @@ async function login() {
 
   }
 
+
   const result =
     await db.auth.signInWithPassword({
+
       email,
+
       password
+
     });
+
 
   if(result.error) {
 
@@ -1709,8 +3056,10 @@ async function login() {
 
   }
 
+
   currentUser =
     result.data.user;
+
 
   const profileResult =
     await db
@@ -1724,6 +3073,7 @@ async function login() {
       )
       .maybeSingle();
 
+
   if(
     profileResult.error ||
     !profileResult.data
@@ -1731,7 +3081,9 @@ async function login() {
 
     await db.auth.signOut();
 
-    currentUser = null;
+    currentUser =
+      null;
+
 
     showMessage(
       "loginMessage",
@@ -1742,6 +3094,7 @@ async function login() {
     return;
 
   }
+
 
   if(
     profileResult.data.role ===
@@ -1758,6 +3111,7 @@ async function login() {
 
   }
 
+
   await startApp();
 
 }
@@ -1771,6 +3125,7 @@ async function checkRecoverySession() {
 
   const hash =
     window.location.hash;
+
 
   if(
     hash &&
@@ -1787,6 +3142,7 @@ async function checkRecoverySession() {
     const result =
       await db.auth.getSession();
 
+
     if(
       result.data &&
       result.data.session
@@ -1795,15 +3151,18 @@ async function checkRecoverySession() {
       currentUser =
         result.data.session.user;
 
+
       showPage(
         "setPasswordPage"
       );
+
 
       return true;
 
     }
 
   }
+
 
   return false;
 
@@ -1833,12 +3192,14 @@ async function saveNewPassword() {
       )
       .value;
 
+
   const confirmation =
     document
       .getElementById(
         "confirmPassword"
       )
       .value;
+
 
   if(
     !password ||
@@ -1857,10 +3218,14 @@ async function saveNewPassword() {
 
   }
 
+
   const result =
     await db.auth.updateUser({
+
       password
+
     });
+
 
   if(result.error) {
 
@@ -1874,19 +3239,24 @@ async function saveNewPassword() {
 
   }
 
+
   currentUser =
     result.data.user;
+
 
   await db
     .from("profiles")
     .update({
+
       must_change_password:
         false
+
     })
     .eq(
       "id",
       currentUser.id
     );
+
 
   showMessage(
     "passwordMessage",
@@ -1894,9 +3264,12 @@ async function saveNewPassword() {
     "success"
   );
 
+
   setTimeout(
     async () => {
+
       await startApp();
+
     },
     700
   );
@@ -1913,6 +3286,7 @@ async function startApp() {
   const result =
     await db.auth.getUser();
 
+
   if(result.error) {
 
     showPage(
@@ -1923,14 +3297,19 @@ async function startApp() {
 
   }
 
+
   currentUser =
     result.data.user;
+
 
   document
     .getElementById(
       "logoutButton"
     )
-    .classList.remove("hidden");
+    .classList.remove(
+      "hidden"
+    );
+
 
   const profileResult =
     await db
@@ -1944,11 +3323,21 @@ async function startApp() {
       )
       .single();
 
-  if(profileResult.error)
+
+  if(profileResult.error) {
+
+    console.error(
+      profileResult.error
+    );
+
     return;
+
+  }
+
 
   const role =
     profileResult.data.role;
+
 
   if(
     role === "patient" &&
@@ -1962,6 +3351,7 @@ async function startApp() {
     return;
 
   }
+
 
   if(role === "therapist") {
 
@@ -1991,15 +3381,27 @@ document
 
       await db.auth.signOut();
 
-      currentUser = null;
 
-      currentPatient = null;
+      currentUser =
+        null;
+
+
+      currentPatient =
+        null;
+
+
+      editingRunningPlanId =
+        null;
+
 
       document
         .getElementById(
           "logoutButton"
         )
-        .classList.add("hidden");
+        .classList.add(
+          "hidden"
+        );
+
 
       showPage(
         "loginPage"
@@ -2015,13 +3417,22 @@ document
 
 async function startTherapist() {
 
+  currentPatient =
+    null;
+
+
   showPage(
     "therapistPage"
   );
 
+
   await loadPatients();
 
+
   await loadExerciseLibrary();
+
+
+  await loadDashboardStats();
 
 }
 
@@ -2042,6 +3453,7 @@ async function startPatient() {
       )
       .maybeSingle();
 
+
   if(
     result.error ||
     !result.data
@@ -2055,8 +3467,10 @@ async function startPatient() {
 
   }
 
+
   currentPatient =
     result.data;
+
 
   document
     .getElementById(
@@ -2067,11 +3481,109 @@ async function startPatient() {
       currentPatient.name +
       " 👋";
 
+
   showPage(
     "patientPortal"
   );
 
+
   await loadPatientPortal();
+
+}
+
+
+/* =========================================================
+   DASHBOARD STATISTICHE
+========================================================= */
+
+async function loadDashboardStats() {
+
+  const patients =
+    await db
+      .from("patients")
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      );
+
+
+  const exercises =
+    await db
+      .from("exercises")
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      );
+
+
+  const running =
+    await db
+      .from("running_plans")
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      );
+
+
+  const notes =
+    await db
+      .from("patient_notes")
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      );
+
+
+  document
+    .getElementById(
+      "dashboardPatientsCount"
+    )
+    .innerText =
+      patients.count || 0;
+
+
+  document
+    .getElementById(
+      "dashboardExercisesCount"
+    )
+    .innerText =
+      exercises.count || 0;
+
+
+  document
+    .getElementById(
+      "dashboardRunningCount"
+    )
+    .innerText =
+      running.count || 0;
+
+
+  document
+    .getElementById(
+      "dashboardNotesCount"
+    )
+    .innerText =
+      notes.count || 0;
 
 }
 
@@ -2087,8 +3599,10 @@ async function loadPatients() {
       "patientsList"
     );
 
+
   list.innerHTML =
     "Caricamento...";
+
 
   const result =
     await db
@@ -2097,9 +3611,11 @@ async function loadPatients() {
       .order(
         "name",
         {
-          ascending:true
+          ascending:
+            true
         }
       );
+
 
   if(
     result.error ||
@@ -2113,7 +3629,20 @@ async function loadPatients() {
 
   }
 
-  list.innerHTML = "";
+
+  if(result.data.length === 0) {
+
+    list.innerHTML =
+      "Nessun paziente presente.";
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    "";
+
 
   result.data.forEach(
     patient => {
@@ -2123,8 +3652,10 @@ async function loadPatients() {
           "div"
         );
 
+
       div.className =
         "patient";
+
 
       div.innerHTML = `
 
@@ -2140,12 +3671,19 @@ async function loadPatients() {
 
       `;
 
+
       div.addEventListener(
         "click",
-        () => openPatient(patient)
+        () =>
+          openPatient(
+            patient
+          )
       );
 
-      list.appendChild(div);
+
+      list.appendChild(
+        div
+      );
 
     }
   );
@@ -2157,10 +3695,17 @@ async function loadPatients() {
    APRI PAZIENTE
 ========================================================= */
 
-async function openPatient(patient) {
+async function openPatient(
+  patient
+) {
 
   currentPatient =
     patient;
+
+
+  editingRunningPlanId =
+    null;
+
 
   document
     .getElementById(
@@ -2170,21 +3715,69 @@ async function openPatient(patient) {
       "👤 " +
       patient.name;
 
+
   showPage(
     "patientPage"
   );
 
+
+  setupSectionTabs(
+    "therapistPatientTabs"
+  );
+
+
   await loadExercises();
+
 
   await loadPatientExercises();
 
+
   await loadPatientDocuments();
 
+
   await loadPatientNotes();
+
 
   await loadRunningPlans();
 
 }
+
+
+/* =========================================================
+   TORNA ALLA DASHBOARD
+========================================================= */
+
+document
+  .getElementById(
+    "backButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      currentPatient =
+        null;
+
+
+      editingRunningPlanId =
+        null;
+
+
+      showPage(
+        "therapistPage"
+      );
+
+
+      await loadPatients();
+
+
+      await loadExerciseLibrary();
+
+
+      await loadDashboardStats();
+
+    }
+  );
 
 
 /* =========================================================
@@ -2197,23 +3790,35 @@ document
   )
   .addEventListener(
     "click",
-    () =>
+    () => {
+
       showPage(
         "newPatientPage"
-      )
+      );
+
+    }
   );
 
 
 document
   .getElementById(
-    "cancelPatient"
+    "backFromNewPatientButton"
   )
   .addEventListener(
     "click",
-    () =>
+    async () => {
+
       showPage(
         "therapistPage"
-      )
+      );
+
+
+      await loadPatients();
+
+
+      await loadDashboardStats();
+
+    }
   );
 
 
@@ -2237,6 +3842,7 @@ async function createPatient() {
       .value
       .trim();
 
+
   const email =
     document
       .getElementById(
@@ -2245,6 +3851,7 @@ async function createPatient() {
       .value
       .trim();
 
+
   const password =
     document
       .getElementById(
@@ -2252,6 +3859,7 @@ async function createPatient() {
       )
       .value
       .trim();
+
 
   if(
     !name ||
@@ -2269,20 +3877,12 @@ async function createPatient() {
 
   }
 
-  /*
-    IMPORTANTE:
-
-    Questo endpoint deve essere una
-    Supabase Edge Function.
-
-    NON inserire mai la service_role key
-    dentro questo file.
-  */
 
   try {
 
     const sessionResult =
       await db.auth.getSession();
+
 
     const token =
       sessionResult
@@ -2290,31 +3890,45 @@ async function createPatient() {
         .session
         ?.access_token;
 
+
     const response =
       await fetch(
         SUPABASE_URL +
         "/functions/v1/create-patient",
         {
-          method:"POST",
 
-          headers:{
+          method:
+            "POST",
+
+          headers: {
+
             "Content-Type":
               "application/json",
 
             "Authorization":
-              "Bearer " + token
+              "Bearer " +
+              token
+
           },
 
-          body:JSON.stringify({
-            name,
-            email,
-            password
-          })
+          body:
+            JSON.stringify({
+
+              name,
+
+              email,
+
+              password
+
+            })
+
         }
       );
 
+
     const data =
       await response.json();
+
 
     if(!response.ok) {
 
@@ -2325,25 +3939,42 @@ async function createPatient() {
 
     }
 
+
     showMessage(
       "patientMessage",
       "Paziente creato correttamente.",
       "success"
     );
 
+
     document
       .getElementById(
         "newPatientName"
       )
-      .value = "";
+      .value =
+        "";
+
 
     document
       .getElementById(
         "newPatientEmail"
       )
-      .value = "";
+      .value =
+        "";
+
+
+    document
+      .getElementById(
+        "newPatientPassword"
+      )
+      .value =
+        "Nocetolab22";
+
 
     await loadPatients();
+
+
+    await loadDashboardStats();
 
   }
   catch(error) {
@@ -2353,6 +3984,200 @@ async function createPatient() {
       error.message,
       "error"
     );
+
+  }
+
+}
+
+
+/* =========================================================
+   ELIMINAZIONE PAZIENTE
+========================================================= */
+
+document
+  .getElementById(
+    "deletePatientButton"
+  )
+  .addEventListener(
+    "click",
+    deleteCurrentPatient
+  );
+
+
+async function deleteCurrentPatient() {
+
+  if(!currentPatient) {
+
+    alert(
+      "Nessun paziente selezionato."
+    );
+
+    return;
+
+  }
+
+
+  const firstConfirm =
+    confirm(
+      "ATTENZIONE.\n\n" +
+      "Stai per eliminare definitivamente " +
+      currentPatient.name +
+      ".\n\n" +
+      "L'operazione potrebbe eliminare " +
+      "esercizi assegnati, documenti, note " +
+      "e programmi di corsa.\n\n" +
+      "Continuare?"
+    );
+
+
+  if(!firstConfirm)
+    return;
+
+
+  const secondConfirm =
+    confirm(
+      "CONFERMA FINALE\n\n" +
+      "Eliminare definitivamente il paziente " +
+      currentPatient.name +
+      "?\n\n" +
+      "Questa operazione non dovrebbe essere considerata reversibile."
+    );
+
+
+  if(!secondConfirm)
+    return;
+
+
+  const button =
+    document.getElementById(
+      "deletePatientButton"
+    );
+
+
+  button.disabled =
+    true;
+
+
+  button.innerText =
+    "⏳ Eliminazione...";
+
+
+  try {
+
+    const sessionResult =
+      await db.auth.getSession();
+
+
+    const token =
+      sessionResult
+        .data
+        .session
+        ?.access_token;
+
+
+    if(!token)
+      throw new Error(
+        "Sessione non valida."
+      );
+
+
+    /*
+      Questa Edge Function deve essere creata
+      su Supabase.
+
+      NON mettere MAI la service_role key
+      dentro questo file.
+    */
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/functions/v1/delete-patient",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              token
+
+          },
+
+          body:
+            JSON.stringify({
+
+              patient_id:
+                currentPatient.id
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Errore durante l'eliminazione del paziente."
+      );
+
+    }
+
+
+    currentPatient =
+      null;
+
+
+    editingRunningPlanId =
+      null;
+
+
+    alert(
+      "Paziente eliminato correttamente."
+    );
+
+
+    showPage(
+      "therapistPage"
+    );
+
+
+    await loadPatients();
+
+
+    await loadExerciseLibrary();
+
+
+    await loadDashboardStats();
+
+  }
+  catch(error) {
+
+    showMessage(
+      "deletePatientMessage",
+      error.message,
+      "error"
+    );
+
+  }
+  finally {
+
+    button.disabled =
+      false;
+
+    button.innerText =
+      "🗑️ Elimina definitivamente paziente";
 
   }
 
@@ -2370,8 +4195,10 @@ async function loadExercises() {
       "exerciseSelect"
     );
 
+
   select.innerHTML =
     '<option value="">Seleziona esercizio</option>';
+
 
   const result =
     await db
@@ -2380,15 +4207,18 @@ async function loadExercises() {
       .order(
         "name",
         {
-          ascending:true
+          ascending:
+            true
         }
       );
+
 
   if(
     result.error ||
     !result.data
   )
     return;
+
 
   result.data.forEach(
     ex => {
@@ -2398,11 +4228,14 @@ async function loadExercises() {
           "option"
         );
 
+
       opt.value =
         ex.id;
 
+
       opt.textContent =
         ex.name;
+
 
       select.appendChild(
         opt
@@ -2421,8 +4254,10 @@ async function loadExerciseLibrary() {
       "exerciseLibrary"
     );
 
+
   container.innerHTML =
     "Caricamento...";
+
 
   const result =
     await db
@@ -2431,9 +4266,11 @@ async function loadExerciseLibrary() {
       .order(
         "name",
         {
-          ascending:true
+          ascending:
+            true
         }
       );
+
 
   if(
     result.error ||
@@ -2448,7 +4285,10 @@ async function loadExerciseLibrary() {
 
   }
 
-  container.innerHTML = "";
+
+  container.innerHTML =
+    "";
+
 
   result.data.forEach(
     ex => {
@@ -2458,8 +4298,10 @@ async function loadExerciseLibrary() {
           "div"
         );
 
+
       div.className =
         "exercise";
+
 
       div.innerHTML = `
 
@@ -2467,15 +4309,22 @@ async function loadExerciseLibrary() {
           ${escapeHtml(ex.name)}
         </h3>
 
+
         ${
           ex.description
           ?
-          `<p style="font-size:13px;color:var(--text-muted);">
+          `<p
+            style="
+              font-size:13px;
+              color:var(--text-muted);
+            "
+          >
             ${escapeHtml(ex.description)}
           </p>`
           :
           ""
         }
+
 
         ${
           ex.video_url
@@ -2493,6 +4342,7 @@ async function loadExerciseLibrary() {
           ""
         }
 
+
         <div class="actions">
 
           <button
@@ -2501,6 +4351,7 @@ async function loadExerciseLibrary() {
           >
             ✏️ Modifica
           </button>
+
 
           <button
             class="danger"
@@ -2511,32 +4362,43 @@ async function loadExerciseLibrary() {
 
         </div>
 
+
         <div
           id="exerciseEdit_${ex.id}"
           class="edit-box hidden"
         >
 
-          <label>Nome</label>
+          <label>
+            Nome
+          </label>
 
           <input
             id="editExName_${ex.id}"
             value="${escapeAttribute(ex.name || "")}"
           >
 
-          <label>Descrizione</label>
+
+          <label>
+            Descrizione
+          </label>
 
           <textarea
             id="editExDescription_${ex.id}"
           >${escapeHtml(ex.description || "")}</textarea>
 
-          <label>Video</label>
+
+          <label>
+            Video
+          </label>
 
           <input
             id="editExVideo_${ex.id}"
             value="${escapeAttribute(ex.video_url || "")}"
           >
 
+
           <br>
+
 
           <div class="actions">
 
@@ -2546,6 +4408,7 @@ async function loadExerciseLibrary() {
             >
               💾 Salva modifiche
             </button>
+
 
             <button
               class="secondary"
@@ -2559,6 +4422,7 @@ async function loadExerciseLibrary() {
         </div>
 
       `;
+
 
       container.appendChild(
         div
@@ -2574,8 +4438,10 @@ function showExerciseEdit(id) {
 
   const box =
     document.getElementById(
-      "exerciseEdit_" + id
+      "exerciseEdit_" +
+      id
     );
+
 
   if(box)
     box.classList.remove(
@@ -2589,8 +4455,10 @@ function hideExerciseEdit(id) {
 
   const box =
     document.getElementById(
-      "exerciseEdit_" + id
+      "exerciseEdit_" +
+      id
     );
+
 
   if(box)
     box.classList.add(
@@ -2605,26 +4473,32 @@ async function updateExercise(id) {
   const name =
     document
       .getElementById(
-        "editExName_" + id
+        "editExName_" +
+        id
       )
       .value
       .trim();
+
 
   const description =
     document
       .getElementById(
-        "editExDescription_" + id
+        "editExDescription_" +
+        id
       )
       .value
       .trim();
 
+
   const video =
     document
       .getElementById(
-        "editExVideo_" + id
+        "editExVideo_" +
+        id
       )
       .value
       .trim();
+
 
   if(!name) {
 
@@ -2636,20 +4510,28 @@ async function updateExercise(id) {
 
   }
 
+
   const result =
     await db
       .from("exercises")
       .update({
+
         name,
+
         description:
-          description || null,
+          description ||
+          null,
+
         video_url:
-          video || null
+          video ||
+          null
+
       })
       .eq(
         "id",
         id
       );
+
 
   if(result.error) {
 
@@ -2662,9 +4544,14 @@ async function updateExercise(id) {
 
   }
 
+
   await loadExerciseLibrary();
 
+
   await loadExercises();
+
+
+  await loadDashboardStats();
 
 }
 
@@ -2678,6 +4565,7 @@ async function deleteExercise(id) {
   )
     return;
 
+
   const result =
     await db
       .from("exercises")
@@ -2686,6 +4574,7 @@ async function deleteExercise(id) {
         "id",
         id
       );
+
 
   if(result.error) {
 
@@ -2698,9 +4587,14 @@ async function deleteExercise(id) {
 
   }
 
+
   await loadExerciseLibrary();
 
+
   await loadExercises();
+
+
+  await loadDashboardStats();
 
 }
 
@@ -2724,14 +4618,26 @@ document
 
 document
   .getElementById(
-    "cancelExercise"
+    "backFromNewExerciseButton"
   )
   .addEventListener(
     "click",
-    () =>
+    async () => {
+
       showPage(
         "therapistPage"
-      )
+      );
+
+
+      await loadPatients();
+
+
+      await loadExerciseLibrary();
+
+
+      await loadDashboardStats();
+
+    }
   );
 
 
@@ -2751,6 +4657,7 @@ document
           .value
           .trim();
 
+
       const description =
         document
           .getElementById(
@@ -2759,6 +4666,7 @@ document
           .value
           .trim();
 
+
       const video =
         document
           .getElementById(
@@ -2766,6 +4674,7 @@ document
           )
           .value
           .trim();
+
 
       if(!name) {
 
@@ -2779,16 +4688,24 @@ document
 
       }
 
+
       const result =
         await db
           .from("exercises")
           .insert([{
+
             name,
+
             description:
-              description || null,
+              description ||
+              null,
+
             video_url:
-              video || null
+              video ||
+              null
+
           }]);
+
 
       if(result.error) {
 
@@ -2802,33 +4719,45 @@ document
 
       }
 
+
       showMessage(
         "exerciseMessage",
         "Esercizio salvato.",
         "success"
       );
 
+
       document
         .getElementById(
           "exerciseName"
         )
-        .value = "";
+        .value =
+          "";
+
 
       document
         .getElementById(
           "exerciseDescription"
         )
-        .value = "";
+        .value =
+          "";
+
 
       document
         .getElementById(
           "exerciseVideo"
         )
-        .value = "";
+        .value =
+          "";
+
 
       await loadExerciseLibrary();
 
+
       await loadExercises();
+
+
+      await loadDashboardStats();
 
     }
   );
@@ -2845,8 +4774,10 @@ async function loadPatientExercises() {
       "patientExercises"
     );
 
+
   container.innerHTML =
     "Caricamento...";
+
 
   const result =
     await db
@@ -2858,6 +4789,7 @@ async function loadPatientExercises() {
         "patient_id",
         currentPatient.id
       );
+
 
   if(
     result.error ||
@@ -2872,7 +4804,10 @@ async function loadPatientExercises() {
 
   }
 
-  container.innerHTML = "";
+
+  container.innerHTML =
+    "";
+
 
   result.data.forEach(
     item => {
@@ -2882,13 +4817,18 @@ async function loadPatientExercises() {
           "div"
         );
 
+
       div.className =
         "exercise";
 
+
       const exName =
         item.exercises
-        ? item.exercises.name
-        : "Esercizio";
+        ?
+        item.exercises.name
+        :
+        "Esercizio";
+
 
       div.innerHTML = `
 
@@ -2896,40 +4836,74 @@ async function loadPatientExercises() {
           ${escapeHtml(exName)}
         </h3>
 
+
         <p style="font-size:14px;">
-          <strong>Parametri:</strong>
+
+          <strong>
+            Parametri:
+          </strong>
 
           ${
             item.sets
-            ? `<strong>${item.sets}</strong> serie`
-            : ""
+            ?
+            `<strong>
+              ${item.sets}
+            </strong> serie`
+            :
+            ""
           }
 
           ${
             item.reps
-            ? ` | <strong>${item.reps}</strong> rep`
-            : ""
+            ?
+            ` |
+            <strong>
+              ${item.reps}
+            </strong>
+            rep`
+            :
+            ""
           }
 
           ${
             item.duration
-            ? ` | <strong>${item.duration}s</strong> tempo`
-            : ""
+            ?
+            ` |
+            <strong>
+              ${item.duration}s
+            </strong>
+            tempo`
+            :
+            ""
           }
 
           ${
             item.rest
-            ? ` | <strong>${item.rest}s</strong> rec`
-            : ""
+            ?
+            ` |
+            <strong>
+              ${item.rest}s
+            </strong>
+            rec`
+            :
+            ""
           }
 
         </p>
 
+
         ${
           item.notes
           ?
-          `<p style="font-size:13px;color:var(--text-muted);">
-            <strong>Note:</strong>
+          `<p
+            style="
+              font-size:13px;
+              color:var(--text-muted);
+            "
+          >
+            <strong>
+              Note:
+            </strong>
             ${escapeHtml(item.notes)}
           </p>`
           :
@@ -2945,6 +4919,7 @@ async function loadPatientExercises() {
           >
             ✏️ Modifica
           </button>
+
 
           <button
             class="danger"
@@ -2965,7 +4940,9 @@ async function loadPatientExercises() {
 
             <div>
 
-              <label>Serie</label>
+              <label>
+                Serie
+              </label>
 
               <input
                 id="editSets_${item.id}"
@@ -2976,9 +4953,12 @@ async function loadPatientExercises() {
 
             </div>
 
+
             <div>
 
-              <label>Ripetizioni</label>
+              <label>
+                Ripetizioni
+              </label>
 
               <input
                 id="editReps_${item.id}"
@@ -2989,9 +4969,12 @@ async function loadPatientExercises() {
 
             </div>
 
+
             <div>
 
-              <label>Durata (sec)</label>
+              <label>
+                Durata (sec)
+              </label>
 
               <input
                 id="editDuration_${item.id}"
@@ -3002,9 +4985,12 @@ async function loadPatientExercises() {
 
             </div>
 
+
             <div>
 
-              <label>Recupero (sec)</label>
+              <label>
+                Recupero (sec)
+              </label>
 
               <input
                 id="editRest_${item.id}"
@@ -3026,7 +5012,9 @@ async function loadPatientExercises() {
             id="editNotes_${item.id}"
           >${escapeHtml(item.notes || "")}</textarea>
 
+
           <br>
+
 
           <div class="actions">
 
@@ -3036,6 +5024,7 @@ async function loadPatientExercises() {
             >
               💾 Salva modifiche
             </button>
+
 
             <button
               class="secondary"
@@ -3049,6 +5038,7 @@ async function loadPatientExercises() {
         </div>
 
       `;
+
 
       container.appendChild(
         div
@@ -3064,8 +5054,10 @@ function showAssignedEdit(id) {
 
   const box =
     document.getElementById(
-      "assignedEdit_" + id
+      "assignedEdit_" +
+      id
     );
+
 
   if(box)
     box.classList.remove(
@@ -3079,8 +5071,10 @@ function hideAssignedEdit(id) {
 
   const box =
     document.getElementById(
-      "assignedEdit_" + id
+      "assignedEdit_" +
+      id
     );
+
 
   if(box)
     box.classList.add(
@@ -3095,38 +5089,48 @@ async function updateAssignedExercise(id) {
   const sets =
     document
       .getElementById(
-        "editSets_" + id
+        "editSets_" +
+        id
       )
       .value;
+
 
   const reps =
     document
       .getElementById(
-        "editReps_" + id
+        "editReps_" +
+        id
       )
       .value;
+
 
   const duration =
     document
       .getElementById(
-        "editDuration_" + id
+        "editDuration_" +
+        id
       )
       .value;
+
 
   const rest =
     document
       .getElementById(
-        "editRest_" + id
+        "editRest_" +
+        id
       )
       .value;
+
 
   const notes =
     document
       .getElementById(
-        "editNotes_" + id
+        "editNotes_" +
+        id
       )
       .value
       .trim();
+
 
   const result =
     await db
@@ -3135,32 +5139,42 @@ async function updateAssignedExercise(id) {
 
         sets:
           sets !== ""
-          ? parseInt(sets)
-          : null,
+          ?
+          parseInt(sets)
+          :
+          null,
 
         reps:
           reps !== ""
-          ? parseInt(reps)
-          : null,
+          ?
+          parseInt(reps)
+          :
+          null,
 
         duration:
           duration !== ""
-          ? parseInt(duration)
-          : null,
+          ?
+          parseInt(duration)
+          :
+          null,
 
         rest:
           rest !== ""
-          ? parseInt(rest)
-          : null,
+          ?
+          parseInt(rest)
+          :
+          null,
 
         notes:
-          notes || null
+          notes ||
+          null
 
       })
       .eq(
         "id",
         id
       );
+
 
   if(result.error) {
 
@@ -3172,6 +5186,7 @@ async function updateAssignedExercise(id) {
     return;
 
   }
+
 
   await loadPatientExercises();
 
@@ -3193,12 +5208,14 @@ document
           )
           .value;
 
+
       const sets =
         document
           .getElementById(
             "sets"
           )
           .value;
+
 
       const reps =
         document
@@ -3207,12 +5224,14 @@ document
           )
           .value;
 
+
       const duration =
         document
           .getElementById(
             "duration"
           )
           .value;
+
 
       const rest =
         document
@@ -3221,6 +5240,7 @@ document
           )
           .value;
 
+
       const notes =
         document
           .getElementById(
@@ -3228,6 +5248,7 @@ document
           )
           .value
           .trim();
+
 
       if(!exerciseId) {
 
@@ -3240,6 +5261,7 @@ document
         return;
 
       }
+
 
       const result =
         await db
@@ -3254,28 +5276,38 @@ document
 
             sets:
               sets
-              ? parseInt(sets)
-              : null,
+              ?
+              parseInt(sets)
+              :
+              null,
 
             reps:
               reps
-              ? parseInt(reps)
-              : null,
+              ?
+              parseInt(reps)
+              :
+              null,
 
             duration:
               duration
-              ? parseInt(duration)
-              : null,
+              ?
+              parseInt(duration)
+              :
+              null,
 
             rest:
               rest
-              ? parseInt(rest)
-              : null,
+              ?
+              parseInt(rest)
+              :
+              null,
 
             notes:
-              notes || null
+              notes ||
+              null
 
           }]);
+
 
       if(result.error) {
 
@@ -3289,11 +5321,61 @@ document
 
       }
 
+
+      document
+        .getElementById(
+          "sets"
+        )
+        .value =
+          "";
+
+
+      document
+        .getElementById(
+          "reps"
+        )
+        .value =
+          "";
+
+
+      document
+        .getElementById(
+          "duration"
+        )
+        .value =
+          "";
+
+
+      document
+        .getElementById(
+          "rest"
+        )
+        .value =
+          "";
+
+
+      document
+        .getElementById(
+          "notes"
+        )
+        .value =
+          "";
+
+
+      document
+        .getElementById(
+          "exerciseSelect"
+        )
+        .value =
+          "";
+
+
       showMessage(
         "assignMessage",
         "Esercizio assegnato.",
         "success"
       );
+
 
       await loadPatientExercises();
 
@@ -3310,6 +5392,7 @@ async function removeAssignedExercise(id) {
   )
     return;
 
+
   const result =
     await db
       .from("patient_exercises")
@@ -3318,6 +5401,7 @@ async function removeAssignedExercise(id) {
         "id",
         id
       );
+
 
   if(result.error) {
 
@@ -3329,6 +5413,7 @@ async function removeAssignedExercise(id) {
     return;
 
   }
+
 
   await loadPatientExercises();
 
@@ -3346,8 +5431,10 @@ async function loadPatientDocuments() {
       "patientDocuments"
     );
 
+
   container.innerHTML =
     "Caricamento...";
+
 
   const result =
     await db
@@ -3360,9 +5447,11 @@ async function loadPatientDocuments() {
       .order(
         "created_at",
         {
-          ascending:false
+          ascending:
+            false
         }
       );
+
 
   if(
     result.error ||
@@ -3377,7 +5466,10 @@ async function loadPatientDocuments() {
 
   }
 
-  container.innerHTML = "";
+
+  container.innerHTML =
+    "";
+
 
   result.data.forEach(
     doc => {
@@ -3387,8 +5479,10 @@ async function loadPatientDocuments() {
           "div"
         );
 
+
       div.className =
         "document";
+
 
       div.innerHTML = `
 
@@ -3396,20 +5490,34 @@ async function loadPatientDocuments() {
           📄 ${escapeHtml(doc.file_name)}
         </h3>
 
+
         <p>
+
           <a
             href="#"
-            onclick="openDocument('${escapeAttribute(doc.file_path)}');return false;"
+            onclick="
+              openDocument(
+                '${escapeAttribute(doc.file_path)}'
+              );
+              return false;
+            "
           >
             Visualizza Referto PDF
           </a>
+
         </p>
+
 
         <div class="actions no-print">
 
           <button
             class="danger"
-            onclick="deleteDocument('${doc.id}','${escapeAttribute(doc.file_path)}')"
+            onclick="
+              deleteDocument(
+                '${doc.id}',
+                '${escapeAttribute(doc.file_path)}'
+              )
+            "
           >
             🗑️ Elimina
           </button>
@@ -3417,6 +5525,7 @@ async function loadPatientDocuments() {
         </div>
 
       `;
+
 
       container.appendChild(
         div
@@ -3428,7 +5537,9 @@ async function loadPatientDocuments() {
 }
 
 
-async function openDocument(path) {
+async function openDocument(
+  path
+) {
 
   const result =
     await db
@@ -3439,6 +5550,7 @@ async function openDocument(path) {
         3600
       );
 
+
   if(result.error) {
 
     alert(
@@ -3448,6 +5560,7 @@ async function openDocument(path) {
     return;
 
   }
+
 
   window.open(
     result.data.signedUrl,
@@ -3470,8 +5583,10 @@ document
           "documentFile"
         );
 
+
       const file =
         fileInput.files[0];
+
 
       if(!file) {
 
@@ -3484,6 +5599,7 @@ document
         return;
 
       }
+
 
       if(
         file.type !==
@@ -3500,12 +5616,14 @@ document
 
       }
 
+
       const fileName =
         currentPatient.id +
         "/" +
         Date.now() +
         "_" +
         file.name;
+
 
       const uploadResult =
         await db
@@ -3515,6 +5633,7 @@ document
             fileName,
             file
           );
+
 
       if(uploadResult.error) {
 
@@ -3527,6 +5646,7 @@ document
         return;
 
       }
+
 
       const dbResult =
         await db
@@ -3544,6 +5664,7 @@ document
 
           }]);
 
+
       if(dbResult.error) {
 
         showMessage(
@@ -3556,13 +5677,17 @@ document
 
       }
 
-      fileInput.value = "";
+
+      fileInput.value =
+        "";
+
 
       showMessage(
         "documentMessage",
         "PDF caricato correttamente.",
         "success"
       );
+
 
       await loadPatientDocuments();
 
@@ -3582,12 +5707,14 @@ async function deleteDocument(
   )
     return;
 
+
   await db
     .storage
     .from(DOCUMENT_BUCKET)
     .remove([
       filePath
     ]);
+
 
   const result =
     await db
@@ -3598,6 +5725,7 @@ async function deleteDocument(
         id
       );
 
+
   if(result.error) {
 
     alert(
@@ -3607,6 +5735,7 @@ async function deleteDocument(
     return;
 
   }
+
 
   await loadPatientDocuments();
 
@@ -3624,8 +5753,10 @@ async function loadPatientNotes() {
       "patientNotesList"
     );
 
+
   container.innerHTML =
     "Caricamento...";
+
 
   const result =
     await db
@@ -3638,12 +5769,31 @@ async function loadPatientNotes() {
       .order(
         "created_at",
         {
-          ascending:false
+          ascending:
+            false
         }
       );
 
+
   if(
-    result.error ||
+    result.error
+  ) {
+
+    container.innerText =
+      "Errore nel caricamento delle note.";
+
+
+    console.error(
+      result.error
+    );
+
+
+    return;
+
+  }
+
+
+  if(
     !result.data ||
     result.data.length === 0
   ) {
@@ -3655,7 +5805,10 @@ async function loadPatientNotes() {
 
   }
 
-  container.innerHTML = "";
+
+  container.innerHTML =
+    "";
+
 
   result.data.forEach(
     note => {
@@ -3665,8 +5818,17 @@ async function loadPatientNotes() {
           "div"
         );
 
+
       div.className =
-        "note-card";
+        "note-card " +
+        (
+          note.is_private
+          ?
+          "private-note"
+          :
+          "public-note"
+        );
+
 
       const date =
         new Date(
@@ -3675,12 +5837,22 @@ async function loadPatientNotes() {
           "it-IT"
         );
 
+
       div.innerHTML = `
 
         <h3>
 
+          ${
+            note.is_private
+            ?
+            "🔒"
+            :
+            "📢"
+          }
+
           ${escapeHtml(
-            note.title || "Nota"
+            note.title ||
+            "Nota"
           )}
 
           <small>
@@ -3689,20 +5861,48 @@ async function loadPatientNotes() {
 
         </h3>
 
+
         <p>
+
           ${escapeHtml(
             note.content
           )}
+
         </p>
+
+
+        <p
+          style="
+            font-size:11px;
+            font-weight:700;
+            color:var(--text-muted);
+          "
+        >
+
+          ${
+            note.is_private
+            ?
+            "🔒 VISIBILE SOLO AL TERAPISTA"
+            :
+            "📢 VISIBILE AL PAZIENTE"
+          }
+
+        </p>
+
 
         <button
           class="danger no-print"
-          onclick="deletePatientNote('${note.id}')"
+          onclick="
+            deletePatientNote(
+              '${note.id}'
+            )
+          "
         >
-          Elimina
+          🗑️ Elimina
         </button>
 
       `;
+
 
       container.appendChild(
         div
@@ -3730,6 +5930,7 @@ document
           .value
           .trim();
 
+
       const content =
         document
           .getElementById(
@@ -3737,6 +5938,16 @@ document
           )
           .value
           .trim();
+
+
+      const isPrivate =
+        document
+          .getElementById(
+            "patientNoteVisibility"
+          )
+          .value ===
+          "true";
+
 
       if(!content) {
 
@@ -3750,6 +5961,7 @@ document
 
       }
 
+
       const result =
         await db
           .from("patient_notes")
@@ -3759,11 +5971,16 @@ document
               currentPatient.id,
 
             title:
-              title || "Nota",
+              title ||
+              "Nota",
 
-            content
+            content,
+
+            is_private:
+              isPrivate
 
           }]);
+
 
       if(result.error) {
 
@@ -3777,25 +5994,54 @@ document
 
       }
 
+
       document
         .getElementById(
           "patientNoteTitle"
         )
-        .value = "";
+        .value =
+          "";
+
 
       document
         .getElementById(
           "patientNoteContent"
         )
-        .value = "";
+        .value =
+          "";
+
+
+      document
+        .getElementById(
+          "patientNoteVisibility"
+        )
+        .value =
+          "false";
+
+
+      showMessage(
+        "patientNoteMessage",
+        isPrivate
+        ?
+        "Nota privata salvata."
+        :
+        "Comunicazione pubblicata.",
+        "success"
+      );
+
 
       await loadPatientNotes();
+
+
+      await loadDashboardStats();
 
     }
   );
 
 
-async function deletePatientNote(id) {
+async function deletePatientNote(
+  id
+) {
 
   if(
     !confirm(
@@ -3803,6 +6049,7 @@ async function deletePatientNote(id) {
     )
   )
     return;
+
 
   const result =
     await db
@@ -3812,6 +6059,7 @@ async function deletePatientNote(id) {
         "id",
         id
       );
+
 
   if(result.error) {
 
@@ -3823,7 +6071,11 @@ async function deletePatientNote(id) {
 
   }
 
+
   await loadPatientNotes();
+
+
+  await loadDashboardStats();
 
 }
 
@@ -3837,38 +6089,51 @@ function toggleIntervalInputs(
   s
 ) {
 
-  const typeVal =
-    document
-      .getElementById(
-        `run_type_${w}_${s}`
-      )
-      .value;
+  const typeElement =
+    document.getElementById(
+      `run_type_${w}_${s}`
+    );
+
 
   const intervalBox =
     document.getElementById(
       `interval_box_${w}_${s}`
     );
 
+
   const labelFast =
     document.getElementById(
       `label_fast_${w}_${s}`
     );
+
 
   const labelSlow =
     document.getElementById(
       `label_slow_${w}_${s}`
     );
 
+
+  if(!typeElement)
+    return;
+
+
+  const typeVal =
+    typeElement.value;
+
+
   if(
-    typeVal === "Ripetute"
+    typeVal ===
+    "Ripetute"
   ) {
 
     intervalBox.classList.remove(
       "hidden"
     );
 
+
     labelFast.innerText =
       "Corsa Veloce";
+
 
     labelSlow.innerText =
       "Recupero";
@@ -3883,8 +6148,10 @@ function toggleIntervalInputs(
       "hidden"
     );
 
+
     labelFast.innerText =
       "Tempo Corsa";
+
 
     labelSlow.innerText =
       "Tempo Camminata";
@@ -3901,6 +6168,10 @@ function toggleIntervalInputs(
 }
 
 
+/* =========================================================
+   GENERA GRIGLIA CORSA
+========================================================= */
+
 document
   .getElementById(
     "generateRunningPlanButton"
@@ -3909,230 +6180,582 @@ document
     "click",
     () => {
 
-      const weeks =
-        parseInt(
-          document
-            .getElementById(
-              "runningWeeks"
-            )
-            .value
-        ) || 4;
-
-      const sessions =
-        parseInt(
-          document
-            .getElementById(
-              "runningSessionsPerWeek"
-            )
-            .value
-        ) || 3;
-
-      const planner =
-        document.getElementById(
-          "runningPlanner"
-        );
-
-      let html =
-        `<table class="running-table">
-          <thead>
-            <tr>
-              <th>Microciclo</th>`;
-
-      for(
-        let s=1;
-        s<=sessions;
-        s++
-      ) {
-
-        html +=
-          `<th>Sessione ${s}</th>`;
-
-      }
-
-      html +=
-        `</tr>
-        </thead>
-        <tbody>`;
-
-
-      for(
-        let w=1;
-        w<=weeks;
-        w++
-      ) {
-
-        html +=
-          `<tr>
-            <td>
-              <strong>
-                Settimana ${w}
-              </strong>
-            </td>`;
-
-
-        for(
-          let s=1;
-          s<=sessions;
-          s++
-        ) {
-
-          html += `
-
-            <td>
-
-              <div class="session-box">
-
-                <label>
-                  Tipologia Corsa
-                </label>
-
-                <select
-                  id="run_type_${w}_${s}"
-                  onchange="toggleIntervalInputs(${w},${s})"
-                >
-
-                  <option value="Corsa Continua">
-                    Corsa Continua
-                  </option>
-
-                  <option value="Corsa + Camminata">
-                    Corsa + Camminata
-                  </option>
-
-                  <option value="Ripetute">
-                    Ripetute
-                  </option>
-
-                  <option value="Fartlek">
-                    Fartlek
-                  </option>
-
-                  <option value="Camminata">
-                    Camminata / Passo
-                  </option>
-
-                  <option value="Riscaldamento">
-                    Riscaldamento / Defaticamento
-                  </option>
-
-                </select>
-
-
-                <label>
-                  Durata Totale (Minuti)
-                </label>
-
-                <input
-                  type="number"
-                  id="run_dur_${w}_${s}"
-                  min="1"
-                  placeholder="Es. 30"
-                >
-
-
-                <div
-                  id="interval_box_${w}_${s}"
-                  class="interval-box hidden"
-                >
-
-                  <label
-                    id="label_fast_${w}_${s}"
-                  >
-                    Tempo Corsa
-                  </label>
-
-                  <input
-                    type="text"
-                    id="run_fast_${w}_${s}"
-                    placeholder="Es. 30 sec"
-                  >
-
-                  <label
-                    id="label_slow_${w}_${s}"
-                  >
-                    Recupero
-                  </label>
-
-                  <input
-                    type="text"
-                    id="run_slow_${w}_${s}"
-                    placeholder="Es. 30 sec"
-                  >
-
-                </div>
-
-
-                <label>
-                  Intensità Target
-                </label>
-
-                <select
-                  id="run_rpe_${w}_${s}"
-                >
-
-                  <option value="">
-                    Seleziona RPE
-                  </option>
-
-                  <option value="1-3 (Leggero)">
-                    1-3 (Rigenerante)
-                  </option>
-
-                  <option value="4-6 (Moderato)">
-                    4-6 (Aerobico Moderato)
-                  </option>
-
-                  <option value="7-8 (Intenso)">
-                    7-8 (Soglia / Intenso)
-                  </option>
-
-                  <option value="9-10 (Massimale)">
-                    9-10 (Massimale)
-                  </option>
-
-                </select>
-
-
-                <label>
-                  Note Tecniche
-                </label>
-
-                <textarea
-                  id="run_notes_${w}_${s}"
-                  rows="2"
-                  placeholder="Indicazioni..."
-                ></textarea>
-
-              </div>
-
-            </td>
-
-          `;
-
-        }
-
-        html +=
-          `</tr>`;
-
-      }
-
-      html +=
-        `</tbody></table>`;
-
-      planner.innerHTML =
-        html;
-
-      document
-        .getElementById(
-          "saveRunningProgramButton"
-        )
-        .classList.remove(
-          "hidden"
-        );
+      generateRunningPlanner();
 
     }
   );
 
+
+function generateRunningPlanner(
+  existingData = null
+) {
+
+  const weeks =
+    parseInt(
+      document
+        .getElementById(
+          "runningWeeks"
+        )
+        .value
+    ) ||
+    4;
+
+
+  const sessions =
+    parseInt(
+      document
+        .getElementById(
+          "runningSessionsPerWeek"
+        )
+        .value
+    ) ||
+    3;
+
+
+  const planner =
+    document.getElementById(
+      "runningPlanner"
+    );
+
+
+  let html =
+    `<table class="running-table">
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Microciclo
+          </th>`;
+
+
+  for(
+    let s = 1;
+    s <= sessions;
+    s++
+  ) {
+
+    html +=
+      `<th>
+        Sessione ${s}
+      </th>`;
+
+  }
+
+
+  html +=
+    `</tr>
+    </thead>
+    <tbody>`;
+
+
+  for(
+    let w = 1;
+    w <= weeks;
+    w++
+  ) {
+
+    const existingWeek =
+      existingData
+      ?
+      existingData.find(
+        item =>
+          Number(item.week) ===
+          w
+      )
+      :
+      null;
+
+
+    html +=
+      `<tr>
+
+        <td>
+
+          <strong>
+            Settimana ${w}
+          </strong>
+
+        </td>`;
+
+
+    for(
+      let s = 1;
+      s <= sessions;
+      s++
+    ) {
+
+      const existingSession =
+        existingWeek &&
+        existingWeek.sessions &&
+        existingWeek.sessions[s - 1]
+        ?
+        existingWeek.sessions[s - 1]
+        :
+        null;
+
+
+      const type =
+        existingSession?.type ||
+        "Corsa Continua";
+
+
+      const duration =
+        existingSession?.duration ||
+        "";
+
+
+      const fast =
+        existingSession?.fast ||
+        "";
+
+
+      const slow =
+        existingSession?.slow ||
+        "";
+
+
+      const rpe =
+        existingSession?.rpe ||
+        "";
+
+
+      const notes =
+        existingSession?.notes ||
+        "";
+
+
+      html += `
+
+        <td>
+
+          <div class="session-box">
+
+            <label>
+              Tipologia Corsa
+            </label>
+
+
+            <select
+              id="run_type_${w}_${s}"
+              onchange="
+                toggleIntervalInputs(
+                  ${w},
+                  ${s}
+                )
+              "
+            >
+
+              <option
+                value="Corsa Continua"
+                ${type === "Corsa Continua" ? "selected" : ""}
+              >
+                Corsa Continua
+              </option>
+
+
+              <option
+                value="Corsa + Camminata"
+                ${type === "Corsa + Camminata" ? "selected" : ""}
+              >
+                Corsa + Camminata
+              </option>
+
+
+              <option
+                value="Ripetute"
+                ${type === "Ripetute" ? "selected" : ""}
+              >
+                Ripetute
+              </option>
+
+
+              <option
+                value="Fartlek"
+                ${type === "Fartlek" ? "selected" : ""}
+              >
+                Fartlek
+              </option>
+
+
+              <option
+                value="Camminata"
+                ${type === "Camminata" ? "selected" : ""}
+              >
+                Camminata / Passo
+              </option>
+
+
+              <option
+                value="Riscaldamento"
+                ${type === "Riscaldamento" ? "selected" : ""}
+              >
+                Riscaldamento / Defaticamento
+              </option>
+
+            </select>
+
+
+            <label>
+              Durata Totale (Minuti)
+            </label>
+
+
+            <input
+              type="number"
+              id="run_dur_${w}_${s}"
+              min="1"
+              value="${escapeAttribute(duration)}"
+              placeholder="Es. 30"
+            >
+
+
+            <div
+              id="interval_box_${w}_${s}"
+              class="
+                interval-box
+                ${
+                  (
+                    type === "Ripetute" ||
+                    type === "Corsa + Camminata"
+                  )
+                  ?
+                  ""
+                  :
+                  "hidden"
+                }
+              "
+            >
+
+              <label
+                id="label_fast_${w}_${s}"
+              >
+                ${
+                  type === "Ripetute"
+                  ?
+                  "Corsa Veloce"
+                  :
+                  "Tempo Corsa"
+                }
+              </label>
+
+
+              <input
+                type="text"
+                id="run_fast_${w}_${s}"
+                value="${escapeAttribute(fast)}"
+                placeholder="Es. 30 sec"
+              >
+
+
+              <label
+                id="label_slow_${w}_${s}"
+              >
+                ${
+                  type === "Ripetute"
+                  ?
+                  "Recupero"
+                  :
+                  "Tempo Camminata"
+                }
+              </label>
+
+
+              <input
+                type="text"
+                id="run_slow_${w}_${s}"
+                value="${escapeAttribute(slow)}"
+                placeholder="Es. 30 sec"
+              >
+
+            </div>
+
+
+            <label>
+              Intensità Target
+            </label>
+
+
+            <select
+              id="run_rpe_${w}_${s}"
+            >
+
+              <option
+                value=""
+                ${rpe === "" ? "selected" : ""}
+              >
+                Seleziona RPE
+              </option>
+
+
+              <option
+                value="1-3 (Leggero)"
+                ${rpe === "1-3 (Leggero)" ? "selected" : ""}
+              >
+                1-3 (Rigenerante)
+              </option>
+
+
+              <option
+                value="4-6 (Moderato)"
+                ${rpe === "4-6 (Moderato)" ? "selected" : ""}
+              >
+                4-6 (Aerobico Moderato)
+              </option>
+
+
+              <option
+                value="7-8 (Intenso)"
+                ${rpe === "7-8 (Intenso)" ? "selected" : ""}
+              >
+                7-8 (Soglia / Intenso)
+              </option>
+
+
+              <option
+                value="9-10 (Massimale)"
+                ${rpe === "9-10 (Massimale)" ? "selected" : ""}
+              >
+                9-10 (Massimale)
+              </option>
+
+            </select>
+
+
+            <label>
+              Note Tecniche
+            </label>
+
+
+            <textarea
+              id="run_notes_${w}_${s}"
+              rows="2"
+              placeholder="Indicazioni..."
+            >${escapeHtml(notes)}</textarea>
+
+          </div>
+
+        </td>
+
+      `;
+
+    }
+
+
+    html +=
+      `</tr>`;
+
+  }
+
+
+  html +=
+    `</tbody>
+    </table>`;
+
+
+  planner.innerHTML =
+    html;
+
+
+  document
+    .getElementById(
+      "saveRunningProgramButton"
+    )
+    .classList.remove(
+      "hidden"
+    );
+
+
+  if(existingData) {
+
+    for(
+      let w = 1;
+      w <= weeks;
+      w++
+    ) {
+
+      for(
+        let s = 1;
+        s <= sessions;
+        s++
+      ) {
+
+        toggleIntervalInputs(
+          w,
+          s
+        );
+
+      }
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   RACCOLTA DATI CORSA
+========================================================= */
+
+function collectRunningPlanData() {
+
+  const weeks =
+    parseInt(
+      document
+        .getElementById(
+          "runningWeeks"
+        )
+        .value
+    ) ||
+    4;
+
+
+  const sessions =
+    parseInt(
+      document
+        .getElementById(
+          "runningSessionsPerWeek"
+        )
+        .value
+    ) ||
+    3;
+
+
+  const planData = [];
+
+
+  for(
+    let w = 1;
+    w <= weeks;
+    w++
+  ) {
+
+    const weekSessions = [];
+
+
+    for(
+      let s = 1;
+      s <= sessions;
+      s++
+    ) {
+
+      const type =
+        document
+          .getElementById(
+            `run_type_${w}_${s}`
+          )
+          .value;
+
+
+      const duration =
+        document
+          .getElementById(
+            `run_dur_${w}_${s}`
+          )
+          .value;
+
+
+      const fast =
+        document
+          .getElementById(
+            `run_fast_${w}_${s}`
+          )
+          .value
+          .trim();
+
+
+      const slow =
+        document
+          .getElementById(
+            `run_slow_${w}_${s}`
+          )
+          .value
+          .trim();
+
+
+      const rpe =
+        document
+          .getElementById(
+            `run_rpe_${w}_${s}`
+          )
+          .value;
+
+
+      const notes =
+        document
+          .getElementById(
+            `run_notes_${w}_${s}`
+          )
+          .value
+          .trim();
+
+
+      weekSessions.push({
+
+        type,
+
+        duration,
+
+        fast:
+          (
+            type === "Ripetute" ||
+            type === "Corsa + Camminata"
+          )
+          ?
+          fast
+          :
+          "",
+
+        slow:
+          (
+            type === "Ripetute" ||
+            type === "Corsa + Camminata"
+          )
+          ?
+          slow
+          :
+          "",
+
+        rpe,
+
+        notes
+
+      });
+
+    }
+
+
+    planData.push({
+
+      week:
+        w,
+
+      sessions:
+        weekSessions
+
+    });
+
+  }
+
+
+  return {
+
+    weeks,
+
+    sessions,
+
+    planData
+
+  };
+
+}
+
+
+/* =========================================================
+   SALVA / MODIFICA CORSA
+========================================================= */
 
 document
   .getElementById(
@@ -4140,172 +6763,292 @@ document
   )
   .addEventListener(
     "click",
-    async () => {
-
-      const weeks =
-        parseInt(
-          document
-            .getElementById(
-              "runningWeeks"
-            )
-            .value
-        ) || 4;
-
-      const sessions =
-        parseInt(
-          document
-            .getElementById(
-              "runningSessionsPerWeek"
-            )
-            .value
-        ) || 3;
-
-      const planData = [];
+    saveRunningProgram
+  );
 
 
-      for(
-        let w=1;
-        w<=weeks;
-        w++
-      ) {
+async function saveRunningProgram() {
 
-        const weekSessions = [];
+  if(!currentPatient) {
 
+    alert(
+      "Nessun paziente selezionato."
+    );
 
-        for(
-          let s=1;
-          s<=sessions;
-          s++
-        ) {
+    return;
 
-          const type =
-            document
-              .getElementById(
-                `run_type_${w}_${s}`
-              )
-              .value;
-
-          const duration =
-            document
-              .getElementById(
-                `run_dur_${w}_${s}`
-              )
-              .value;
-
-          const fast =
-            document
-              .getElementById(
-                `run_fast_${w}_${s}`
-              )
-              .value;
-
-          const slow =
-            document
-              .getElementById(
-                `run_slow_${w}_${s}`
-              )
-              .value;
-
-          const rpe =
-            document
-              .getElementById(
-                `run_rpe_${w}_${s}`
-              )
-              .value;
-
-          const notes =
-            document
-              .getElementById(
-                `run_notes_${w}_${s}`
-              )
-              .value;
+  }
 
 
-          weekSessions.push({
-
-            type,
-
-            duration,
-
-            fast:
-              (
-                type === "Ripetute" ||
-                type === "Corsa + Camminata"
-              )
-              ? fast
-              : "",
-
-            slow:
-              (
-                type === "Ripetute" ||
-                type === "Corsa + Camminata"
-              )
-              ? slow
-              : "",
-
-            rpe,
-
-            notes
-
-          });
-
-        }
-
-        planData.push({
-
-          week:w,
-
-          sessions:
-            weekSessions
-
-        });
-
-      }
+  const data =
+    collectRunningPlanData();
 
 
-      const result =
-        await db
-          .from("running_plans")
-          .insert([{
-
-            patient_id:
-              currentPatient.id,
-
-            weeks_count:
-              weeks,
-
-            sessions_per_week:
-              sessions,
-
-            plan_data:
-              planData
-
-          }]);
+  let result;
 
 
-      if(result.error) {
+  if(editingRunningPlanId) {
 
-        showMessage(
-          "runningMessage",
-          result.error.message,
-          "error"
+    result =
+      await db
+        .from("running_plans")
+        .update({
+
+          weeks_count:
+            data.weeks,
+
+          sessions_per_week:
+            data.sessions,
+
+          plan_data:
+            data.planData
+
+        })
+        .eq(
+          "id",
+          editingRunningPlanId
         );
 
-        return;
+  }
+  else {
 
-      }
+    result =
+      await db
+        .from("running_plans")
+        .insert([{
+
+          patient_id:
+            currentPatient.id,
+
+          weeks_count:
+            data.weeks,
+
+          sessions_per_week:
+            data.sessions,
+
+          plan_data:
+            data.planData
+
+        }]);
+
+  }
+
+
+  if(result.error) {
+
+    showMessage(
+      "runningMessage",
+      result.error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const message =
+    editingRunningPlanId
+    ?
+    "Programma modificato con successo!"
+    :
+    "Programma di corsa salvato con successo!";
+
+
+  showMessage(
+    "runningMessage",
+    message,
+    "success"
+  );
+
+
+  editingRunningPlanId =
+    null;
+
+
+  document
+    .getElementById(
+      "cancelRunningEditButton"
+    )
+    .classList.add(
+      "hidden"
+    );
+
+
+  document
+    .getElementById(
+      "saveRunningProgramButton"
+    )
+    .innerText =
+      "💾 Salva Scheda Corsa";
+
+
+  await loadRunningPlans();
+
+
+  await loadDashboardStats();
+
+}
+
+
+/* =========================================================
+   MODIFICA PROGRAMMA CORSA
+========================================================= */
+
+async function editRunningPlan(
+  id
+) {
+
+  const result =
+    await db
+      .from("running_plans")
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .single();
+
+
+  if(
+    result.error ||
+    !result.data
+  ) {
+
+    alert(
+      "Programma non trovato."
+    );
+
+    return;
+
+  }
+
+
+  const plan =
+    result.data;
+
+
+  editingRunningPlanId =
+    id;
+
+
+  document
+    .getElementById(
+      "runningWeeks"
+    )
+    .value =
+      plan.weeks_count;
+
+
+  document
+    .getElementById(
+      "runningSessionsPerWeek"
+    )
+    .value =
+      plan.sessions_per_week;
+
+
+  generateRunningPlanner(
+    plan.plan_data
+  );
+
+
+  document
+    .getElementById(
+      "saveRunningProgramButton"
+    )
+    .innerText =
+      "💾 Salva Modifiche";
+
+
+  document
+    .getElementById(
+      "cancelRunningEditButton"
+    )
+    .classList.remove(
+      "hidden"
+    );
+
+
+  showMessage(
+    "runningMessage",
+    "Stai modificando il programma selezionato.",
+    "success"
+  );
+
+
+  document
+    .getElementById(
+      "runningPlanner"
+    )
+    .scrollIntoView({
+
+      behavior:
+        "smooth",
+
+      block:
+        "start"
+
+    });
+
+}
+
+
+/* =========================================================
+   ANNULLA MODIFICA CORSA
+========================================================= */
+
+document
+  .getElementById(
+    "cancelRunningEditButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      editingRunningPlanId =
+        null;
+
+
+      document
+        .getElementById(
+          "runningPlanner"
+        )
+        .innerHTML =
+          "";
+
+
+      document
+        .getElementById(
+          "saveRunningProgramButton"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "cancelRunningEditButton"
+        )
+        .classList.add(
+          "hidden"
+        );
+
 
       showMessage(
         "runningMessage",
-        "Programma di corsa salvato con successo!",
+        "Modifica annullata.",
         "success"
       );
-
-      await loadRunningPlans();
 
     }
   );
 
+
+/* =========================================================
+   CARICA PROGRAMMI CORSA
+========================================================= */
 
 async function loadRunningPlans() {
 
@@ -4314,8 +7057,10 @@ async function loadRunningPlans() {
       "runningPlansList"
     );
 
+
   container.innerHTML =
     "Caricamento...";
+
 
   const result =
     await db
@@ -4328,12 +7073,31 @@ async function loadRunningPlans() {
       .order(
         "created_at",
         {
-          ascending:false
+          ascending:
+            false
         }
       );
 
+
   if(
-    result.error ||
+    result.error
+  ) {
+
+    container.innerText =
+      "Errore nel caricamento dei programmi.";
+
+
+    console.error(
+      result.error
+    );
+
+
+    return;
+
+  }
+
+
+  if(
     !result.data ||
     result.data.length === 0
   ) {
@@ -4345,7 +7109,9 @@ async function loadRunningPlans() {
 
   }
 
-  container.innerHTML = "";
+
+  container.innerHTML =
+    "";
 
 
   result.data.forEach(
@@ -4356,25 +7122,36 @@ async function loadRunningPlans() {
           "div"
         );
 
+
       div.className =
         "card";
 
+
       let tableHtml =
         `<table class="running-table">
+
           <thead>
+
             <tr>
-              <th>Settimana</th>`;
+
+              <th>
+                Settimana
+              </th>`;
+
 
       for(
-        let s=1;
-        s<=plan.sessions_per_week;
+        let s = 1;
+        s <= plan.sessions_per_week;
         s++
       ) {
 
         tableHtml +=
-          `<th>Sessione ${s}</th>`;
+          `<th>
+            Sessione ${s}
+          </th>`;
 
       }
+
 
       tableHtml +=
         `</tr>
@@ -4382,104 +7159,230 @@ async function loadRunningPlans() {
         <tbody>`;
 
 
-      plan.plan_data.forEach(
-        wData => {
+      if(
+        Array.isArray(
+          plan.plan_data
+        )
+      ) {
 
-          tableHtml +=
-            `<tr>
-              <td>
-                <strong>
-                  Settimana ${wData.week}
-                </strong>
-              </td>`;
+        plan.plan_data.forEach(
+          wData => {
+
+            tableHtml +=
+              `<tr>
+
+                <td>
+
+                  <strong>
+                    Settimana ${wData.week}
+                  </strong>
+
+                </td>`;
 
 
-          wData.sessions.forEach(
-            (sess,idx) => {
+            wData.sessions.forEach(
+              (sess, idx) => {
 
-              let content =
-                `<strong>
-                  🏃 Sessione ${idx+1}:
-                  ${escapeHtml(sess.type || "Corsa")}
-                </strong><br>`;
+                let content =
+                  `<strong>
+                    🏃 Sessione ${idx + 1}:
+                    ${escapeHtml(
+                      sess.type ||
+                      "Corsa"
+                    )}
+                  </strong><br>`;
 
-              if(sess.duration)
-                content +=
-                  `⏱️ Durata:
-                  <strong>${escapeHtml(sess.duration)} min</strong><br>`;
 
-              if(sess.type === "Ripetute") {
-
-                if(sess.fast)
+                if(sess.duration)
                   content +=
-                    `⚡ Veloce:
-                    ${escapeHtml(sess.fast)}<br>`;
+                    `⏱️ Durata:
+                    <strong>
+                      ${escapeHtml(
+                        sess.duration
+                      )} min
+                    </strong><br>`;
 
-                if(sess.slow)
+
+                if(
+                  sess.type ===
+                  "Ripetute"
+                ) {
+
+                  if(sess.fast)
+                    content +=
+                      `⚡ Veloce:
+                      ${escapeHtml(
+                        sess.fast
+                      )}<br>`;
+
+
+                  if(sess.slow)
+                    content +=
+                      `🐢 Rec:
+                      ${escapeHtml(
+                        sess.slow
+                      )}<br>`;
+
+                }
+                else if(
+                  sess.type ===
+                  "Corsa + Camminata"
+                ) {
+
+                  if(sess.fast)
+                    content +=
+                      `🏃 Corsa:
+                      ${escapeHtml(
+                        sess.fast
+                      )}<br>`;
+
+
+                  if(sess.slow)
+                    content +=
+                      `🚶 Camminata:
+                      ${escapeHtml(
+                        sess.slow
+                      )}<br>`;
+
+                }
+
+
+                if(sess.rpe)
                   content +=
-                    `🐢 Rec:
-                    ${escapeHtml(sess.slow)}<br>`;
+                    `📊 RPE:
+                    <strong>
+                      ${escapeHtml(
+                        sess.rpe
+                      )}
+                    </strong><br>`;
+
+
+                if(sess.notes)
+                  content +=
+                    `<small>
+                      📝
+                      ${escapeHtml(
+                        sess.notes
+                      )}
+                    </small>`;
+
+
+                tableHtml +=
+                  `<td>
+                    ${content}
+                  </td>`;
 
               }
-              else if(
-                sess.type ===
-                "Corsa + Camminata"
-              ) {
+            );
 
-                if(sess.fast)
-                  content +=
-                    `🏃 Corsa:
-                    ${escapeHtml(sess.fast)}<br>`;
 
-                if(sess.slow)
-                  content +=
-                    `🚶 Camminata:
-                    ${escapeHtml(sess.slow)}<br>`;
+            tableHtml +=
+              `</tr>`;
 
-              }
+          }
+        );
 
-              if(sess.rpe)
-                content +=
-                  `📊 RPE:
-                  <strong>${escapeHtml(sess.rpe)}</strong><br>`;
-
-              if(sess.notes)
-                content +=
-                  `<small>
-                    📝 ${escapeHtml(sess.notes)}
-                  </small>`;
-
-              tableHtml +=
-                `<td>${content}</td>`;
-
-            }
-          );
-
-          tableHtml +=
-            `</tr>`;
-
-        }
-      );
+      }
 
 
       tableHtml +=
-        `</tbody></table>`;
+        `</tbody>
+        </table>`;
+
+
+      const createdDate =
+        plan.created_at
+        ?
+        new Date(
+          plan.created_at
+        ).toLocaleDateString(
+          "it-IT"
+        )
+        :
+        "";
 
 
       div.innerHTML = `
 
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:10px;
+          "
+        >
+
+          <div>
+
+            <strong>
+              🏃 Programma di Corsa
+            </strong>
+
+            ${
+              createdDate
+              ?
+              `<small>
+                — creato il ${createdDate}
+              </small>`
+              :
+              ""
+            }
+
+          </div>
+
+        </div>
+
+
         ${tableHtml}
+
 
         <br>
 
-        <button
-          class="danger no-print"
-          onclick="deleteRunningPlan('${plan.id}')"
-        >
-          🗑️ Elimina Scheda Corsa
-        </button>
+
+        <div class="actions no-print">
+
+          <button
+            class="edit"
+            onclick="
+              editRunningPlan(
+                '${plan.id}'
+              )
+            "
+          >
+            ✏️ Modifica
+          </button>
+
+
+          <button
+            class="primary"
+            onclick="
+              duplicateRunningPlan(
+                '${plan.id}'
+              )
+            "
+          >
+            📋 Duplica
+          </button>
+
+
+          <button
+            class="danger"
+            onclick="
+              deleteRunningPlan(
+                '${plan.id}'
+              )
+            "
+          >
+            🗑️ Elimina
+          </button>
+
+        </div>
 
       `;
+
 
       container.appendChild(
         div
@@ -4491,7 +7394,116 @@ async function loadRunningPlans() {
 }
 
 
-async function deleteRunningPlan(id) {
+/* =========================================================
+   DUPLICA PROGRAMMA CORSA
+========================================================= */
+
+async function duplicateRunningPlan(
+  id
+) {
+
+  if(!currentPatient) {
+
+    alert(
+      "Nessun paziente selezionato."
+    );
+
+    return;
+
+  }
+
+
+  const result =
+    await db
+      .from("running_plans")
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .single();
+
+
+  if(
+    result.error ||
+    !result.data
+  ) {
+
+    alert(
+      "Impossibile trovare il programma."
+    );
+
+    return;
+
+  }
+
+
+  const original =
+    result.data;
+
+
+  const duplicatedData =
+    JSON.parse(
+      JSON.stringify(
+        original.plan_data
+      )
+    );
+
+
+  const insertResult =
+    await db
+      .from("running_plans")
+      .insert([{
+
+        patient_id:
+          currentPatient.id,
+
+        weeks_count:
+          original.weeks_count,
+
+        sessions_per_week:
+          original.sessions_per_week,
+
+        plan_data:
+          duplicatedData
+
+      }]);
+
+
+  if(insertResult.error) {
+
+    alert(
+      "Errore durante la duplicazione:\n" +
+      insertResult.error.message
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "runningMessage",
+    "Programma duplicato con successo.",
+    "success"
+  );
+
+
+  await loadRunningPlans();
+
+
+  await loadDashboardStats();
+
+}
+
+
+/* =========================================================
+   ELIMINA PROGRAMMA CORSA
+========================================================= */
+
+async function deleteRunningPlan(
+  id
+) {
 
   if(
     !confirm(
@@ -4499,6 +7511,7 @@ async function deleteRunningPlan(id) {
     )
   )
     return;
+
 
   const result =
     await db
@@ -4508,6 +7521,7 @@ async function deleteRunningPlan(id) {
         "id",
         id
       );
+
 
   if(result.error) {
 
@@ -4519,7 +7533,11 @@ async function deleteRunningPlan(id) {
 
   }
 
+
   await loadRunningPlans();
+
+
+  await loadDashboardStats();
 
 }
 
@@ -4530,12 +7548,15 @@ async function deleteRunningPlan(id) {
 
 async function loadPatientPortal() {
 
-  /* ESERCIZI */
+  /* =======================================================
+     ESERCIZI
+  ====================================================== */
 
   const exContainer =
     document.getElementById(
       "patientPortalExercises"
     );
+
 
   exContainer.innerHTML =
     "Caricamento...";
@@ -4554,6 +7575,14 @@ async function loadPatientPortal() {
 
 
   if(
+    exResult.error
+  ) {
+
+    exContainer.innerText =
+      "Errore nel caricamento degli esercizi.";
+
+  }
+  else if(
     !exResult.data ||
     exResult.data.length === 0
   ) {
@@ -4564,7 +7593,9 @@ async function loadPatientPortal() {
   }
   else {
 
-    exContainer.innerHTML = "";
+    exContainer.innerHTML =
+      "";
+
 
     exResult.data.forEach(
       item => {
@@ -4574,29 +7605,43 @@ async function loadPatientPortal() {
             "div"
           );
 
+
         div.className =
           "exercise";
 
+
         const ex =
-          item.exercises || {};
+          item.exercises ||
+          {};
+
 
         div.innerHTML = `
 
           <h3>
             ${escapeHtml(
-              ex.name || "Esercizio"
+              ex.name ||
+              "Esercizio"
             )}
           </h3>
+
 
           ${
             ex.description
             ?
-            `<p style="font-size:13px;color:var(--text-muted);">
-              ${escapeHtml(ex.description)}
+            `<p
+              style="
+                font-size:13px;
+                color:var(--text-muted);
+              "
+            >
+              ${escapeHtml(
+                ex.description
+              )}
             </p>`
             :
             ""
           }
+
 
           <p style="font-size:14px;">
 
@@ -4606,45 +7651,67 @@ async function loadPatientPortal() {
 
             ${
               item.sets
-              ? `${item.sets} serie`
-              : ""
+              ?
+              `${item.sets} serie`
+              :
+              ""
             }
 
             ${
               item.reps
-              ? ` | ${item.reps} rep`
-              : ""
+              ?
+              ` | ${item.reps} rep`
+              :
+              ""
             }
 
             ${
               item.duration
-              ? ` | ${item.duration}s`
-              : ""
+              ?
+              ` | ${item.duration}s`
+              :
+              ""
             }
 
             ${
               item.rest
-              ? ` | rec ${item.rest}s`
-              : ""
+              ?
+              ` | rec ${item.rest}s`
+              :
+              ""
             }
 
           </p>
 
+
           ${
             item.notes
             ?
-            `<p style="font-size:13px;color:var(--text-muted);">
-              <strong>Note:</strong>
-              ${escapeHtml(item.notes)}
+            `<p
+              style="
+                font-size:13px;
+                color:var(--text-muted);
+              "
+            >
+              <strong>
+                Note:
+              </strong>
+
+              ${escapeHtml(
+                item.notes
+              )}
+
             </p>`
             :
             ""
           }
 
+
           ${
             ex.video_url
             ?
             `<p class="video no-print">
+
               <a
                 href="${escapeAttribute(ex.video_url)}"
                 target="_blank"
@@ -4652,12 +7719,14 @@ async function loadPatientPortal() {
               >
                 🎥 Guarda Video Dimostrativo
               </a>
+
             </p>`
             :
             ""
           }
 
         `;
+
 
         exContainer.appendChild(
           div
@@ -4669,12 +7738,15 @@ async function loadPatientPortal() {
   }
 
 
-  /* DOCUMENTI */
+  /* =======================================================
+     DOCUMENTI
+  ====================================================== */
 
   const docContainer =
     document.getElementById(
       "patientPortalDocuments"
     );
+
 
   docContainer.innerHTML =
     "Caricamento...";
@@ -4691,12 +7763,21 @@ async function loadPatientPortal() {
       .order(
         "created_at",
         {
-          ascending:false
+          ascending:
+            false
         }
       );
 
 
   if(
+    docResult.error
+  ) {
+
+    docContainer.innerText =
+      "Errore nel caricamento dei report.";
+
+  }
+  else if(
     !docResult.data ||
     docResult.data.length === 0
   ) {
@@ -4707,7 +7788,9 @@ async function loadPatientPortal() {
   }
   else {
 
-    docContainer.innerHTML = "";
+    docContainer.innerHTML =
+      "";
+
 
     docResult.data.forEach(
       doc => {
@@ -4717,23 +7800,34 @@ async function loadPatientPortal() {
             "div"
           );
 
+
         div.className =
           "document";
+
 
         div.innerHTML = `
 
           <h3>
-            📄 ${escapeHtml(doc.file_name)}
+            📄 ${escapeHtml(
+              doc.file_name
+            )}
           </h3>
+
 
           <a
             href="#"
-            onclick="openDocument('${escapeAttribute(doc.file_path)}');return false;"
+            onclick="
+              openDocument(
+                '${escapeAttribute(doc.file_path)}'
+              );
+              return false;
+            "
           >
             Visualizza Report PDF
           </a>
 
         `;
+
 
         docContainer.appendChild(
           div
@@ -4745,16 +7839,30 @@ async function loadPatientPortal() {
   }
 
 
-  /* NOTE */
+  /* =======================================================
+     NOTE
+  ====================================================== */
 
   const notesContainer =
     document.getElementById(
       "patientPortalNotes"
     );
 
+
   notesContainer.innerHTML =
     "Caricamento...";
 
+
+  /*
+    IMPORTANTISSIMO:
+
+    Chiediamo esplicitamente solo le note
+    non private.
+
+    Questo è utile anche lato frontend,
+    ma la vera protezione deve essere
+    garantita dalle policy RLS.
+  */
 
   const notesResult =
     await db
@@ -4764,15 +7872,28 @@ async function loadPatientPortal() {
         "patient_id",
         currentPatient.id
       )
+      .eq(
+        "is_private",
+        false
+      )
       .order(
         "created_at",
         {
-          ascending:false
+          ascending:
+            false
         }
       );
 
 
   if(
+    notesResult.error
+  ) {
+
+    notesContainer.innerText =
+      "Errore nel caricamento delle note.";
+
+  }
+  else if(
     !notesResult.data ||
     notesResult.data.length === 0
   ) {
@@ -4783,7 +7904,9 @@ async function loadPatientPortal() {
   }
   else {
 
-    notesContainer.innerHTML = "";
+    notesContainer.innerHTML =
+      "";
+
 
     notesResult.data.forEach(
       note => {
@@ -4793,16 +7916,20 @@ async function loadPatientPortal() {
             "div"
           );
 
+
         div.className =
-          "note-card";
+          "note-card public-note";
+
 
         div.innerHTML = `
 
           <h3>
-            ${escapeHtml(
-              note.title
+            📢 ${escapeHtml(
+              note.title ||
+              "Nota"
             )}
           </h3>
+
 
           <p>
             ${escapeHtml(
@@ -4811,6 +7938,7 @@ async function loadPatientPortal() {
           </p>
 
         `;
+
 
         notesContainer.appendChild(
           div
@@ -4822,12 +7950,15 @@ async function loadPatientPortal() {
   }
 
 
-  /* CORSA */
+  /* =======================================================
+     CORSA
+  ====================================================== */
 
   const runContainer =
     document.getElementById(
       "patientPortalRunning"
     );
+
 
   runContainer.innerHTML =
     "Caricamento...";
@@ -4844,12 +7975,21 @@ async function loadPatientPortal() {
       .order(
         "created_at",
         {
-          ascending:false
+          ascending:
+            false
         }
       );
 
 
   if(
+    runResult.error
+  ) {
+
+    runContainer.innerText =
+      "Errore nel caricamento del programma.";
+
+  }
+  else if(
     !runResult.data ||
     runResult.data.length === 0
   ) {
@@ -4860,27 +8000,45 @@ async function loadPatientPortal() {
   }
   else {
 
-    runContainer.innerHTML = "";
+    runContainer.innerHTML =
+      "";
+
 
     runResult.data.forEach(
       plan => {
 
         let html =
-          `<table class="running-table">
+          `<div
+            class="card"
+            style="
+              margin-bottom:20px;
+            "
+          >
+
+          <table class="running-table">
+
             <thead>
+
               <tr>
-                <th>Settimana</th>`;
+
+                <th>
+                  Settimana
+                </th>`;
+
 
         for(
-          let s=1;
-          s<=plan.sessions_per_week;
+          let s = 1;
+          s <= plan.sessions_per_week;
           s++
         ) {
 
           html +=
-            `<th>Sessione ${s}</th>`;
+            `<th>
+              Sessione ${s}
+            </th>`;
 
         }
+
 
         html +=
           `</tr>
@@ -4893,35 +8051,59 @@ async function loadPatientPortal() {
 
             html +=
               `<tr>
+
                 <td>
+
                   <strong>
                     Settimana ${week.week}
                   </strong>
+
                 </td>`;
 
 
             week.sessions.forEach(
-              (sess,index) => {
+              (
+                sess,
+                index
+              ) => {
 
                 let content =
                   `<strong>
-                    🏃 Sessione ${index+1}:
-                    ${escapeHtml(sess.type || "Corsa")}
+                    🏃 Sessione ${index + 1}:
+                    ${escapeHtml(
+                      sess.type ||
+                      "Corsa"
+                    )}
                   </strong><br>`;
+
 
                 if(sess.duration)
                   content +=
-                    `⏱️ ${escapeHtml(sess.duration)} min<br>`;
+                    `⏱️
+                    ${escapeHtml(
+                      sess.duration
+                    )} min<br>`;
 
-                if(sess.type === "Ripetute") {
+
+                if(
+                  sess.type ===
+                  "Ripetute"
+                ) {
 
                   if(sess.fast)
                     content +=
-                      `⚡ ${escapeHtml(sess.fast)}<br>`;
+                      `⚡
+                      ${escapeHtml(
+                        sess.fast
+                      )}<br>`;
+
 
                   if(sess.slow)
                     content +=
-                      `🐢 ${escapeHtml(sess.slow)}<br>`;
+                      `🐢
+                      ${escapeHtml(
+                        sess.slow
+                      )}<br>`;
 
                 }
                 else if(
@@ -4931,29 +8113,48 @@ async function loadPatientPortal() {
 
                   if(sess.fast)
                     content +=
-                      `🏃 ${escapeHtml(sess.fast)}<br>`;
+                      `🏃
+                      ${escapeHtml(
+                        sess.fast
+                      )}<br>`;
+
 
                   if(sess.slow)
                     content +=
-                      `🚶 ${escapeHtml(sess.slow)}<br>`;
+                      `🚶
+                      ${escapeHtml(
+                        sess.slow
+                      )}<br>`;
 
                 }
 
+
                 if(sess.rpe)
                   content +=
-                    `📊 ${escapeHtml(sess.rpe)}<br>`;
+                    `📊
+                    ${escapeHtml(
+                      sess.rpe
+                    )}<br>`;
+
 
                 if(sess.notes)
                   content +=
                     `<small>
-                      📝 ${escapeHtml(sess.notes)}
+                      📝
+                      ${escapeHtml(
+                        sess.notes
+                      )}
                     </small>`;
 
+
                 html +=
-                  `<td>${content}</td>`;
+                  `<td>
+                    ${content}
+                  </td>`;
 
               }
             );
+
 
             html +=
               `</tr>`;
@@ -4963,7 +8164,11 @@ async function loadPatientPortal() {
 
 
         html +=
-          `</tbody></table>`;
+          `</tbody>
+          </table>
+
+          </div>`;
+
 
         runContainer.innerHTML +=
           html;
@@ -4991,27 +8196,34 @@ async function triggerPrint(
       containerId
     );
 
+
   const printSheet =
     document.getElementById(
       "printSheet"
     );
 
-  if(!container) return;
+
+  if(!container)
+    return;
+
 
   const logoUrl =
     await getLogoUrl();
+
 
   const clone =
     container.cloneNode(
       true
     );
 
+
   clone
     .querySelectorAll(
       ".no-print"
     )
     .forEach(
-      el => el.remove()
+      el =>
+        el.remove()
     );
 
 
@@ -5019,7 +8231,10 @@ async function triggerPrint(
 
     <div
       style="
-        font-family:'Plus Jakarta Sans',Arial,sans-serif;
+        font-family:
+        'Plus Jakarta Sans',
+        Arial,
+        sans-serif;
         padding:15px;
       "
     >
@@ -5027,11 +8242,15 @@ async function triggerPrint(
       <div
         style="
           display:flex;
-          justify-content:space-between;
+          justify-content:
+            space-between;
           align-items:center;
-          border-bottom:2px solid #0b192c;
-          padding-bottom:12px;
-          margin-bottom:20px;
+          border-bottom:
+            2px solid #0b192c;
+          padding-bottom:
+            12px;
+          margin-bottom:
+            20px;
         "
       >
 
@@ -5042,12 +8261,14 @@ async function triggerPrint(
               margin:0;
               font-size:24px;
               color:#0b192c;
-              text-transform:uppercase;
+              text-transform:
+                uppercase;
               font-weight:800;
             "
           >
             Noceto Lab
           </h1>
+
 
           <p
             style="
@@ -5055,7 +8276,8 @@ async function triggerPrint(
               font-size:12px;
               color:#0075ff;
               font-weight:700;
-              text-transform:uppercase;
+              text-transform:
+                uppercase;
             "
           >
             Fisioterapia & Performance
@@ -5063,12 +8285,16 @@ async function triggerPrint(
 
         </div>
 
+
         ${
           logoUrl
           ?
           `<img
             src="${logoUrl}"
-            style="height:55px;width:auto;"
+            style="
+              height:55px;
+              width:auto;
+            "
             alt="Logo Noceto Lab"
           >`
           :
@@ -5085,15 +8311,22 @@ async function triggerPrint(
           color:#0b192c;
         "
       >
-        ${escapeHtml(documentTitle)}:
-        ${escapeHtml(patientName || "")}
+        ${escapeHtml(
+          documentTitle
+        )}:
+        ${escapeHtml(
+          patientName ||
+          ""
+        )}
       </h2>
+
 
       ${clone.innerHTML}
 
     </div>
 
   `;
+
 
   window.print();
 
@@ -5108,7 +8341,8 @@ document
     "click",
     () =>
       triggerPrint(
-        currentPatient?.name || "",
+        currentPatient?.name ||
+        "",
         "patientExercises",
         "Scheda Esercizi"
       )
@@ -5123,7 +8357,8 @@ document
     "click",
     () =>
       triggerPrint(
-        currentPatient?.name || "",
+        currentPatient?.name ||
+        "",
         "patientPortalExercises",
         "Scheda Esercizi"
       )
@@ -5138,7 +8373,8 @@ document
     "click",
     () =>
       triggerPrint(
-        currentPatient?.name || "",
+        currentPatient?.name ||
+        "",
         "runningPlansList",
         "Programma di Corsa"
       )
@@ -5153,7 +8389,8 @@ document
     "click",
     () =>
       triggerPrint(
-        currentPatient?.name || "",
+        currentPatient?.name ||
+        "",
         "patientPortalRunning",
         "Programma di Corsa"
       )
@@ -5164,34 +8401,84 @@ document
    SICUREZZA HTML
 ========================================================= */
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
 
-  if(value === null ||
-     value === undefined)
+  if(
+    value === null ||
+    value === undefined
+  )
     return "";
 
+
   return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
 
-function escapeAttribute(value) {
+function escapeAttribute(
+  value
+) {
 
-  if(value === null ||
-     value === undefined)
+  if(
+    value === null ||
+    value === undefined
+  )
     return "";
 
+
   return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    );
 
 }
 
@@ -5206,8 +8493,10 @@ window.addEventListener(
 
     await loadLogo();
 
+
     const isRecovery =
       await checkRecoverySession();
+
 
     if(!isRecovery) {
 
@@ -5221,4 +8510,5 @@ window.addEventListener(
 </script>
 
 </body>
+
 </html>

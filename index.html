@@ -1,197 +1,1578 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Noceto Lab - Gestione Pazienti</title>
-  <style>
-    :root {
-      --primary: #1a365d;
-      --secondary: #2b6cb0;
-      --accent: #319795;
-      --bg: #f7fafc;
-      --card-bg: #ffffff;
-      --text: #2d3748;
-      --border: #e2e8f0;
-      --danger: #e53e3e;
-    }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
+<title>Noceto Lab | Fisioterapia &amp; Performance</title>
 
-    .card {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border: 1px solid var(--border);
-    }
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://eutcpxmnrzisssddefau.supabase.co/storage/v1/object/sign/patient-documents/logo-noceto-lab.PNG?token=eyJraWQiOiIwZWYyMGVjMi04ZTY0LTQ1YTAtYmFmZC01MDA2ODlkYjZkNjQiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJwYXRpZW50LWRvY3VtZW50cy9sb2dvLW5vY2V0by1sYWIuUE5HIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIxMzc3MCwiZXhwIjozMzI5MjY3Nzc3MH0.ozB_4fFnnXGSLw1lnypN_W23ijZRy40J5rq-TpcJzjuROJdv10QQ0Izuw2QGMfjydBzU6LSHZfMBoKTevWkqxQ">
 
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
+<!-- Google Font per stile sportivo e pulito -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    h1, h2, h3 {
-      color: var(--primary);
-      margin: 0;
-    }
+<style>
 
-    button {
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
+/* PALETTE CROMATICA PROFESSIONALE & SPORTIVA */
+:root {
+  --primary: #0b192c;          /* Blu Notte Profondo */
+  --accent: #0075ff;           /* Blu Sportivo Elettrico */
+  --accent-light: #e6f0ff;     /* Sfondo evidenziato */
+  --accent-hover: #0056b3;
+  --bg-color: #f4f7fa;        /* Sfondo generale grigio/azzurro fresco */
+  --card-bg: #ffffff;         /* Sfondo schede */
+  --text-main: #0f172a;        /* Testo scuro ad alto contrasto */
+  --text-muted: #64748b;       /* Testo secondario */
+  --border-color: #e2e8f0;    /* Bordi leggeri */
+  --danger: #ef4444;          /* Rosso errore/elimina */
+  --success: #10b981;         /* Verde successo */
+  --radius: 12px;
+  --shadow: 0 4px 20px -2px rgba(11, 25, 44, 0.06);
+  --shadow-hover: 0 10px 25px -5px rgba(0, 117, 255, 0.15);
+}
 
-    button.primary { background: var(--primary); color: white; }
-    button.secondary { background: var(--secondary); color: white; }
-    button.danger { background: var(--danger); color: white; }
+* {
+  box-sizing: border-box;
+}
 
-    input[type="text"], textarea {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 14px;
-    }
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
 
-    .item-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+/* HEADER BRANDIZZATO SPORT */
+header {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-    .list-item {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #f8fafc;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-    .private-badge {
-      background: #edf2f7;
-      color: #4a5568;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
+.logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
 
-    .public-badge {
-      background: #e6fffa;
-      color: #234e52;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
+.brand-text h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
 
-    @media print {
-      body * { visibility: hidden !important; }
-      #printSheet, #printSheet * { visibility: visible !important; }
-      #printSheet {
-        display: block !important;
-        position: absolute !important;
-        left: 0 !important; top: 0 !important;
-        width: 100% !important; margin: 0 !important;
-        padding: 20px !important; background: #fff !important;
-      }
-      .no-print, button, input, select { display: none !important; }
-    }
-  </style>
+.brand-text p {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.container {
+  max-width: 1050px;
+  margin: 24px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #f8fafc;
+  color: var(--text-main);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #ffffff;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 117, 255, 0.25);
+}
+
+.primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  background: #f1f5f9;
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+}
+
+.secondary:hover {
+  background: #e2e8f0;
+}
+
+.danger {
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.danger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.patient {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 18px;
+  cursor: pointer;
+  background: var(--card-bg);
+  transition: all 0.2s;
+}
+
+.patient:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.exercise,
+.document {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  background: #ffffff;
+}
+
+.exercise h3,
+.document h3 {
+  margin-top: 0;
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.video a,
+.document a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.video a:hover,
+.document a:hover {
+  text-decoration: underline;
+}
+
+.message {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.error {
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.success {
+  background: #ecfdf5;
+  color: var(--success);
+  border: 1px solid #a7f3d0;
+}
+
+.login {
+  max-width: 420px;
+  margin: 60px auto;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.back {
+  margin-bottom: 14px;
+}
+
+small {
+  color: var(--text-muted);
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 24px 0;
+}
+
+.note-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+
+/* TABS SPORTIVE E DINAMICHE */
+.section-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  position: sticky;
+  top: 72px;
+  z-index: 10;
+  background: var(--bg-color);
+  padding: 10px 0;
+}
+
+.section-tab {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.section-tab.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 10px rgba(11, 25, 44, 0.2);
+}
+
+.tab-panel.hidden-panel {
+  display: none !important;
+}
+
+/* STAMPA / PDF */
+.print-sheet {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printSheet, #printSheet * {
+    visibility: visible;
+  }
+  #printSheet {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+    color: black;
+    padding: 10px;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* TABELLA CORSA LAYOUT SPORTIVO */
+.running-planner {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.running-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 14px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.running-table th,
+.running-table td {
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+  background: #ffffff;
+}
+
+.running-table th {
+  background: #f8fafc;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.session-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.session-box label {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.interval-box {
+  background: var(--accent-light);
+  border-left: 3px solid var(--accent);
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 6px;
+}
+
+/* CARDS PER MOBILE */
+@media screen and (max-width: 768px) {
+  .running-table, 
+  .running-table tbody, 
+  .running-table tr, 
+  .running-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .running-table thead {
+    display: none;
+  }
+
+  .running-table tr {
+    margin-bottom: 20px;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    background: #fff;
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .running-table td {
+    border: none;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .running-table td:first-child {
+    font-size: 1.1em;
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .running-table td:last-child {
+    border-bottom: none;
+  }
+}
+
+@media(max-width:600px) {
+  header {
+    padding: 12px 16px;
+  }
+  .container {
+    padding: 10px;
+    margin: 10px auto;
+  }
+  .card {
+    padding: 16px;
+  }
+}
+
+</style>
+
 </head>
+
 <body>
 
+<!-- HEADER CON LOGO E BRANDING SPORTIVO -->
+<header>
+  <div class="brand">
+    <img src="https://eutcpxmnrzisssddefau.supabase.co/storage/v1/object/sign/patient-documents/logo-noceto-lab.PNG?token=eyJraWQiOiIwZWYyMGVjMi04ZTY0LTQ1YTAtYmFmZC01MDA2ODlkYjZkNjQiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJwYXRpZW50LWRvY3VtZW50cy9sb2dvLW5vY2V0by1sYWIuUE5HIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIxMzc3MCwiZXhwIjozMzI5MjY3Nzc3MH0.ozB_4fFnnXGSLw1lnypN_W23ijZRy40J5rq-TpcJzjuROJdv10QQ0Izuw2QGMfjydBzU6LSHZfMBoKTevWkqxQ" alt="Noceto Lab Logo" class="logo">
+    <div class="brand-text">
+      <h1>Noceto Lab</h1>
+      <p>Fisioterapia &amp; Performance</p>
+    </div>
+  </div>
+  <button id="logoutButton" class="secondary hidden">Esci</button>
+</header>
+
 <div class="container">
-  <!-- Header Paziente -->
+
+<!-- LOGIN -->
+<section id="loginPage" class="login">
   <div class="card">
-    <div class="section-title">
-      <h2 id="patientTitle">Dettaglio Paziente</h2>
-      <button id="deletePatientButton" class="danger">🗑️ Elimina Paziente</button>
-    </div>
-    <div id="patientDetails">
-      <p>Seleziona o carica un paziente per visualizzare la scheda completa.</p>
+    <h2>🔐 Accedi al Portale</h2>
+    <label>Email</label>
+    <input id="email" type="email" placeholder="La tua email">
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Password">
+    <br><br>
+    <button id="loginButton" class="primary" style="width: 100%;">Accedi</button>
+    <div id="loginMessage" class="message hidden"></div>
+  </div>
+</section>
+
+<!-- IMPOSTAZIONE PASSWORD -->
+<section id="setPasswordPage" class="login hidden">
+  <div class="card">
+    <h2>🔑 Imposta Password</h2>
+    <p>Scegli una password per accedere al tuo programma.</p>
+    <label>Nuova password</label>
+    <input id="newPassword" type="password" placeholder="Nuova password">
+    <label>Conferma password</label>
+    <input id="confirmPassword" type="password" placeholder="Ripeti la password">
+    <br><br>
+    <button id="savePasswordButton" class="primary" style="width: 100%;">Salva password</button>
+    <div id="passwordMessage" class="message hidden"></div>
+  </div>
+</section>
+
+<!-- DASHBOARD FISIOTERAPISTA -->
+<section id="therapistPage" class="hidden">
+  <div class="card">
+    <h2>👨‍⚕️ Dashboard Clinica</h2>
+    <p style="color: var(--text-muted); margin-top: 0;">Gestisci i tuoi pazienti e la libreria esercizi.</p>
+    <div class="actions">
+      <button id="newPatientButton" class="primary">＋ Nuovo paziente</button>
+      <button id="newExerciseButton" class="secondary">＋ Nuovo esercizio</button>
     </div>
   </div>
 
-  <!-- FASE 2: Sezione Note Private & Comunicazioni -->
   <div class="card">
-    <div class="section-title">
-      <h3>📝 Note Private & Comunicazioni</h3>
-    </div>
-    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-      <textarea id="noteInput" placeholder="Scrivi una nota clinica o una comunicazione..." style="flex: 1; min-height: 60px;"></textarea>
-      <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center;">
-        <label style="font-size: 14px;"><input type="checkbox" id="noteIsPrivate" checked> Privata (Solo Terapista)</label>
-        <button id="addNoteBtn" class="primary">Salva Nota</button>
-      </div>
-    </div>
-    <div id="notesList" class="item-list">
-      <div class="list-item">
-        <div>
-          <strong>Nota Clinica (Esempio)</strong> - <span class="private-badge">Privata</span>
-          <br><small style="color: #718096;">01/09/2026 - Matteo Riva</small>
-          <p style="margin: 5px 0 0 0;">Paziente riferisce riduzione del dolore su scala VAS a 3/10 dopo terapia.</p>
-        </div>
-      </div>
-    </div>
+    <h2>👥 Registro Pazienti</h2>
+    <div id="patientsList" class="grid">Caricamento...</div>
   </div>
 
-  <!-- FASE 2: Sezione Documenti & Referti -->
   <div class="card">
     <div class="section-title">
-      <h3>📁 Documenti & Referti</h3>
+      <h2>🏋️ Libreria Esercizi</h2>
     </div>
-    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-      <input type="text" id="docTitleInput" placeholder="Titolo documento (es. Referto RMN Ginocchio)" style="flex: 1;">
-      <input type="text" id="docUrlInput" placeholder="URL file / Link Supabase Storage" style="flex: 1;">
-      <button id="addDocBtn" class="secondary">Aggiungi Documento</button>
-    </div>
-    <div id="docsList" class="item-list">
-      <div class="list-item">
-        <div>
-          <strong>Risonanza Magnetica Lumbare.pdf</strong>
-          <br><small style="color: #718096;">Caricato il 15/08/2026</small>
-        </div>
-        <button class="secondary" style="font-size: 12px;">Apri / Scarica</button>
-      </div>
-    </div>
+    <div id="exerciseLibrary">Caricamento...</div>
+  </div>
+</section>
+
+<!-- SCHEDA PAZIENTE -->
+<section id="patientPage" class="hidden">
+  <button id="backButton" class="secondary back">← Torna ai Pazienti</button>
+
+  <div class="section-tabs" id="therapistPatientTabs">
+    <button class="section-tab active" data-target="therapistTabProgram">📋 Esercizi</button>
+    <button class="section-tab" data-target="therapistTabDocuments">📄 Documenti</button>
+    <button class="section-tab" data-target="therapistTabNotes">📝 Note</button>
+    <button class="section-tab" data-target="therapistTabRunning">🏃 Scheda Corsa</button>
   </div>
 
-  <!-- FASE 2: Sezione Storico & Cronologia -->
   <div class="card">
+    <h2 id="patientTitle">Paziente</h2>
+  </div>
+
+  <!-- PROGRAMMA ESERCIZI -->
+  <div class="card tab-panel" id="therapistTabProgram">
     <div class="section-title">
-      <h3>📜 Storico & Cronologia Attività</h3>
+      <h2>📋 Scheda Esercizi Assegnati</h2>
+      <button id="printExerciseSheetButton" class="secondary">🖨️ Stampa / PDF</button>
     </div>
-    <div id="historyList" class="item-list">
-      <div class="list-item">
-        <div>
-          <strong>Assegnazione Programma Corsa</strong>
-          <p style="margin: 3px 0 0 0; font-size: 14px;">Assegnato programma 3 sedute/settimana per 4 settimane.</p>
-        </div>
-        <small style="color: #718096;">20/08/2026</small>
+    <div id="patientExercises">Caricamento...</div>
+  </div>
+
+  <!-- ASSEGNA ESERCIZIO -->
+  <div class="card tab-panel" id="therapistTabProgramAssign">
+    <h2>＋ Assegna Esercizio</h2>
+    <label>Esercizio</label>
+    <select id="exerciseSelect">
+      <option value="">Seleziona esercizio</option>
+    </select>
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
+      <div>
+        <label>Serie</label>
+        <input id="sets" type="number" min="0" placeholder="3">
+      </div>
+      <div>
+        <label>Ripetizioni</label>
+        <input id="reps" type="number" min="0" placeholder="10">
+      </div>
+      <div>
+        <label>Durata (sec)</label>
+        <input id="duration" type="number" min="0" placeholder="30">
+      </div>
+      <div>
+        <label>Recupero (sec)</label>
+        <input id="rest" type="number" min="0" placeholder="60">
       </div>
     </div>
+    <label>Note operative per l'atleta</label>
+    <textarea id="notes" placeholder="Indicazioni su carico, esecuzione o sensazioni..."></textarea>
+    <br><br>
+    <button id="assignButton" class="primary">Assegna Esercizio</button>
+    <div id="assignMessage" class="message hidden"></div>
   </div>
+
+  <!-- REPORT E DOCUMENTI -->
+  <div class="card tab-panel" id="therapistTabDocuments">
+    <div class="section-title">
+      <h2>📄 Clinical Report &amp; PDF</h2>
+    </div>
+    <p style="color: var(--text-muted); font-size: 13px;">Carica report, referti o schede aggiuntive in formato PDF.</p>
+    <input id="documentFile" type="file" accept="application/pdf,.pdf">
+    <br><br>
+    <button id="uploadDocumentButton" class="primary">📎 Carica Referto PDF</button>
+    <div id="documentMessage" class="message hidden"></div>
+    <hr>
+    <div id="patientDocuments">Caricamento...</div>
+  </div>
+
+  <!-- NOTE E COMUNICAZIONI -->
+  <div class="card tab-panel" id="therapistTabNotes">
+    <div class="section-title">
+      <h2>📝 Diario &amp; Comunicazioni</h2>
+    </div>
+    <label>Oggetto</label>
+    <input id="patientNoteTitle" placeholder="Es. Indicazioni sulla fase di scarico">
+    <label>Contenuto della Nota</label>
+    <textarea id="patientNoteContent" placeholder="Aggiorna le indicazioni cliniche o atletiche..."></textarea>
+    <br><br>
+    <button id="savePatientNoteButton" class="primary">＋ Pubblica Nota</button>
+    <div id="patientNoteMessage" class="message hidden"></div>
+    <hr>
+    <div id="patientNotesList">Caricamento...</div>
+  </div>
+
+  <!-- ALLENAMENTO CORSA -->
+  <div class="card tab-panel" id="therapistTabRunning">
+    <div class="section-title">
+      <h2>🏃 Programmazione Corsa &amp; Performance</h2>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 13px;">Configura la struttura del microciclo di corsa per l'atleta.</p>
+
+    <div class="grid">
+      <div>
+        <label>Numero di settimane</label>
+        <input id="runningWeeks" type="number" min="1" max="52" value="4">
+      </div>
+      <div>
+        <label>Frequenza settimanale</label>
+        <select id="runningSessionsPerWeek">
+          <option value="2">2 sessioni / sett.</option>
+          <option value="3" selected>3 sessioni / sett.</option>
+          <option value="4">4 sessioni / sett.</option>
+          <option value="5">5 sessioni / sett.</option>
+        </select>
+      </div>
+    </div>
+
+    <br>
+    <div class="actions">
+      <button id="generateRunningPlanButton" class="primary">⚡ Genera Griglia Allenamenti</button>
+      <button id="saveRunningProgramButton" class="primary hidden">💾 Salva Scheda Corsa</button>
+    </div>
+
+    <div id="runningMessage" class="message hidden"></div>
+    <hr>
+    <div id="runningPlanner" class="running-planner"></div>
+    <hr>
+    <div class="section-title">
+      <h3>Programmi Salvati</h3>
+      <button id="printRunningSheetButton" class="secondary">🖨️ Stampa Scheda Corsa</button>
+    </div>
+    <div id="runningPlansList">Caricamento...</div>
+  </div>
+
+</section>
+
+<!-- NUOVO PAZIENTE -->
+<section id="newPatientPage" class="hidden">
+  <div class="card">
+    <h2>👤 Anagrafica Nuovo Paziente</h2>
+    <label>Nome e Cognome</label>
+    <input id="newPatientName" placeholder="Es. Mario Rossi">
+    <label>Email (Username di accesso)</label>
+    <input id="newPatientEmail" type="email" placeholder="mario.rossi@email.it">
+    <br><br>
+    <button id="savePatient" class="primary">Registra Paziente</button>
+    <button id="cancelPatient" class="secondary">Annulla</button>
+    <div id="patientMessage" class="message hidden"></div>
+  </div>
+</section>
+
+<!-- NUOVO ESERCIZIO -->
+<section id="newExercisePage" class="hidden">
+  <div class="card">
+    <h2>🏋️ Registra Esercizio in Libreria</h2>
+    <label>Nome Esercizio</label>
+    <input id="exerciseName" placeholder="Es. Single Leg Bulgarian Split Squat">
+    <label>Descrizione &amp; Focus Tecnico</label>
+    <textarea id="exerciseDescription" placeholder="Fasi di esecuzione, biomeccanica e raccomandazioni..."></textarea>
+    <label>Link Video (YouTube / Vimeo / Cloud)</label>
+    <input id="exerciseVideo" type="url" placeholder="https://...">
+    <br><br>
+    <button id="saveExercise" class="primary">Salva Esercizio</button>
+    <button id="cancelExercise" class="secondary">Annulla</button>
+    <div id="exerciseMessage" class="message hidden"></div>
+  </div>
+</section>
+
+<!-- PORTALE PAZIENTE -->
+<section id="patientPortal" class="hidden">
+
+  <div class="section-tabs" id="patientPortalTabs">
+    <button class="section-tab active" data-target="portalExercises">🏋️ Esercizi</button>
+    <button class="section-tab" data-target="portalDocuments">📄 Referti</button>
+    <button class="section-tab" data-target="portalNotes">📝 Note Studio</button>
+    <button class="section-tab" data-target="portalRunning">🏃 Corsa</button>
+  </div>
+
+  <div class="card" style="background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%); color: white;">
+    <h2 id="patientWelcome" style="color: white; font-size: 22px;">Ciao 👋</h2>
+    <p style="margin: 0; opacity: 0.85;">Benvenuto nella tua area riservata di Noceto Lab.</p>
+  </div>
+
+  <div class="card tab-panel" id="portalExercises">
+    <div class="section-title">
+      <h2>🏋️ Scheda Esercizi</h2>
+      <button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa PDF</button>
+    </div>
+    <div id="patientPortalExercises">Caricamento...</div>
+  </div>
+
+  <div class="card tab-panel" id="portalDocuments">
+    <h2>📄 I tuoi Report Clinici</h2>
+    <div id="patientPortalDocuments">Caricamento...</div>
+  </div>
+
+  <div class="card tab-panel" id="portalNotes">
+    <h2>📝 Note dal Fisioterapista</h2>
+    <div id="patientPortalNotes">Caricamento...</div>
+  </div>
+
+  <div class="card tab-panel" id="portalRunning">
+    <div class="section-title">
+      <h2>🏃 Tabella di Corsa</h2>
+      <button id="patientPrintRunningButton" class="secondary">🖨️ Stampa Programma Corsa</button>
+    </div>
+    <div id="patientPortalRunning">Caricamento...</div>
+  </div>
+
+</section>
+
 </div>
+
+<!-- CONTENITORE STAMPA PDF CON CARTA INTESTATA -->
+<div id="printSheet" class="print-sheet"></div>
+
+<!-- SUPABASE SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+function setupSectionTabs(containerId) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const buttons = container.querySelectorAll(".section-tab");
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      button.classList.add("active");
+      const targetId = button.dataset.target;
+      const section = document.getElementById(targetId);
+      if(!section) return;
+      const root = container.closest("section");
+      root.querySelectorAll(".tab-panel").forEach(panel => panel.classList.add("hidden-panel"));
+      section.classList.remove("hidden-panel");
+      if(containerId === "therapistPatientTabs") {
+        const assignPanel = document.getElementById("therapistTabProgramAssign");
+        if(assignPanel) assignPanel.classList.toggle("hidden-panel", targetId !== "therapistTabProgram");
+      }
+    });
+  });
+  const first = buttons[0];
+  if(first) first.click();
+}
+
+/* CONFIGURAZIONE SUPABASE */
+const SUPABASE_URL = "https://eutcpxmnrzisssddefau.supabase.co";
+const SUPABASE_KEY = "sb_publishable_C2DPlnqwDgOkEC1FrdGDhg_XQ8m3KLz";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const DOCUMENT_BUCKET = "patient-documents";
+const LOGO_URL = "https://eutcpxmnrzisssddefau.supabase.co/storage/v1/object/sign/patient-documents/logo-noceto-lab.PNG?token=eyJraWQiOiIwZWYyMGVjMi04ZTY0LTQ1YTAtYmFmZC01MDA2ODlkYjZkNjQiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJwYXRpZW50LWRvY3VtZW50cy9sb2dvLW5vY2V0by1sYWIuUE5HIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODIxMzc3MCwiZXhwIjozMzI5MjY3Nzc3MH0.ozB_4fFnnXGSLw1lnypN_W23ijZRy40J5rq-TpcJzjuROJdv10QQ0Izuw2QGMfjydBzU6LSHZfMBoKTevWkqxQ";
+
+/* VARIABILI GLOBALI */
+let currentUser = null;
+let currentPatient = null;
+
+const pages = [
+  "loginPage", "setPasswordPage", "therapistPage", 
+  "patientPage", "newPatientPage", "newExercisePage", "patientPortal"
+];
+
+setupSectionTabs("therapistPatientTabs");
+setupSectionTabs("patientPortalTabs");
+
+function showPage(pageId) {
+  pages.forEach(id => document.getElementById(id).classList.add("hidden"));
+  document.getElementById(pageId).classList.remove("hidden");
+}
+
+function showMessage(id, text, type) {
+  const element = document.getElementById(id);
+  element.innerText = text;
+  element.className = "message " + type;
+}
+
+/* AUTHENTICATION */
+document.getElementById("loginButton").addEventListener("click", login);
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if(!email || !password) {
+    showMessage("loginMessage", "Inserisci email e password.", "error");
+    return;
+  }
+
+  const result = await db.auth.signInWithPassword({ email, password });
+  if(result.error) {
+    showMessage("loginMessage", result.error.message, "error");
+    return;
+  }
+
+  currentUser = result.data.user;
+
+  const profileResult = await db.from("profiles").select("role, must_change_password").eq("id", currentUser.id).maybeSingle();
+
+  if(profileResult.error || !profileResult.data) {
+    await db.auth.signOut();
+    currentUser = null;
+    showMessage("loginMessage", "Errore nel caricamento del profilo.", "error");
+    return;
+  }
+
+  if(profileResult.data.role === "patient" && profileResult.data.must_change_password === true) {
+    showPage("setPasswordPage");
+    return;
+  }
+
+  await startApp();
+}
+
+async function checkRecoverySession() {
+  const hash = window.location.hash;
+  if(hash && (hash.includes("type=recovery") || hash.includes("access_token="))) {
+    const result = await db.auth.getSession();
+    if(result.data && result.data.session) {
+      currentUser = result.data.session.user;
+      showPage("setPasswordPage");
+      return true;
+    }
+  }
+  return false;
+}
+
+document.getElementById("savePasswordButton").addEventListener("click", saveNewPassword);
+
+async function saveNewPassword() {
+  const password = document.getElementById("newPassword").value;
+  const confirmation = document.getElementById("confirmPassword").value;
+
+  if(!password || !confirmation || password !== confirmation || password.length < 6) {
+    showMessage("passwordMessage", "Le password devono coincidere ed essere di almeno 6 caratteri.", "error");
+    return;
+  }
+
+  const result = await db.auth.updateUser({ password });
+  if(result.error) {
+    showMessage("passwordMessage", result.error.message, "error");
+    return;
+  }
+
+  currentUser = result.data.user;
+  await db.from("profiles").update({ must_change_password: false }).eq("id", currentUser.id);
+  showMessage("passwordMessage", "Password salvata con successo!", "success");
+
+  setTimeout(async () => { await startApp(); }, 700);
+}
+
+async function startApp() {
+  const result = await db.auth.getUser();
+  if(result.error) {
+    showPage("loginPage");
+    return;
+  }
+
+  currentUser = result.data.user;
+  document.getElementById("logoutButton").classList.remove("hidden");
+
+  const profileResult = await db.from("profiles").select("role, must_change_password").eq("id", currentUser.id).single();
+  if(profileResult.error) return;
+
+  const role = profileResult.data.role;
+
+  if(role === "patient" && profileResult.data.must_change_password === true) {
+    showPage("setPasswordPage");
+    return;
+  }
+
+  if(role === "therapist") await startTherapist();
+  else if(role === "patient") await startPatient();
+}
+
+async function startTherapist() {
+  showPage("therapistPage");
+  await loadPatients();
+  await loadExerciseLibrary();
+}
+
+async function startPatient() {
+  const result = await db.from("patients").select("*").eq("user_id", currentUser.id).maybeSingle();
+  if(result.error || !result.data) {
+    alert("Profilo paziente non trovato.");
+    return;
+  }
+  currentPatient = result.data;
+  document.getElementById("patientWelcome").innerText = "Ciao " + currentPatient.name + " 👋";
+  showPage("patientPortal");
+  await loadPatientPortal();
+}
+
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  await db.auth.signOut();
+  currentUser = null;
+  currentPatient = null;
+  document.getElementById("logoutButton").classList.add("hidden");
+  showPage("loginPage");
+});
+
+/* PAZIENTI */
+async function loadPatients() {
+  const list = document.getElementById("patientsList");
+  list.innerHTML = "Caricamento...";
+
+  const result = await db.from("patients").select("*").order("name", { ascending: true });
+  if(result.error || !result.data) {
+    list.innerHTML = "Errore o nessun paziente presente.";
+    return;
+  }
+
+  list.innerHTML = "";
+  result.data.forEach(patient => {
+    const div = document.createElement("div");
+    div.className = "patient";
+    div.innerHTML = `<strong>👤 ${patient.name}</strong><br><br><small style="color:var(--accent); font-weight:700;">Apri Scheda Clinica →</small>`;
+    div.addEventListener("click", () => openPatient(patient));
+    list.appendChild(div);
+  });
+}
+
+async function openPatient(patient) {
+  currentPatient = patient;
+  document.getElementById("patientTitle").innerText = "👤 " + patient.name;
+  showPage("patientPage");
+
+  await loadExercises();
+  await loadPatientExercises();
+  await loadPatientDocuments();
+  await loadPatientNotes();
+  await loadRunningPlans();
+}
+
+/* LIBRERIA ESERCIZI */
+async function loadExercises() {
+  const select = document.getElementById("exerciseSelect");
+  select.innerHTML = '<option value="">Seleziona esercizio</option>';
+  const result = await db.from("exercises").select("*").order("name", { ascending: true });
+  if(!result.error && result.data) {
+    result.data.forEach(ex => {
+      const opt = document.createElement("option");
+      opt.value = ex.id;
+      opt.textContent = ex.name;
+      select.appendChild(opt);
+    });
+  }
+}
+
+async function loadExerciseLibrary() {
+  const container = document.getElementById("exerciseLibrary");
+  container.innerHTML = "Caricamento...";
+  const result = await db.from("exercises").select("*").order("name", { ascending: true });
+
+  if(result.error || !result.data || result.data.length === 0) {
+    container.innerText = "Nessun esercizio salvato.";
+    return;
+  }
+
+  container.innerHTML = "";
+  result.data.forEach(ex => {
+    const div = document.createElement("div");
+    div.className = "exercise";
+    div.innerHTML = `
+      <h3>${ex.name}</h3>
+      ${ex.description ? `<p style="font-size:13px; color:var(--text-muted);">${ex.description}</p>` : ""}
+      ${ex.video_url ? `<p class="video"><a href="${ex.video_url}" target="_blank" rel="noopener">🎥 Dimostrazione Video</a></p>` : ""}
+      <div class="actions">
+        <button class="danger" onclick="deleteExercise('${ex.id}')">🗑️ Elimina</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function deleteExercise(id) {
+  if(!confirm("Confermi l'eliminazione?")) return;
+  await db.from("exercises").delete().eq("id", id);
+  await loadExerciseLibrary();
+  await loadExercises();
+}
+
+document.getElementById("newPatientButton").addEventListener("click", () => showPage("newPatientPage"));
+document.getElementById("cancelPatient").addEventListener("click", () => showPage("therapistPage"));
+document.getElementById("savePatient").addEventListener("click", async () => {
+  const name = document.getElementById("newPatientName").value.trim();
+  const email = document.getElementById("newPatientEmail").value.trim();
+  if(!name || !email) return;
+
+  const res = await db.from("patients").insert([{ name, email }]);
+  if(!res.error) {
+    showPage("therapistPage");
+    loadPatients();
+  }
+});
+
+document.getElementById("newExerciseButton").addEventListener("click", () => showPage("newExercisePage"));
+document.getElementById("cancelExercise").addEventListener("click", () => showPage("therapistPage"));
+document.getElementById("saveExercise").addEventListener("click", async () => {
+  const name = document.getElementById("exerciseName").value.trim();
+  const description = document.getElementById("exerciseDescription").value.trim();
+  const video = document.getElementById("exerciseVideo").value.trim();
+
+  if(!name) return;
+
+  const res = await db.from("exercises").insert([{ name, description, video_url: video }]);
+  if(!res.error) {
+    showPage("therapistPage");
+    loadExerciseLibrary();
+    loadExercises();
+  }
+});
+
+document.getElementById("backButton").addEventListener("click", () => showPage("therapistPage"));
+
+/* GESTIONE ESERCIZI PAZIENTE */
+async function loadPatientExercises() {
+  const container = document.getElementById("patientExercises");
+  container.innerHTML = "Caricamento...";
+
+  const res = await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id", currentPatient.id);
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessun esercizio assegnato.";
+    return;
+  }
+
+  container.innerHTML = "";
+  res.data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "exercise";
+
+    const exName = item.exercises ? item.exercises.name : "Esercizio";
+    let details = [];
+    if(item.sets) details.push(`<strong>${item.sets}</strong> serie`);
+    if(item.reps) details.push(`<strong>${item.reps}</strong> rep`);
+    if(item.duration) details.push(`<strong>${item.duration}s</strong> tempo`);
+    if(item.rest) details.push(`<strong>${item.rest}s</strong> rec`);
+
+    div.innerHTML = `
+      <h3>${exName}</h3>
+      <p style="font-size:14px; margin: 8px 0;"><strong>Parametri:</strong> ${details.join(" | ") || "Standard"}</p>
+      ${item.notes ? `<p style="font-size:13px; color:var(--text-muted);"><strong>Note:</strong> ${item.notes}</p>` : ""}
+      <div class="actions no-print" style="margin-top:10px;">
+        <button class="danger" onclick="removeAssignedExercise('${item.id}')">🗑️ Rimuovi</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById("assignButton").addEventListener("click", async () => {
+  const exerciseId = document.getElementById("exerciseSelect").value;
+  const sets = document.getElementById("sets").value;
+  const reps = document.getElementById("reps").value;
+  const duration = document.getElementById("duration").value;
+  const rest = document.getElementById("rest").value;
+  const notes = document.getElementById("notes").value.trim();
+
+  if(!exerciseId) return;
+
+  const res = await db.from("patient_exercises").insert([{
+    patient_id: currentPatient.id,
+    exercise_id: exerciseId,
+    sets: sets ? parseInt(sets) : null,
+    reps: reps ? parseInt(reps) : null,
+    duration: duration ? parseInt(duration) : null,
+    rest: rest ? parseInt(rest) : null,
+    notes: notes || null
+  }]);
+
+  if(!res.error) {
+    showMessage("assignMessage", "Assegnato con successo!", "success");
+    await loadPatientExercises();
+  }
+});
+
+async function removeAssignedExercise(id) {
+  if(!confirm("Cancellare questo esercizio dal paziente?")) return;
+  await db.from("patient_exercises").delete().eq("id", id);
+  await loadPatientExercises();
+}
+
+/* DOCUMENTI */
+async function loadPatientDocuments() {
+  const container = document.getElementById("patientDocuments");
+  container.innerHTML = "Caricamento...";
+
+  const res = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessun documento inserito.";
+    return;
+  }
+
+  container.innerHTML = "";
+  res.data.forEach(doc => {
+    const div = document.createElement("div");
+    div.className = "document";
+    const publicUrl = db.storage.from(DOCUMENT_BUCKET).getPublicUrl(doc.file_path).data.publicUrl;
+
+    div.innerHTML = `
+      <h3>📄 ${doc.file_name}</h3>
+      <p><a href="${publicUrl}" target="_blank" rel="noopener">Visualizza Referto PDF</a></p>
+      <div class="actions no-print">
+        <button class="danger" onclick="deleteDocument('${doc.id}', '${doc.file_path}')">🗑️ Elimina</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById("uploadDocumentButton").addEventListener("click", async () => {
+  const fileInput = document.getElementById("documentFile");
+  const file = fileInput.files[0];
+  if(!file) return;
+
+  const fileName = `${currentPatient.id}/${Date.now()}_${file.name}`;
+  const uploadRes = await db.storage.from(DOCUMENT_BUCKET).upload(fileName, file);
+
+  if(!uploadRes.error) {
+    await db.from("patient_documents").insert([{
+      patient_id: currentPatient.id,
+      file_name: file.name,
+      file_path: fileName
+    }]);
+    fileInput.value = "";
+    await loadPatientDocuments();
+  }
+});
+
+async function deleteDocument(id, filePath) {
+  if(!confirm("Eliminare il PDF selezionato?")) return;
+  await db.storage.from(DOCUMENT_BUCKET).remove([filePath]);
+  await db.from("patient_documents").delete().eq("id", id);
+  await loadPatientDocuments();
+}
+
+/* NOTE */
+async function loadPatientNotes() {
+  const container = document.getElementById("patientNotesList");
+  container.innerHTML = "Caricamento...";
+
+  const res = await db.from("patient_notes").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessuna nota presente.";
+    return;
+  }
+
+  container.innerHTML = "";
+  res.data.forEach(note => {
+    const div = document.createElement("div");
+    div.className = "note-card";
+    const date = new Date(note.created_at).toLocaleDateString("it-IT");
+    div.innerHTML = `
+      <h3>${note.title || "Nota"} <small style="font-size:12px; color:var(--text-muted);">(${date})</small></h3>
+      <p style="font-size:14px; margin-top:6px;">${note.content}</p>
+      <button class="danger no-print" style="margin-top:8px;" onclick="deletePatientNote('${note.id}')">Elimina</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+document.getElementById("savePatientNoteButton").addEventListener("click", async () => {
+  const title = document.getElementById("patientNoteTitle").value.trim();
+  const content = document.getElementById("patientNoteContent").value.trim();
+  if(!content) return;
+
+  const res = await db.from("patient_notes").insert([{
+    patient_id: currentPatient.id,
+    title: title || "Nota",
+    content: content
+  }]);
+
+  if(!res.error) {
+    document.getElementById("patientNoteTitle").value = "";
+    document.getElementById("patientNoteContent").value = "";
+    await loadPatientNotes();
+  }
+});
+
+async function deletePatientNote(id) {
+  if(!confirm("Cancellare nota?")) return;
+  await db.from("patient_notes").delete().eq("id", id);
+  await loadPatientNotes();
+}
+
+/* PROGRAMMA CORSA AVANZATO */
+function toggleIntervalInputs(w, s) {
+  const typeVal = document.getElementById(`run_type_${w}_${s}`).value;
+  const intervalBox = document.getElementById(`interval_box_${w}_${s}`);
+  const labelFast = document.getElementById(`label_fast_${w}_${s}`);
+  const labelSlow = document.getElementById(`label_slow_${w}_${s}`);
+
+  if(typeVal === "Ripetute") {
+    intervalBox.classList.remove("hidden");
+    labelFast.innerText = "Corsa Veloce (sec/min)";
+    labelSlow.innerText = "Corsa Lenta / Recupero";
+  } else if(typeVal === "Corsa + Camminata") {
+    intervalBox.classList.remove("hidden");
+    labelFast.innerText = "Tempo Corsa (sec/min)";
+    labelSlow.innerText = "Tempo Camminata (sec/min)";
+  } else {
+    intervalBox.classList.add("hidden");
+  }
+}
+
+document.getElementById("generateRunningPlanButton").addEventListener("click", () => {
+  const weeks = parseInt(document.getElementById("runningWeeks").value) || 4;
+  const sessions = parseInt(document.getElementById("runningSessionsPerWeek").value) || 3;
+  const planner = document.getElementById("runningPlanner");
+
+  let html = `<table class="running-table"><thead><tr><th>Microciclo</th>`;
+  for(let s = 1; s <= sessions; s++) {
+    html += `<th>Sessione ${s}</th>`;
+  }
+  html += `</tr></thead><tbody>`;
+
+  for(let w = 1; w <= weeks; w++) {
+    html += `<tr><td><strong>Settimana ${w}</strong></td>`;
+    for(let s = 1; s <= sessions; s++) {
+      html += `<td>
+        <div class="session-box">
+          <label>Tipologia Corsa</label>
+          <select id="run_type_${w}_${s}" onchange="toggleIntervalInputs(${w}, ${s})">
+            <option value="Corsa Continua">Corsa Continua</option>
+            <option value="Corsa + Camminata">Corsa + Camminata (Interval)</option>
+            <option value="Ripetute">Ripetute</option>
+            <option value="Fartlek">Fartlek</option>
+            <option value="Camminata">Camminata / Passo</option>
+            <option value="Riscaldamento">Riscaldamento / Defaticamento</option>
+          </select>
+
+          <label>Durata Totale (Minuti)</label>
+          <input type="number" id="run_dur_${w}_${s}" placeholder="Es. 30" min="1">
+
+          <div id="interval_box_${w}_${s}" class="interval-box hidden">
+            <label id="label_fast_${w}_${s}">Tempo Corsa (sec/min)</label>
+            <input type="text" id="run_fast_${w}_${s}" placeholder="Es. 30 sec oppure 2 min">
+
+            <label id="label_slow_${w}_${s}">Tempo Camminata (sec/min)</label>
+            <input type="text" id="run_slow_${w}_${s}" placeholder="Es. 30 sec oppure 1 min">
+          </div>
+
+          <label>Intensità Target (RPE 1-10)</label>
+          <select id="run_rpe_${w}_${s}">
+            <option value="">Seleziona RPE</option>
+            <option value="1-3 (Leggero)">1-3 (Rigenerante)</option>
+            <option value="4-6 (Moderato)">4-6 (Aerobico Moderato)</option>
+            <option value="7-8 (Intenso)">7-8 (Soglia / Intenso)</option>
+            <option value="9-10 (Massimale)">9-10 (Massimale)</option>
+          </select>
+
+          <label>Note Tecniche</label>
+          <textarea id="run_notes_${w}_${s}" rows="2" placeholder="Indicazioni su cadenza, FC..."></textarea>
+        </div>
+      </td>`;
+    }
+    html += `</tr>`;
+  }
+  html += `</tbody></table>`;
+
+  planner.innerHTML = html;
+  document.getElementById("saveRunningProgramButton").classList.remove("hidden");
+});
+
+document.getElementById("saveRunningProgramButton").addEventListener("click", async () => {
+  const weeks = parseInt(document.getElementById("runningWeeks").value) || 4;
+  const sessions = parseInt(document.getElementById("runningSessionsPerWeek").value) || 3;
+
+  const planData = [];
+  for(let w = 1; w <= weeks; w++) {
+    const weekSessions = [];
+    for(let s = 1; s <= sessions; s++) {
+      const type = document.getElementById(`run_type_${w}_${s}`).value;
+      const duration = document.getElementById(`run_dur_${w}_${s}`).value;
+      const fast = document.getElementById(`run_fast_${w}_${s}`).value;
+      const slow = document.getElementById(`run_slow_${w}_${s}`).value;
+      const rpe = document.getElementById(`run_rpe_${w}_${s}`).value;
+      const notes = document.getElementById(`run_notes_${w}_${s}`).value;
+
+      weekSessions.push({
+        type,
+        duration,
+        fast: (type === "Ripetute" || type === "Corsa + Camminata") ? fast : "",
+        slow: (type === "Ripetute" || type === "Corsa + Camminata") ? slow : "",
+        rpe,
+        notes
+      });
+    }
+    planData.push({ week: w, sessions: weekSessions });
+  }
+
+  const res = await db.from("running_plans").insert([{
+    patient_id: currentPatient.id,
+    weeks_count: weeks,
+    sessions_per_week: sessions,
+    plan_data: planData
+  }]);
+
+  if(res.error) {
+    showMessage("runningMessage", res.error.message, "error");
+  } else {
+    showMessage("runningMessage", "Programma di corsa salvato con successo!", "success");
+    await loadRunningPlans();
+  }
+});
+
+async function loadRunningPlans() {
+  const container = document.getElementById("runningPlansList");
+  container.innerHTML = "Caricamento...";
+
+  const res = await db.from("running_plans").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+  if(res.error || !res.data || res.data.length === 0) {
+    container.innerText = "Nessun programma di corsa trovato.";
+    return;
+  }
+
+  container.innerHTML = "";
+  res.data.forEach(plan => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    let tableHtml = `<table class="running-table"><thead><tr><th>Settimana</th>`;
+    for(let s = 1; s <= plan.sessions_per_week; s++) {
+      tableHtml += `<th>Sessione ${s}</th>`;
+    }
+    tableHtml += `</tr></thead><tbody>`;
+
+    plan.plan_data.forEach(wData => {
+      tableHtml += `<tr><td><strong>Settimana ${wData.week}</strong></td>`;
+      wData.sessions.forEach((sess, idx) => {
+        let sessionContent = `<strong style="display:block; margin-bottom:4px; color:var(--primary);">🏃 Sessione ${idx + 1}: ${sess.type || "Corsa"}</strong>`;
+        if(sess.duration) sessionContent += `⏱️ Durata: <strong>${sess.duration} min</strong><br>`;
+        if(sess.type === "Ripetute") {
+          if(sess.fast) sessionContent += `⚡ Veloce: ${sess.fast}<br>`;
+          if(sess.slow) sessionContent += `🐢 Rec: ${sess.slow}<br>`;
+        } else if(sess.type === "Corsa + Camminata") {
+          if(sess.fast) sessionContent += `🏃 Corsa: ${sess.fast}<br>`;
+          if(sess.slow) sessionContent += `🚶 Camminata: ${sess.slow}<br>`;
+        }
+        if(sess.rpe) sessionContent += `📊 RPE: <span style="font-weight:700; color:var(--accent);">${sess.rpe}</span><br>`;
+        if(sess.notes) sessionContent += `<small style="display:block; margin-top:4px;">📝 <em>${sess.notes}</em></small>`;
+
+        tableHtml += `<td>${sessionContent}</td>`;
+      });
+      tableHtml += `</tr>`;
+    });
+    tableHtml += `</tbody></table>`;
+
+    div.innerHTML = `
+      ${tableHtml}
+      <br>
+      <button class="danger no-print" onclick="deleteRunningPlan('${plan.id}')">🗑️ Elimina Scheda Corsa</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+async function deleteRunningPlan(id) {
+  if(!confirm("Eliminare definitivamente questo scheda di corsa?")) return;
+  await db.from("running_plans").delete().eq("id", id);
+  await loadRunningPlans();
+}
+
+/* PORTALE PAZIENTE */
+async function loadPatientPortal() {
+  const exContainer = document.getElementById("patientPortalExercises");
+  exContainer.innerHTML = "Caricamento...";
+  const exRes = await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id", currentPatient.id);
+
+  if(!exRes.data || exRes.data.length === 0) {
+    exContainer.innerText = "Nessun esercizio presente.";
+  } else {
+    exContainer.innerHTML = "";
+    exRes.data.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "exercise";
+      const ex = item.exercises || {};
+      let details = [];
+      if(item.sets) details.push(`<strong>${item.sets}</strong> serie`);
+      if(item.reps) details.push(`<strong>${item.reps}</strong> rep`);
+      if(item.duration) details.push(`<strong>${item.duration}s</strong> tempo`);
+      if(item.rest) details.push(`<strong>${item.rest}s</strong> rec`);
+
+      div.innerHTML = `
+        <h3>${ex.name || "Esercizio"}</h3>
+        <p style="font-size:13px; color:var(--text-muted);">${ex.description || ""}</p>
+        <p style="font-size:14px;"><strong>Parametri:</strong> ${details.join(" | ")}</p>
+        ${item.notes ? `<p style="font-size:13px; color:var(--text-muted);"><strong>Note:</strong> ${item.notes}</p>` : ""}
+        ${ex.video_url ? `<p class="video no-print"><a href="${ex.video_url}" target="_blank" rel="noopener">🎥 Guarda Video Dimostrativo</a></p>` : ""}
+      `;
+      exContainer.appendChild(div);
+    });
+  }
+
+  const docContainer = document.getElementById("patientPortalDocuments");
+  docContainer.innerHTML = "Caricamento...";
+  const docRes = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+  if(!docRes.data || docRes.data.length === 0) {
+    docContainer.innerText = "Nessun report presente.";
+  } else {
+    docContainer.innerHTML = "";
+    docRes.data.forEach(doc => {
+      const publicUrl = db.storage.from(DOCUMENT_BUCKET).getPublicUrl(doc.file_path).data.publicUrl;
+      const div = document.createElement("div");
+      div.className = "document";
+      div.innerHTML = `<h3>📄 ${doc.file_name}</h3><a href="${publicUrl}" target="_blank" rel="noopener">Download Report PDF</a>`;
+      docContainer.appendChild(div);
+    });
+  }
+
+  const notesContainer = document.getElementById("patientPortalNotes");
+  notesContainer.innerHTML = "Caricamento...";
+  const notesRes = await db.from("patient_notes").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+  if(!notesRes.data || notesRes.data.length === 0) {
+    notesContainer.innerText = "Nessuna nota comunicata.";
+  } else {
+    notesContainer.innerHTML = "";
+    notesRes.data.forEach(n => {
+      const div = document.createElement("div");
+      div.className = "note-card";
+      div.innerHTML = `<h3>${n.title}</h3><p style="font-size:14px;">${n.content}</p>`;
+      notesContainer.appendChild(div);
+    });
+  }
+
+  const runContainer = document.getElementById("patientPortalRunning");
+  runContainer.innerHTML = "Caricamento...";
+  const runRes = await db.from("running_plans").select("*").eq("patient_id", currentPatient.id).order("created_at", { ascending: false });
+
+  if(!runRes.data || runRes.data.length === 0) {
+    runContainer.innerText = "Nessun programma corsa assegnato.";
+  } else {
+    runContainer.innerHTML = "";
+    runRes.data.forEach(plan => {
+      let tableHtml = `<table class="running-table"><thead><tr><th>Settimana</th>`;
+      for(let s = 1; s <= plan.sessions_per_week; s++) tableHtml += `<th>Sessione ${s}</th>`;
+      tableHtml += `</tr></thead><tbody>`;
+
+      plan.plan_data.forEach(wData => {
+        tableHtml += `<tr><td><strong>Settimana ${wData.week}</strong></td>`;
+        wData.sessions.forEach((sess, idx) => {
+          let sessionContent = `<strong style="display:block; margin-bottom:4px; color:var(--primary);">🏃 Sessione ${idx + 1}: ${sess.type || "Corsa"}</strong>`;
+          if(sess.duration) sessionContent += `⏱️ Durata: <strong>${sess.duration} min</strong><br>`;
+          if(sess.type === "Ripetute") {
+            if(sess.fast) sessionContent += `⚡ Veloce: ${sess.fast}<br>`;
+            if(sess.slow) sessionContent += `🐢 Rec: ${sess.slow}<br>`;
+          } else if(sess.type === "Corsa + Camminata") {
+            if(sess.fast) sessionContent += `🏃 Corsa: ${sess.fast}<br>`;
+            if(sess.slow) sessionContent += `🚶 Camminata: ${sess.slow}<br>`;
+          }
+          if(sess.rpe) sessionContent += `📊 RPE: <span style="font-weight:700; color:var(--accent);">${sess.rpe}</span><br>`;
+          if(sess.notes) sessionContent += `<small style="display:block; margin-top:4px;">📝 <em>${sess.notes}</em></small>`;
+
+          tableHtml += `<td>${sessionContent}</td>`;
+        });
+        tableHtml += `</tr>`;
+      });
+      tableHtml += `</tbody></table>`;
+      runContainer.innerHTML += tableHtml;
+    });
+  }
+}
+
+/* STAMPA CON LOGO E INTESTAZIONE PROFESSIONALE */
+function triggerPrint(patientName, containerId, documentTitle) {
+  const container = document.getElementById(containerId);
+  const printSheet = document.getElementById("printSheet");
+
+  if(!container) return;
+
+  const clone = container.cloneNode(true);
+  clone.querySelectorAll(".no-print").forEach(el => el.remove());
+
+  printSheet.innerHTML = `
+    <div style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 15px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0b192c; padding-bottom: 12px; margin-bottom: 20px;">
+        <div>
+          <h1 style="margin: 0; font-size: 24px; color: #0b192c; text-transform: uppercase; font-weight:800;">Noceto Lab</h1>
+          <p style="margin: 4px 0 0 0; font-size: 12px; color: #0075ff; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Fisioterapia &amp; Performance Clinica</p>
+        </div>
+        <img src="${LOGO_URL}" style="height: 55px; width: auto;" alt="Logo Noceto Lab">
+      </div>
+      <h2 style="margin-top: 10px; font-size: 18px; color:#0b192c;">${documentTitle}: ${patientName || ""}</h2>
+      ${clone.innerHTML}
+    </div>
+  `;
+
+  window.print();
+}
+
+// Event Listeners Stampa Esercizi
+document.getElementById("printExerciseSheetButton").addEventListener("click", () => {
+  triggerPrint(currentPatient ? currentPatient.name : "", "patientExercises", "Scheda Esercizi");
+});
+
+document.getElementById("patientPrintExerciseSheetButton").addEventListener("click", () => {
+  triggerPrint(currentPatient ? currentPatient.name : "", "patientPortalExercises", "Scheda Esercizi");
+});
+
+// Event Listeners Stampa Corsa
+document.getElementById("printRunningSheetButton").addEventListener("click", () => {
+  triggerPrint(currentPatient ? currentPatient.name : "", "runningPlansList", "Programma di Corsa");
+});
+
+document.getElementById("patientPrintRunningButton").addEventListener("click", () => {
+  triggerPrint(currentPatient ? currentPatient.name : "", "patientPortalRunning", "Programma di Corsa");
+});
+
+/* INIZIALIZZAZIONE */
+window.addEventListener("DOMContentLoaded", async () => {
+  const isRecovery = await checkRecoverySession();
+  if(!isRecovery) {
+    await startApp();
+  }
+});
+
+</script>
 
 </body>
 </html>

@@ -1,266 +1,5224 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Noceto Lab | Fisioterapia & Performance</title>
-<link rel="icon" type="image/png" href="https://eutcpxmnrzisssddefau.supabase.co/storage/v1/object/sign/patient-documents/logo-noceto-lab.PNG">
+
+<link rel="icon" id="favicon" type="image/png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-:root{--primary:#0b192c;--accent:#0075ff;--accent-light:#e6f0ff;--accent-hover:#0056b3;--bg:#f4f7fa;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--danger:#ef4444;--success:#10b981;--radius:12px;--shadow:0 4px 20px -2px rgba(11,25,44,.06)}
-*{box-sizing:border-box}body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text)}
-header{background:var(--primary);color:#fff;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 15px rgba(0,0,0,.15);position:sticky;top:0;z-index:100}
-.brand{display:flex;align-items:center;gap:14px}.logo{height:44px;width:auto;object-fit:contain;background:#fff;padding:4px 8px;border-radius:8px}.brand-text h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.5px;text-transform:uppercase}.brand-text p{margin:0;font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
-.container{max-width:1100px;margin:24px auto;padding:0 20px}.card{background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:24px;box-shadow:var(--shadow);border:1px solid var(--border)}
-h2{font-size:18px;font-weight:700;margin:0 0 16px;color:var(--primary)}h3{color:var(--primary)}
-input,textarea,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:8px;margin-top:6px;font-size:14px;font-family:inherit;background:#f8fafc;color:var(--text)}input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fff}
-label{display:block;margin-top:14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-button{border:0;border-radius:8px;padding:11px 16px;cursor:pointer;font-weight:700;font-size:13px;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px}.primary{background:var(--accent);color:#fff}.secondary{background:#f1f5f9;color:var(--primary);border:1px solid var(--border)}.danger{background:#fef2f2;color:var(--danger);border:1px solid #fecaca}.successBtn{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
-.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}.actions{display:flex;gap:10px;flex-wrap:wrap}.login{max-width:420px;margin:60px auto}.patient,.exercise,.document,.note-card,.session-box{border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;background:#fff}.patient{cursor:pointer}.patient:hover{border-color:var(--accent)}small{color:var(--muted)}
-.message{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600}.error{background:#fef2f2;color:var(--danger);border:1px solid #fecaca}.success{background:#ecfdf5;color:var(--success);border:1px solid #a7f3d0}
-.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.section-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;position:sticky;top:72px;z-index:10;background:var(--bg);padding:10px 0}.section-tab{background:#fff;border:1px solid var(--border);color:var(--muted);border-radius:30px;padding:8px 18px}.section-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-.tab-panel.hidden-panel{display:none!important}.running-planner{width:100%;overflow-x:auto}.running-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}.running-table th,.running-table td{border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:12px;text-align:left;vertical-align:top;background:#fff}.running-table th{background:#f8fafc;color:var(--primary);font-size:13px;text-transform:uppercase}.interval-box{background:var(--accent-light);border-left:3px solid var(--accent);padding:8px;margin-top:8px;border-radius:6px}
-.print-sheet{display:none}@media print{body>*{visibility:hidden}#printSheet,#printSheet *{visibility:visible}#printSheet{display:block!important;position:absolute;left:0;top:0;width:100%;background:#fff;color:#000;padding:10px}.no-print{display:none!important}}
-@media(max-width:768px){.running-table,.running-table tbody,.running-table tr,.running-table td{display:block;width:100%}.running-table thead{display:none}.running-table tr{margin-bottom:20px;border:2px solid var(--accent);border-radius:var(--radius);padding:14px}.running-table td{border:none;border-bottom:1px dashed var(--border)}}
-@media(max-width:600px){header{padding:12px 16px}.container{padding:10px;margin:10px auto}.card{padding:16px}}
+
+:root {
+  --primary: #0b192c;
+  --accent: #0075ff;
+  --accent-light: #e6f0ff;
+  --accent-hover: #0056b3;
+  --bg-color: #f4f7fa;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --danger: #ef4444;
+  --success: #10b981;
+  --radius: 12px;
+  --shadow: 0 4px 20px -2px rgba(11, 25, 44, 0.06);
+  --shadow-hover: 0 10px 25px -5px rgba(0, 117, 255, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  background: var(--primary);
+  color: #ffffff;
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  height: 44px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.brand-text p {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.container {
+  max-width: 1050px;
+  margin: 24px auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #f8fafc;
+  color: var(--text-main);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #ffffff;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 117, 255, 0.25);
+}
+
+.primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  background: #f1f5f9;
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+}
+
+.secondary:hover {
+  background: #e2e8f0;
+}
+
+.danger {
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.danger:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.edit {
+  background: #eff6ff;
+  color: var(--accent);
+  border: 1px solid #bfdbfe;
+}
+
+.edit:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.patient {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 18px;
+  cursor: pointer;
+  background: var(--card-bg);
+  transition: all 0.2s;
+}
+
+.patient:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.exercise,
+.document {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  background: #ffffff;
+}
+
+.exercise h3,
+.document h3 {
+  margin-top: 0;
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.video a,
+.document a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.video a:hover,
+.document a:hover {
+  text-decoration: underline;
+}
+
+.message {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.error {
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.success {
+  background: #ecfdf5;
+  color: var(--success);
+  border: 1px solid #a7f3d0;
+}
+
+.login {
+  max-width: 420px;
+  margin: 60px auto;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.back {
+  margin-bottom: 14px;
+}
+
+small {
+  color: var(--text-muted);
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 24px 0;
+}
+
+.note-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+
+.section-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  position: sticky;
+  top: 72px;
+  z-index: 10;
+  background: var(--bg-color);
+  padding: 10px 0;
+}
+
+.section-tab {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.section-tab.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.tab-panel.hidden-panel {
+  display: none !important;
+}
+
+.edit-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.running-planner {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.running-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 14px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.running-table th,
+.running-table td {
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+  background: #ffffff;
+}
+
+.running-table th {
+  background: #f8fafc;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.session-box {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.session-box label {
+  margin-top: 8px;
+  font-size: 10px;
+}
+
+.interval-box {
+  background: var(--accent-light);
+  border-left: 3px solid var(--accent);
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 6px;
+}
+
+.print-sheet {
+  display: none;
+}
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  #printSheet,
+  #printSheet * {
+    visibility: visible;
+  }
+
+  #printSheet {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+    color: black;
+    padding: 10px;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+
+  .running-table,
+  .running-table tbody,
+  .running-table tr,
+  .running-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .running-table thead {
+    display: none;
+  }
+
+  .running-table tr {
+    margin-bottom: 20px;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    background: #fff;
+    padding: 14px;
+  }
+
+  .running-table td {
+    border: none;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .running-table td:first-child {
+    font-size: 1.1em;
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .running-table td:last-child {
+    border-bottom: none;
+  }
+
+}
+
+@media(max-width:600px) {
+
+  header {
+    padding: 12px 16px;
+  }
+
+  .container {
+    padding: 10px;
+    margin: 10px auto;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+}
+
 </style>
+
 </head>
+
 <body>
+
 <header>
+
   <div class="brand">
-    <img id="brandLogo" src="https://eutcpxmnrzisssddefau.supabase.co/storage/v1/object/sign/patient-documents/logo-noceto-lab.PNG" alt="Noceto Lab Logo" class="logo">
-    <div class="brand-text"><h1>Noceto Lab</h1><p>Fisioterapia & Performance</p></div>
+
+    <img
+      id="siteLogo"
+      src=""
+      alt="Noceto Lab Logo"
+      class="logo"
+    >
+
+    <div class="brand-text">
+      <h1>Noceto Lab</h1>
+      <p>Fisioterapia & Performance</p>
+    </div>
+
   </div>
-  <button id="logoutButton" class="secondary hidden">Esci</button>
+
+  <button id="logoutButton" class="secondary hidden">
+    Esci
+  </button>
+
 </header>
+
 
 <div class="container">
 
+
+<!-- LOGIN -->
+
 <section id="loginPage" class="login">
+
   <div class="card">
+
     <h2>🔐 Accedi al Portale</h2>
-    <label>Email</label><input id="email" type="email" placeholder="La tua email">
-    <label>Password</label><input id="password" type="password" placeholder="Password">
-    <br><br><button id="loginButton" class="primary" style="width:100%">Accedi</button>
-    <div id="loginMessage" class="message hidden"></div>
+
+    <label>Email</label>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="La tua email"
+    >
+
+    <label>Password</label>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
+
+    <br><br>
+
+    <button
+      id="loginButton"
+      class="primary"
+      style="width:100%;"
+    >
+      Accedi
+    </button>
+
+    <div
+      id="loginMessage"
+      class="message hidden"
+    ></div>
+
   </div>
+
 </section>
 
-<section id="setPasswordPage" class="login hidden">
+
+<!-- CAMBIO PASSWORD -->
+
+<section
+  id="setPasswordPage"
+  class="login hidden"
+>
+
   <div class="card">
-    <h2>🔑 Imposta la tua password</h2>
-    <p>È il primo accesso. Sostituisci la password temporanea con una personale.</p>
-    <label>Nuova password</label><input id="newPassword" type="password">
-    <label>Conferma password</label><input id="confirmPassword" type="password">
-    <br><br><button id="savePasswordButton" class="primary" style="width:100%">Salva password</button>
-    <div id="passwordMessage" class="message hidden"></div>
+
+    <h2>🔑 Imposta Password</h2>
+
+    <p>
+      Scegli una nuova password personale per accedere al tuo programma.
+    </p>
+
+    <label>Nuova password</label>
+
+    <input
+      id="newPassword"
+      type="password"
+      placeholder="Nuova password"
+    >
+
+    <label>Conferma password</label>
+
+    <input
+      id="confirmPassword"
+      type="password"
+      placeholder="Ripeti la password"
+    >
+
+    <br><br>
+
+    <button
+      id="savePasswordButton"
+      class="primary"
+      style="width:100%;"
+    >
+      Salva password
+    </button>
+
+    <div
+      id="passwordMessage"
+      class="message hidden"
+    ></div>
+
   </div>
+
 </section>
 
-<section id="therapistPage" class="hidden">
-  <div class="card"><h2>👨‍⚕️ Dashboard Clinica</h2><p style="color:var(--muted)">Gestisci pazienti ed esercizi.</p>
-    <div class="actions"><button id="newPatientButton" class="primary">＋ Nuovo paziente</button><button id="newExerciseButton" class="secondary">＋ Nuovo esercizio</button></div>
-  </div>
-  <div class="card"><h2>👥 Registro Pazienti</h2><div id="patientsList" class="grid">Caricamento...</div></div>
-  <div class="card"><h2>🏋️ Libreria Esercizi</h2><div id="exerciseLibrary">Caricamento...</div></div>
-</section>
 
-<section id="patientPage" class="hidden">
-  <button id="backButton" class="secondary">← Torna ai Pazienti</button>
-  <div class="section-tabs" id="therapistPatientTabs">
-    <button class="section-tab active" data-target="therapistTabProgram">📋 Esercizi</button>
-    <button class="section-tab" data-target="therapistTabDocuments">📄 Documenti</button>
-    <button class="section-tab" data-target="therapistTabNotes">📝 Note</button>
-    <button class="section-tab" data-target="therapistTabRunning">🏃 Scheda Corsa</button>
-  </div>
-  <div class="card"><h2 id="patientTitle">Paziente</h2></div>
+<!-- DASHBOARD TERAPISTA -->
 
-  <div class="card tab-panel" id="therapistTabProgram">
-    <div class="section-title"><h2>📋 Esercizi Assegnati</h2><button id="printExerciseSheetButton" class="secondary">🖨️ Stampa / PDF</button></div>
-    <div id="patientExercises">Caricamento...</div>
-    <hr>
-    <h2>＋ Assegna Esercizio</h2>
-    <label>Esercizio</label><select id="exerciseSelect"><option value="">Seleziona esercizio</option></select>
-    <div class="grid">
-      <div><label>Serie</label><input id="sets" type="number" min="0"></div><div><label>Ripetizioni</label><input id="reps" type="number" min="0"></div>
-      <div><label>Durata (sec)</label><input id="duration" type="number" min="0"></div><div><label>Recupero (sec)</label><input id="rest" type="number" min="0"></div>
+<section
+  id="therapistPage"
+  class="hidden"
+>
+
+  <div class="card">
+
+    <h2>👨‍⚕️ Dashboard Clinica</h2>
+
+    <p style="color:var(--text-muted); margin-top:0;">
+      Gestisci pazienti, esercizi e programmi.
+    </p>
+
+    <div class="actions">
+
+      <button
+        id="newPatientButton"
+        class="primary"
+      >
+        ＋ Nuovo paziente
+      </button>
+
+      <button
+        id="newExerciseButton"
+        class="secondary"
+      >
+        ＋ Nuovo esercizio
+      </button>
+
     </div>
-    <label>Note operative</label><textarea id="notes"></textarea><br><br>
-    <button id="assignButton" class="primary">Assegna Esercizio</button><div id="assignMessage" class="message hidden"></div>
+
   </div>
 
-  <div class="card tab-panel" id="therapistTabDocuments">
-    <h2>📄 Clinical Report & PDF</h2><input id="documentFile" type="file" accept="application/pdf,.pdf"><br><br>
-    <button id="uploadDocumentButton" class="primary">📎 Carica Referto PDF</button><div id="documentMessage" class="message hidden"></div><hr><div id="patientDocuments">Caricamento...</div>
+
+  <div class="card">
+
+    <h2>👥 Registro Pazienti</h2>
+
+    <div
+      id="patientsList"
+      class="grid"
+    >
+      Caricamento...
+    </div>
+
   </div>
 
-  <div class="card tab-panel" id="therapistTabNotes">
-    <h2>📝 Diario & Comunicazioni</h2><label>Oggetto</label><input id="patientNoteTitle"><label>Contenuto</label><textarea id="patientNoteContent"></textarea><br><br>
-    <button id="savePatientNoteButton" class="primary">＋ Pubblica Nota</button><div id="patientNoteMessage" class="message hidden"></div><hr><div id="patientNotesList">Caricamento...</div>
+
+  <div class="card">
+
+    <div class="section-title">
+
+      <h2>🏋️ Libreria Esercizi</h2>
+
+    </div>
+
+    <div id="exerciseLibrary">
+      Caricamento...
+    </div>
+
   </div>
 
-  <div class="card tab-panel" id="therapistTabRunning">
-    <div class="section-title"><h2>🏃 Programmazione Corsa</h2><button id="printRunningSheetButton" class="secondary">🖨️ Stampa</button></div>
-    <div class="grid"><div><label>Numero settimane</label><input id="runningWeeks" type="number" min="1" max="52" value="4"></div>
-    <div><label>Sessioni/settimana</label><select id="runningSessionsPerWeek"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div></div><br>
-    <div class="actions"><button id="generateRunningPlanButton" class="primary">⚡ Genera Griglia</button><button id="saveRunningProgramButton" class="primary hidden">💾 Salva</button></div>
-    <div id="runningMessage" class="message hidden"></div><hr><div id="runningPlanner"></div><hr><h3>Programmi Salvati</h3><div id="runningPlansList">Caricamento...</div>
-  </div>
 </section>
 
-<section id="newPatientPage" class="hidden"><div class="card">
-  <h2>👤 Nuovo Paziente</h2><label>Nome e Cognome</label><input id="newPatientName">
-  <label>Email</label><input id="newPatientEmail" type="email">
-  <label>Password temporanea</label><input id="newPatientPassword" type="text" placeholder="Es. Nocetolab22">
-  <small>Questa password verrà comunicata al paziente. Al primo accesso dovrà cambiarla.</small><br><br>
-  <button id="savePatient" class="primary">Registra Paziente</button> <button id="cancelPatient" class="secondary">Annulla</button>
-  <div id="patientMessage" class="message hidden"></div>
-</div></section>
 
-<section id="newExercisePage" class="hidden"><div class="card">
-  <h2>🏋️ Nuovo Esercizio</h2><label>Nome</label><input id="exerciseName"><label>Descrizione</label><textarea id="exerciseDescription"></textarea><label>Link Video</label><input id="exerciseVideo" type="url"><br><br>
-  <button id="saveExercise" class="primary">Salva</button> <button id="cancelExercise" class="secondary">Annulla</button><div id="exerciseMessage" class="message hidden"></div>
-</div></section>
+<!-- SCHEDA PAZIENTE -->
 
-<section id="patientPortal" class="hidden">
-  <div class="section-tabs" id="patientPortalTabs"><button class="section-tab active" data-target="portalExercises">🏋️ Esercizi</button><button class="section-tab" data-target="portalDocuments">📄 Referti</button><button class="section-tab" data-target="portalNotes">📝 Note Studio</button><button class="section-tab" data-target="portalRunning">🏃 Corsa</button></div>
-  <div class="card" style="background:linear-gradient(135deg,var(--primary),#1e3a8a);color:#fff"><h2 id="patientWelcome" style="color:#fff">Ciao 👋</h2><p>Benvenuto nella tua area riservata di Noceto Lab.</p></div>
-  <div class="card tab-panel" id="portalExercises"><div class="section-title"><h2>🏋️ Scheda Esercizi</h2><button id="patientPrintExerciseSheetButton" class="secondary">🖨️ Stampa PDF</button></div><div id="patientPortalExercises"></div></div>
-  <div class="card tab-panel" id="portalDocuments"><h2>📄 I tuoi Report</h2><div id="patientPortalDocuments"></div></div>
-  <div class="card tab-panel" id="portalNotes"><h2>📝 Note dal Fisioterapista</h2><div id="patientPortalNotes"></div></div>
-  <div class="card tab-panel" id="portalRunning"><div class="section-title"><h2>🏃 Tabella di Corsa</h2><button id="patientPrintRunningButton" class="secondary">🖨️ Stampa</button></div><div id="patientPortalRunning"></div></div>
+<section
+  id="patientPage"
+  class="hidden"
+>
+
+  <button
+    id="backButton"
+    class="secondary back"
+  >
+    ← Torna ai Pazienti
+  </button>
+
+
+  <div
+    class="section-tabs"
+    id="therapistPatientTabs"
+  >
+
+    <button
+      class="section-tab active"
+      data-target="therapistTabProgram"
+    >
+      📋 Esercizi
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="therapistTabDocuments"
+    >
+      📄 Documenti
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="therapistTabNotes"
+    >
+      📝 Note
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="therapistTabRunning"
+    >
+      🏃 Scheda Corsa
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2 id="patientTitle">
+      Paziente
+    </h2>
+
+  </div>
+
+
+  <!-- ESERCIZI -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabProgram"
+  >
+
+    <div class="section-title">
+
+      <h2>📋 Scheda Esercizi Assegnati</h2>
+
+      <button
+        id="printExerciseSheetButton"
+        class="secondary"
+      >
+        🖨️ Stampa / PDF
+      </button>
+
+    </div>
+
+    <div id="patientExercises">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <!-- ASSEGNA ESERCIZIO -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabProgramAssign"
+  >
+
+    <h2>＋ Assegna Esercizio</h2>
+
+    <label>Esercizio</label>
+
+    <select id="exerciseSelect">
+
+      <option value="">
+        Seleziona esercizio
+      </option>
+
+    </select>
+
+
+    <div
+      class="grid"
+      style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));"
+    >
+
+      <div>
+
+        <label>Serie</label>
+
+        <input
+          id="sets"
+          type="number"
+          min="0"
+          placeholder="3"
+        >
+
+      </div>
+
+      <div>
+
+        <label>Ripetizioni</label>
+
+        <input
+          id="reps"
+          type="number"
+          min="0"
+          placeholder="10"
+        >
+
+      </div>
+
+      <div>
+
+        <label>Durata (sec)</label>
+
+        <input
+          id="duration"
+          type="number"
+          min="0"
+          placeholder="30"
+        >
+
+      </div>
+
+      <div>
+
+        <label>Recupero (sec)</label>
+
+        <input
+          id="rest"
+          type="number"
+          min="0"
+          placeholder="60"
+        >
+
+      </div>
+
+    </div>
+
+
+    <label>
+      Note operative per il paziente
+    </label>
+
+    <textarea
+      id="notes"
+      placeholder="Indicazioni su carico, esecuzione o sensazioni..."
+    ></textarea>
+
+    <br><br>
+
+    <button
+      id="assignButton"
+      class="primary"
+    >
+      Assegna Esercizio
+    </button>
+
+    <div
+      id="assignMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
+
+  <!-- DOCUMENTI -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabDocuments"
+  >
+
+    <div class="section-title">
+
+      <h2>📄 Clinical Report & PDF</h2>
+
+    </div>
+
+    <p style="color:var(--text-muted);font-size:13px;">
+      Carica report, referti o schede aggiuntive in formato PDF.
+    </p>
+
+    <input
+      id="documentFile"
+      type="file"
+      accept="application/pdf,.pdf"
+    >
+
+    <br><br>
+
+    <button
+      id="uploadDocumentButton"
+      class="primary"
+    >
+      📎 Carica Referto PDF
+    </button>
+
+    <div
+      id="documentMessage"
+      class="message hidden"
+    ></div>
+
+    <hr>
+
+    <div id="patientDocuments">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <!-- NOTE -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabNotes"
+  >
+
+    <div class="section-title">
+
+      <h2>📝 Diario & Comunicazioni</h2>
+
+    </div>
+
+    <label>Oggetto</label>
+
+    <input
+      id="patientNoteTitle"
+      placeholder="Es. Indicazioni sulla fase di scarico"
+    >
+
+    <label>Contenuto della Nota</label>
+
+    <textarea
+      id="patientNoteContent"
+      placeholder="Aggiorna le indicazioni cliniche o atletiche..."
+    ></textarea>
+
+    <br><br>
+
+    <button
+      id="savePatientNoteButton"
+      class="primary"
+    >
+      ＋ Pubblica Nota
+    </button>
+
+    <div
+      id="patientNoteMessage"
+      class="message hidden"
+    ></div>
+
+    <hr>
+
+    <div id="patientNotesList">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <!-- CORSA -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabRunning"
+  >
+
+    <div class="section-title">
+
+      <h2>🏃 Programmazione Corsa & Performance</h2>
+
+    </div>
+
+    <p style="color:var(--text-muted);font-size:13px;">
+      Configura la struttura del microciclo di corsa.
+    </p>
+
+
+    <div class="grid">
+
+      <div>
+
+        <label>Numero di settimane</label>
+
+        <input
+          id="runningWeeks"
+          type="number"
+          min="1"
+          max="52"
+          value="4"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label>Frequenza settimanale</label>
+
+        <select id="runningSessionsPerWeek">
+
+          <option value="2">
+            2 sessioni / sett.
+          </option>
+
+          <option
+            value="3"
+            selected
+          >
+            3 sessioni / sett.
+          </option>
+
+          <option value="4">
+            4 sessioni / sett.
+          </option>
+
+          <option value="5">
+            5 sessioni / sett.
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <br>
+
+    <div class="actions">
+
+      <button
+        id="generateRunningPlanButton"
+        class="primary"
+      >
+        ⚡ Genera Griglia Allenamenti
+      </button>
+
+      <button
+        id="saveRunningProgramButton"
+        class="primary hidden"
+      >
+        💾 Salva Scheda Corsa
+      </button>
+
+    </div>
+
+
+    <div
+      id="runningMessage"
+      class="message hidden"
+    ></div>
+
+    <hr>
+
+    <div
+      id="runningPlanner"
+      class="running-planner"
+    ></div>
+
+    <hr>
+
+    <div class="section-title">
+
+      <h3>
+        Programmi Salvati
+      </h3>
+
+      <button
+        id="printRunningSheetButton"
+        class="secondary"
+      >
+        🖨️ Stampa Scheda Corsa
+      </button>
+
+    </div>
+
+    <div id="runningPlansList">
+      Caricamento...
+    </div>
+
+  </div>
+
 </section>
+
+
+<!-- NUOVO PAZIENTE -->
+
+<section
+  id="newPatientPage"
+  class="hidden"
+>
+
+  <div class="card">
+
+    <h2>👤 Anagrafica Nuovo Paziente</h2>
+
+    <label>Nome e Cognome</label>
+
+    <input
+      id="newPatientName"
+      placeholder="Es. Mario Rossi"
+    >
+
+    <label>Email</label>
+
+    <input
+      id="newPatientEmail"
+      type="email"
+      placeholder="mario.rossi@email.it"
+    >
+
+    <label>Password temporanea</label>
+
+    <input
+      id="newPatientPassword"
+      type="text"
+      value="Nocetolab22"
+    >
+
+    <p style="font-size:12px;color:var(--text-muted);">
+      Il paziente utilizzerà questa password al primo accesso e sarà obbligato a cambiarla.
+    </p>
+
+    <br>
+
+    <button
+      id="savePatient"
+      class="primary"
+    >
+      Registra Paziente
+    </button>
+
+    <button
+      id="cancelPatient"
+      class="secondary"
+    >
+      Annulla
+    </button>
+
+    <div
+      id="patientMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- NUOVO ESERCIZIO -->
+
+<section
+  id="newExercisePage"
+  class="hidden"
+>
+
+  <div class="card">
+
+    <h2>
+      🏋️ Registra Esercizio in Libreria
+    </h2>
+
+    <label>Nome Esercizio</label>
+
+    <input
+      id="exerciseName"
+      placeholder="Es. Bulgarian Split Squat"
+    >
+
+    <label>Descrizione & Focus Tecnico</label>
+
+    <textarea
+      id="exerciseDescription"
+      placeholder="Fasi di esecuzione, biomeccanica e raccomandazioni..."
+    ></textarea>
+
+    <label>Link Video</label>
+
+    <input
+      id="exerciseVideo"
+      type="url"
+      placeholder="https://..."
+    >
+
+    <br><br>
+
+    <button
+      id="saveExercise"
+      class="primary"
+    >
+      Salva Esercizio
+    </button>
+
+    <button
+      id="cancelExercise"
+      class="secondary"
+    >
+      Annulla
+    </button>
+
+    <div
+      id="exerciseMessage"
+      class="message hidden"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- PORTALE PAZIENTE -->
+
+<section
+  id="patientPortal"
+  class="hidden"
+>
+
+  <div
+    class="section-tabs"
+    id="patientPortalTabs"
+  >
+
+    <button
+      class="section-tab active"
+      data-target="portalExercises"
+    >
+      🏋️ Esercizi
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="portalDocuments"
+    >
+      📄 Referti
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="portalNotes"
+    >
+      📝 Note Studio
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="portalRunning"
+    >
+      🏃 Corsa
+    </button>
+
+  </div>
+
+
+  <div
+    class="card"
+    style="background:linear-gradient(135deg,var(--primary) 0%,#1e3a8a 100%);color:white;"
+  >
+
+    <h2
+      id="patientWelcome"
+      style="color:white;font-size:22px;"
+    >
+      Ciao 👋
+    </h2>
+
+    <p style="margin:0;opacity:.85;">
+      Benvenuto nella tua area riservata di Noceto Lab.
+    </p>
+
+  </div>
+
+
+  <div
+    class="card tab-panel"
+    id="portalExercises"
+  >
+
+    <div class="section-title">
+
+      <h2>🏋️ Scheda Esercizi</h2>
+
+      <button
+        id="patientPrintExerciseSheetButton"
+        class="secondary"
+      >
+        🖨️ Stampa PDF
+      </button>
+
+    </div>
+
+    <div id="patientPortalExercises">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <div
+    class="card tab-panel"
+    id="portalDocuments"
+  >
+
+    <h2>
+      📄 I tuoi Report Clinici
+    </h2>
+
+    <div id="patientPortalDocuments">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <div
+    class="card tab-panel"
+    id="portalNotes"
+  >
+
+    <h2>
+      📝 Note dal Fisioterapista
+    </h2>
+
+    <div id="patientPortalNotes">
+      Caricamento...
+    </div>
+
+  </div>
+
+
+  <div
+    class="card tab-panel"
+    id="portalRunning"
+  >
+
+    <div class="section-title">
+
+      <h2>🏃 Tabella di Corsa</h2>
+
+      <button
+        id="patientPrintRunningButton"
+        class="secondary"
+      >
+        🖨️ Stampa Programma Corsa
+      </button>
+
+    </div>
+
+    <div id="patientPortalRunning">
+      Caricamento...
+    </div>
+
+  </div>
+
+</section>
+
 
 </div>
-<div id="printSheet" class="print-sheet"></div>
+
+
+<div
+  id="printSheet"
+  class="print-sheet"
+></div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
 <script>
-const SUPABASE_URL="https://eutcpxmnrzisssddefau.supabase.co";
-const SUPABASE_KEY="sb_publishable_C2DPlnqwDgOkEC1FrdGDhg_XQ8m3KLz";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const DOCUMENT_BUCKET="patient-documents";
-const LOGO_PATH="logo-noceto-lab.PNG";
-let currentUser=null,currentPatient=null,editingExerciseId=null,editingAssignedId=null;
 
-const pages=["loginPage","setPasswordPage","therapistPage","patientPage","newPatientPage","newExercisePage","patientPortal"];
-function showPage(id){pages.forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById(id).classList.remove("hidden")}
-function msg(id,text,type){const e=document.getElementById(id);e.innerText=text;e.className="message "+type}
-function setupTabs(id){const c=document.getElementById(id);if(!c)return;const b=c.querySelectorAll(".section-tab");b.forEach(x=>x.onclick=()=>{b.forEach(y=>y.classList.remove("active"));x.classList.add("active");const root=c.closest("section");root.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden-panel"));document.getElementById(x.dataset.target)?.classList.remove("hidden-panel")});b[0]?.click()}
-setupTabs("therapistPatientTabs");setupTabs("patientPortalTabs");
 
-document.getElementById("loginButton").onclick=login;
-async function login(){
- const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;
- if(!email||!password)return msg("loginMessage","Inserisci email e password.","error");
- const r=await db.auth.signInWithPassword({email,password});if(r.error)return msg("loginMessage",r.error.message,"error");
- currentUser=r.data.user;await startApp();
-}
-async function startApp(){
- const r=await db.auth.getUser();if(r.error){showPage("loginPage");return}currentUser=r.data.user;
- document.getElementById("logoutButton").classList.remove("hidden");
- const p=await db.from("profiles").select("role,must_change_password").eq("id",currentUser.id).single();
- if(p.error){alert(p.error.message);return}
- if(p.data.role==="patient"&&p.data.must_change_password===true){showPage("setPasswordPage");return}
- if(p.data.role==="therapist")await startTherapist();else await startPatient();
-}
-async function saveNewPassword(){
- const a=document.getElementById("newPassword").value,b=document.getElementById("confirmPassword").value;
- if(a.length<6||a!==b)return msg("passwordMessage","Le password devono coincidere e avere almeno 6 caratteri.","error");
- const r=await db.auth.updateUser({password:a});if(r.error)return msg("passwordMessage",r.error.message,"error");
- const u=await db.from("profiles").update({must_change_password:false}).eq("id",currentUser.id);
- if(u.error)return msg("passwordMessage",u.error.message,"error");
- msg("passwordMessage","Password salvata!","success");setTimeout(startApp,500);
-}
-document.getElementById("savePasswordButton").onclick=saveNewPassword;
-document.getElementById("logoutButton").onclick=async()=>{await db.auth.signOut();currentUser=null;currentPatient=null;showPage("loginPage");document.getElementById("logoutButton").classList.add("hidden")};
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-async function startTherapist(){showPage("therapistPage");await loadPatients();await loadExerciseLibrary()}
-async function startPatient(){
- const r=await db.from("patients").select("*").eq("user_id",currentUser.id).maybeSingle();
- if(r.error||!r.data)return alert("Profilo paziente non trovato.");
- currentPatient=r.data;document.getElementById("patientWelcome").innerText="Ciao "+currentPatient.name+" 👋";showPage("patientPortal");await loadPatientPortal();
-}
-async function loadPatients(){
- const box=document.getElementById("patientsList");box.innerText="Caricamento...";
- const r=await db.from("patients").select("*").order("name");if(r.error){box.innerText=r.error.message;return}
- box.innerHTML=r.data.map(p=>`<div class="patient" onclick='openPatient(${JSON.stringify(p).replace(/'/g,"&#39;")})'><strong>👤 ${esc(p.name)}</strong><br><br><small>Apri Scheda Clinica →</small></div>`).join("")||"Nessun paziente.";
-}
-async function openPatient(p){currentPatient=p;document.getElementById("patientTitle").innerText="👤 "+p.name;showPage("patientPage");await Promise.all([loadExercises(),loadPatientExercises(),loadPatientDocuments(),loadPatientNotes(),loadRunningPlans()])}
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+const SUPABASE_URL =
+  "https://eutcpxmnrzisssddefau.supabase.co";
 
-async function loadExercises(){
- const s=document.getElementById("exerciseSelect");s.innerHTML='<option value="">Seleziona esercizio</option>';
- const r=await db.from("exercises").select("*").order("name");if(!r.error)r.data.forEach(x=>s.add(new Option(x.name,x.id)));
-}
-async function loadExerciseLibrary(){
- const box=document.getElementById("exerciseLibrary"),r=await db.from("exercises").select("*").order("name");if(r.error){box.innerText=r.error.message;return}
- box.innerHTML=r.data.map(x=>`<div class="exercise"><h3>${esc(x.name)}</h3><p>${esc(x.description||"")}</p>${x.video_url?`<p><a href="${esc(x.video_url)}" target="_blank">🎥 Video</a></p>`:""}<div class="actions"><button class="secondary" onclick="editExercise('${x.id}')">✏️ Modifica</button><button class="danger" onclick="deleteExercise('${x.id}')">🗑️ Elimina</button></div></div>`).join("")||"Nessun esercizio.";
-}
-function editExercise(id){editingExerciseId=id;showPage("newExercisePage");db.from("exercises").select("*").eq("id",id).single().then(r=>{if(r.data){exerciseName.value=r.data.name;exerciseDescription.value=r.data.description||"";exerciseVideo.value=r.data.video_url||"";saveExercise.innerText="Aggiorna Esercizio"}})}
-async function deleteExercise(id){if(!confirm("Eliminare questo esercizio?"))return;const r=await db.from("exercises").delete().eq("id",id);if(r.error)alert(r.error.message);await loadExerciseLibrary();await loadExercises()}
-newExerciseButton.onclick=()=>{editingExerciseId=null;exerciseName.value="";exerciseDescription.value="";exerciseVideo.value="";saveExercise.innerText="Salva";showPage("newExercisePage")};
-cancelExercise.onclick=()=>showPage("therapistPage");
-saveExercise.onclick=async()=>{const payload={name:exerciseName.value.trim(),description:exerciseDescription.value.trim()||null,video_url:exerciseVideo.value.trim()||null};if(!payload.name)return;
- const r=editingExerciseId?await db.from("exercises").update(payload).eq("id",editingExerciseId):await db.from("exercises").insert(payload);
- if(r.error)return msg("exerciseMessage",r.error.message,"error");editingExerciseId=null;showPage("therapistPage");await loadExerciseLibrary();await loadExercises();
-};
+const SUPABASE_KEY =
+  "sb_publishable_C2DPlnqwDgOkEC1FrdGDhg_XQ8m3KLz";
 
-async function loadPatientExercises(){
- const box=document.getElementById("patientExercises"),r=await db.from("patient_exercises").select("*,exercises(*)").eq("patient_id",currentPatient.id);
- if(r.error){box.innerText=r.error.message;return}if(!r.data.length){box.innerText="Nessun esercizio assegnato.";return}
- box.innerHTML=r.data.map(i=>{const x=i.exercises||{};return `<div class="exercise"><h3>${esc(x.name||"Esercizio")}</h3><p>Serie: <b>${i.sets??"-"}</b> | Rep: <b>${i.reps??"-"}</b> | Durata: <b>${i.duration??"-"}s</b> | Recupero: <b>${i.rest??"-"}s</b></p>${i.notes?`<p><b>Note:</b> ${esc(i.notes)}</p>`:""}<div class="actions no-print"><button class="secondary" onclick="editAssigned('${i.id}')">✏️ Modifica</button><button class="danger" onclick="removeAssignedExercise('${i.id}')">🗑️ Rimuovi</button></div></div>`}).join("");
-}
-function editAssigned(id){editingAssignedId=id;db.from("patient_exercises").select("*").eq("id",id).single().then(r=>{if(!r.data)return;exerciseSelect.value=r.data.exercise_id;sets.value=r.data.sets??"";reps.value=r.data.reps??"";duration.value=r.data.duration??"";rest.value=r.data.rest??"";notes.value=r.data.notes??"";assignButton.innerText="💾 Aggiorna Esercizio";document.getElementById("therapistTabProgram").scrollIntoView({behavior:"smooth"})})}
-assignButton.onclick=async()=>{const payload={patient_id:currentPatient.id,exercise_id:exerciseSelect.value,sets:sets.value?+sets.value:null,reps:reps.value?+reps.value:null,duration:duration.value?+duration.value:null,rest:rest.value?+rest.value:null,notes:notes.value.trim()||null};if(!payload.exercise_id)return;
- const r=editingAssignedId?await db.from("patient_exercises").update(payload).eq("id",editingAssignedId):await db.from("patient_exercises").insert(payload);
- if(r.error)return msg("assignMessage",r.error.message,"error");editingAssignedId=null;assignButton.innerText="Assegna Esercizio";sets.value=reps.value=duration.value=rest.value=notes.value="";msg("assignMessage","Salvato con successo!","success");await loadPatientExercises();
-}
-async function removeAssignedExercise(id){if(!confirm("Rimuovere l'esercizio?"))return;const r=await db.from("patient_exercises").delete().eq("id",id);if(r.error)alert(r.error.message);await loadPatientExercises()}
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
-async function loadPatientDocuments(){
- const box=document.getElementById("patientDocuments"),r=await db.from("patient_documents").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});if(r.error){box.innerText=r.error.message;return}
- box.innerHTML=r.data.map(d=>{const u=db.storage.from(DOCUMENT_BUCKET).getPublicUrl(d.file_path).data.publicUrl;return `<div class="document"><h3>📄 ${esc(d.file_name)}</h3><a href="${u}" target="_blank">Visualizza PDF</a><br><button class="danger no-print" style="margin-top:10px" onclick="deleteDocument('${d.id}','${esc(d.file_path)}')">🗑️ Elimina</button></div>`}).join("")||"Nessun documento.";
-}
-uploadDocumentButton.onclick=async()=>{const f=documentFile.files[0];if(!f)return;if(f.type!=="application/pdf")return msg("documentMessage","Solo PDF.","error");const path=`${currentPatient.id}/${Date.now()}_${f.name}`;const u=await db.storage.from(DOCUMENT_BUCKET).upload(path,f);if(u.error)return msg("documentMessage",u.error.message,"error");const r=await db.from("patient_documents").insert({patient_id:currentPatient.id,file_name:f.name,file_path:path});if(r.error)return msg("documentMessage",r.error.message,"error");documentFile.value="";await loadPatientDocuments();msg("documentMessage","PDF caricato.","success")}
-async function deleteDocument(id,path){if(!confirm("Eliminare il PDF?"))return;await db.storage.from(DOCUMENT_BUCKET).remove([path]);await db.from("patient_documents").delete().eq("id",id);await loadPatientDocuments()}
+const DOCUMENT_BUCKET =
+  "patient-documents";
 
-async function loadPatientNotes(){const box=document.getElementById("patientNotesList"),r=await db.from("patient_notes").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});if(r.error){box.innerText=r.error.message;return}box.innerHTML=r.data.map(n=>`<div class="note-card"><h3>${esc(n.title||"Nota")}</h3><p>${esc(n.content)}</p><small>${new Date(n.created_at).toLocaleDateString("it-IT")}</small><br><button class="danger no-print" style="margin-top:8px" onclick="deleteNote('${n.id}')">Elimina</button></div>`).join("")||"Nessuna nota."}
-savePatientNoteButton.onclick=async()=>{const content=patientNoteContent.value.trim();if(!content)return;const r=await db.from("patient_notes").insert({patient_id:currentPatient.id,title:patientNoteTitle.value.trim()||"Nota",content});if(r.error)return msg("patientNoteMessage",r.error.message,"error");patientNoteTitle.value=patientNoteContent.value="";await loadPatientNotes()}
-async function deleteNote(id){if(!confirm("Eliminare nota?"))return;await db.from("patient_notes").delete().eq("id",id);await loadPatientNotes()}
+const LOGO_PATH =
+  "logo-noceto-lab.PNG";
 
-generateRunningPlanButton.onclick=()=>{const w=+runningWeeks.value||4,s=+runningSessionsPerWeek.value||3;let h='<table class="running-table"><thead><tr><th>Settimana</th>';for(let j=1;j<=s;j++)h+=`<th>Sessione ${j}</th>`;h+='</tr></thead><tbody>';for(let i=1;i<=w;i++){h+=`<tr><td><b>Settimana ${i}</b></td>`;for(let j=1;j<=s;j++)h+=`<td><div class="session-box"><label>Tipologia</label><select id="run_type_${i}_${j}"><option>Corsa Continua</option><option>Ripetute</option><option>Fartlek</option><option>Corsa + Camminata</option><option>Camminata</option><option>Riscaldamento / Defaticamento</option></select><label>Durata (min)</label><input id="run_dur_${i}_${j}" type="number"><label>RPE</label><select id="run_rpe_${i}_${j}"><option value="">-</option><option>1-3</option><option>4-6</option><option>7-8</option><option>9-10</option></select><label>Note</label><textarea id="run_notes_${i}_${j}" rows="2"></textarea></div></td>`;h+='</tr>'}h+='</tbody></table>';runningPlanner.innerHTML=h;saveRunningProgramButton.classList.remove("hidden")}
-saveRunningProgramButton.onclick=async()=>{const w=+runningWeeks.value,s=+runningSessionsPerWeek.value,data=[];for(let i=1;i<=w;i++){const sessions=[];for(let j=1;j<=s;j++)sessions.push({type:document.getElementById(`run_type_${i}_${j}`).value,duration:document.getElementById(`run_dur_${i}_${j}`).value,rpe:document.getElementById(`run_rpe_${i}_${j}`).value,notes:document.getElementById(`run_notes_${i}_${j}`).value});data.push({week:i,sessions})}const r=await db.from("running_plans").insert({patient_id:currentPatient.id,weeks_count:w,sessions_per_week:s,plan_data:data});if(r.error)return msg("runningMessage",r.error.message,"error");msg("runningMessage","Programma salvato.","success");await loadRunningPlans()}
-async function loadRunningPlans(){const box=document.getElementById("runningPlansList"),r=await db.from("running_plans").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});if(r.error){box.innerText=r.error.message;return}box.innerHTML=r.data.map(p=>`<div class="card"><b>Programma ${new Date(p.created_at).toLocaleDateString("it-IT")}</b><pre style="white-space:pre-wrap">${esc(JSON.stringify(p.plan_data,null,2))}</pre><button class="danger no-print" onclick="deleteRunning('${p.id}')">Elimina</button></div>`).join("")||"Nessun programma."}
-async function deleteRunning(id){if(!confirm("Eliminare?"))return;await db.from("running_plans").delete().eq("id",id);await loadRunningPlans()}
 
-async function loadPatientPortal(){
- const ex=await db.from("patient_exercises").select("*,exercises(*)").eq("patient_id",currentPatient.id);patientPortalExercises.innerHTML=(ex.data||[]).map(i=>`<div class="exercise"><h3>${esc(i.exercises?.name||"Esercizio")}</h3><p>${esc(i.exercises?.description||"")}</p><p>Serie: <b>${i.sets??"-"}</b> | Rep: <b>${i.reps??"-"}</b> | Durata: <b>${i.duration??"-"}s</b> | Recupero: <b>${i.rest??"-"}s</b></p>${i.notes?`<p><b>Note:</b> ${esc(i.notes)}</p>`:""}${i.exercises?.video_url?`<a href="${esc(i.exercises.video_url)}" target="_blank">🎥 Guarda video</a>`:""}</div>`).join("")||"Nessun esercizio.";
- const d=await db.from("patient_documents").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});patientPortalDocuments.innerHTML=(d.data||[]).map(x=>{const u=db.storage.from(DOCUMENT_BUCKET).getPublicUrl(x.file_path).data.publicUrl;return `<div class="document"><h3>📄 ${esc(x.file_name)}</h3><a href="${u}" target="_blank">Visualizza PDF</a></div>`}).join("")||"Nessun report.";
- const n=await db.from("patient_notes").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});patientPortalNotes.innerHTML=(n.data||[]).map(x=>`<div class="note-card"><h3>${esc(x.title)}</h3><p>${esc(x.content)}</p></div>`).join("")||"Nessuna nota.";
- const p=await db.from("running_plans").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});patientPortalRunning.innerHTML=(p.data||[]).map(x=>`<div class="card"><b>Programma del ${new Date(x.created_at).toLocaleDateString("it-IT")}</b><pre style="white-space:pre-wrap">${esc(JSON.stringify(x.plan_data,null,2))}</pre></div>`).join("")||"Nessun programma.";
+/* =========================================================
+   VARIABILI GLOBALI
+========================================================= */
+
+let currentUser = null;
+
+let currentPatient = null;
+
+
+/* =========================================================
+   PAGINE
+========================================================= */
+
+const pages = [
+  "loginPage",
+  "setPasswordPage",
+  "therapistPage",
+  "patientPage",
+  "newPatientPage",
+  "newExercisePage",
+  "patientPortal"
+];
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+async function getLogoUrl() {
+
+  const result =
+    await db
+      .storage
+      .from(DOCUMENT_BUCKET)
+      .createSignedUrl(
+        LOGO_PATH,
+        3600
+      );
+
+  if(result.error) {
+
+    console.error(
+      "Errore caricamento logo:",
+      result.error
+    );
+
+    return "";
+
+  }
+
+  return result.data.signedUrl;
+
 }
 
-newPatientButton.onclick=()=>showPage("newPatientPage");cancelPatient.onclick=()=>showPage("therapistPage");
-savePatient.onclick=async()=>{
- const name=newPatientName.value.trim(),email=newPatientEmail.value.trim(),password=newPatientPassword.value;
- if(!name||!email||password.length<6)return msg("patientMessage","Inserisci nome, email e password temporanea di almeno 6 caratteri.","error");
- const {data:{session}}=await db.auth.getSession();if(!session)return msg("patientMessage","Sessione non valida.","error");
- const r=await fetch(SUPABASE_URL+"/functions/v1/create-patient",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({name,email,password})});
- const j=await r.json().catch(()=>({}));if(!r.ok)return msg("patientMessage",j.error||"Errore nella creazione del paziente.","error");
- newPatientName.value=newPatientEmail.value=newPatientPassword.value="";showPage("therapistPage");await loadPatients();
+
+async function loadLogo() {
+
+  const logoUrl =
+    await getLogoUrl();
+
+  if(!logoUrl) return;
+
+  const logo =
+    document.getElementById("siteLogo");
+
+  if(logo) {
+    logo.src = logoUrl;
+  }
+
+  const favicon =
+    document.getElementById("favicon");
+
+  if(favicon) {
+    favicon.href = logoUrl;
+  }
+
 }
 
-backButton.onclick=()=>showPage("therapistPage");
-function triggerPrint(name,id,title){const c=document.getElementById(id),p=document.getElementById("printSheet");const clone=c.cloneNode(true);clone.querySelectorAll(".no-print").forEach(x=>x.remove());p.innerHTML=`<div style="font-family:Arial;padding:20px"><div style="display:flex;justify-content:space-between;border-bottom:2px solid #0b192c;padding-bottom:12px"><div><h1>Noceto Lab</h1><p>Fisioterapia & Performance</p></div><img src="https://eutcpxmnrzisssddefau.supabase.co/storage/v1/object/sign/patient-documents/logo-noceto-lab.PNG" style="height:55px"></div><h2>${title}: ${esc(name)}</h2>${clone.innerHTML}</div>`;window.print()}
-printExerciseSheetButton.onclick=()=>triggerPrint(currentPatient.name,"patientExercises","Scheda Esercizi");
-patientPrintExerciseSheetButton.onclick=()=>triggerPrint(currentPatient.name,"patientPortalExercises","Scheda Esercizi");
-printRunningSheetButton.onclick=()=>triggerPrint(currentPatient.name,"runningPlansList","Programma Corsa");
-patientPrintRunningButton.onclick=()=>triggerPrint(currentPatient.name,"patientPortalRunning","Programma Corsa");
 
-window.addEventListener("DOMContentLoaded",startApp);
+/* =========================================================
+   TABS
+========================================================= */
+
+function setupSectionTabs(containerId) {
+
+  const container =
+    document.getElementById(containerId);
+
+  if(!container) return;
+
+  const buttons =
+    container.querySelectorAll(".section-tab");
+
+  buttons.forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        buttons.forEach(
+          b =>
+            b.classList.remove("active")
+        );
+
+        button.classList.add("active");
+
+        const targetId =
+          button.dataset.target;
+
+        const section =
+          document.getElementById(
+            targetId
+          );
+
+        if(!section) return;
+
+        const root =
+          container.closest("section");
+
+        root
+          .querySelectorAll(".tab-panel")
+          .forEach(
+            panel =>
+              panel.classList.add(
+                "hidden-panel"
+              )
+          );
+
+        section.classList.remove(
+          "hidden-panel"
+        );
+
+        if(
+          containerId ===
+          "therapistPatientTabs"
+        ) {
+
+          const assignPanel =
+            document.getElementById(
+              "therapistTabProgramAssign"
+            );
+
+          if(assignPanel) {
+
+            assignPanel.classList.toggle(
+              "hidden-panel",
+              targetId !==
+              "therapistTabProgram"
+            );
+
+          }
+
+        }
+
+      }
+    );
+
+  });
+
+  if(buttons[0]) {
+    buttons[0].click();
+  }
+
+}
+
+
+setupSectionTabs(
+  "therapistPatientTabs"
+);
+
+setupSectionTabs(
+  "patientPortalTabs"
+);
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function showPage(pageId) {
+
+  pages.forEach(id => {
+
+    const element =
+      document.getElementById(id);
+
+    if(element) {
+      element.classList.add("hidden");
+    }
+
+  });
+
+  document
+    .getElementById(pageId)
+    .classList.remove("hidden");
+
+}
+
+
+function showMessage(
+  id,
+  text,
+  type
+) {
+
+  const element =
+    document.getElementById(id);
+
+  if(!element) return;
+
+  element.innerText = text;
+
+  element.className =
+    "message " + type;
+
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+document
+  .getElementById("loginButton")
+  .addEventListener(
+    "click",
+    login
+  );
+
+
+async function login() {
+
+  const email =
+    document
+      .getElementById("email")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("password")
+      .value;
+
+  if(!email || !password) {
+
+    showMessage(
+      "loginMessage",
+      "Inserisci email e password.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const result =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(result.error) {
+
+    showMessage(
+      "loginMessage",
+      result.error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+  currentUser =
+    result.data.user;
+
+  const profileResult =
+    await db
+      .from("profiles")
+      .select(
+        "role, must_change_password"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+  if(
+    profileResult.error ||
+    !profileResult.data
+  ) {
+
+    await db.auth.signOut();
+
+    currentUser = null;
+
+    showMessage(
+      "loginMessage",
+      "Errore nel caricamento del profilo.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(
+    profileResult.data.role ===
+      "patient" &&
+    profileResult.data.must_change_password ===
+      true
+  ) {
+
+    showPage(
+      "setPasswordPage"
+    );
+
+    return;
+
+  }
+
+  await startApp();
+
+}
+
+
+/* =========================================================
+   RECOVERY
+========================================================= */
+
+async function checkRecoverySession() {
+
+  const hash =
+    window.location.hash;
+
+  if(
+    hash &&
+    (
+      hash.includes(
+        "type=recovery"
+      ) ||
+      hash.includes(
+        "access_token="
+      )
+    )
+  ) {
+
+    const result =
+      await db.auth.getSession();
+
+    if(
+      result.data &&
+      result.data.session
+    ) {
+
+      currentUser =
+        result.data.session.user;
+
+      showPage(
+        "setPasswordPage"
+      );
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+document
+  .getElementById(
+    "savePasswordButton"
+  )
+  .addEventListener(
+    "click",
+    saveNewPassword
+  );
+
+
+async function saveNewPassword() {
+
+  const password =
+    document
+      .getElementById(
+        "newPassword"
+      )
+      .value;
+
+  const confirmation =
+    document
+      .getElementById(
+        "confirmPassword"
+      )
+      .value;
+
+  if(
+    !password ||
+    !confirmation ||
+    password !== confirmation ||
+    password.length < 6
+  ) {
+
+    showMessage(
+      "passwordMessage",
+      "Le password devono coincidere ed essere di almeno 6 caratteri.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const result =
+    await db.auth.updateUser({
+      password
+    });
+
+  if(result.error) {
+
+    showMessage(
+      "passwordMessage",
+      result.error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+  currentUser =
+    result.data.user;
+
+  await db
+    .from("profiles")
+    .update({
+      must_change_password:
+        false
+    })
+    .eq(
+      "id",
+      currentUser.id
+    );
+
+  showMessage(
+    "passwordMessage",
+    "Password salvata con successo!",
+    "success"
+  );
+
+  setTimeout(
+    async () => {
+      await startApp();
+    },
+    700
+  );
+
+}
+
+
+/* =========================================================
+   START APP
+========================================================= */
+
+async function startApp() {
+
+  const result =
+    await db.auth.getUser();
+
+  if(result.error) {
+
+    showPage(
+      "loginPage"
+    );
+
+    return;
+
+  }
+
+  currentUser =
+    result.data.user;
+
+  document
+    .getElementById(
+      "logoutButton"
+    )
+    .classList.remove("hidden");
+
+  const profileResult =
+    await db
+      .from("profiles")
+      .select(
+        "role, must_change_password"
+      )
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .single();
+
+  if(profileResult.error)
+    return;
+
+  const role =
+    profileResult.data.role;
+
+  if(
+    role === "patient" &&
+    profileResult.data.must_change_password
+  ) {
+
+    showPage(
+      "setPasswordPage"
+    );
+
+    return;
+
+  }
+
+  if(role === "therapist") {
+
+    await startTherapist();
+
+  }
+  else if(role === "patient") {
+
+    await startPatient();
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+document
+  .getElementById(
+    "logoutButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      await db.auth.signOut();
+
+      currentUser = null;
+
+      currentPatient = null;
+
+      document
+        .getElementById(
+          "logoutButton"
+        )
+        .classList.add("hidden");
+
+      showPage(
+        "loginPage"
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   TERAPISTA
+========================================================= */
+
+async function startTherapist() {
+
+  showPage(
+    "therapistPage"
+  );
+
+  await loadPatients();
+
+  await loadExerciseLibrary();
+
+}
+
+
+/* =========================================================
+   PAZIENTE
+========================================================= */
+
+async function startPatient() {
+
+  const result =
+    await db
+      .from("patients")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+  if(
+    result.error ||
+    !result.data
+  ) {
+
+    alert(
+      "Profilo paziente non trovato."
+    );
+
+    return;
+
+  }
+
+  currentPatient =
+    result.data;
+
+  document
+    .getElementById(
+      "patientWelcome"
+    )
+    .innerText =
+      "Ciao " +
+      currentPatient.name +
+      " 👋";
+
+  showPage(
+    "patientPortal"
+  );
+
+  await loadPatientPortal();
+
+}
+
+
+/* =========================================================
+   PAZIENTI
+========================================================= */
+
+async function loadPatients() {
+
+  const list =
+    document.getElementById(
+      "patientsList"
+    );
+
+  list.innerHTML =
+    "Caricamento...";
+
+  const result =
+    await db
+      .from("patients")
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending:true
+        }
+      );
+
+  if(
+    result.error ||
+    !result.data
+  ) {
+
+    list.innerHTML =
+      "Errore o nessun paziente presente.";
+
+    return;
+
+  }
+
+  list.innerHTML = "";
+
+  result.data.forEach(
+    patient => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "patient";
+
+      div.innerHTML = `
+
+        <strong>
+          👤 ${escapeHtml(patient.name)}
+        </strong>
+
+        <br><br>
+
+        <small>
+          Apri Scheda Clinica →
+        </small>
+
+      `;
+
+      div.addEventListener(
+        "click",
+        () => openPatient(patient)
+      );
+
+      list.appendChild(div);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   APRI PAZIENTE
+========================================================= */
+
+async function openPatient(patient) {
+
+  currentPatient =
+    patient;
+
+  document
+    .getElementById(
+      "patientTitle"
+    )
+    .innerText =
+      "👤 " +
+      patient.name;
+
+  showPage(
+    "patientPage"
+  );
+
+  await loadExercises();
+
+  await loadPatientExercises();
+
+  await loadPatientDocuments();
+
+  await loadPatientNotes();
+
+  await loadRunningPlans();
+
+}
+
+
+/* =========================================================
+   NUOVO PAZIENTE
+========================================================= */
+
+document
+  .getElementById(
+    "newPatientButton"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      showPage(
+        "newPatientPage"
+      )
+  );
+
+
+document
+  .getElementById(
+    "cancelPatient"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      showPage(
+        "therapistPage"
+      )
+  );
+
+
+document
+  .getElementById(
+    "savePatient"
+  )
+  .addEventListener(
+    "click",
+    createPatient
+  );
+
+
+async function createPatient() {
+
+  const name =
+    document
+      .getElementById(
+        "newPatientName"
+      )
+      .value
+      .trim();
+
+  const email =
+    document
+      .getElementById(
+        "newPatientEmail"
+      )
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById(
+        "newPatientPassword"
+      )
+      .value
+      .trim();
+
+  if(
+    !name ||
+    !email ||
+    !password
+  ) {
+
+    showMessage(
+      "patientMessage",
+      "Compila tutti i campi.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  /*
+    IMPORTANTE:
+
+    Questo endpoint deve essere una
+    Supabase Edge Function.
+
+    NON inserire mai la service_role key
+    dentro questo file.
+  */
+
+  try {
+
+    const sessionResult =
+      await db.auth.getSession();
+
+    const token =
+      sessionResult
+        .data
+        .session
+        ?.access_token;
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/functions/v1/create-patient",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " + token
+          },
+
+          body:JSON.stringify({
+            name,
+            email,
+            password
+          })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok) {
+
+      throw new Error(
+        data.error ||
+        "Errore nella creazione del paziente."
+      );
+
+    }
+
+    showMessage(
+      "patientMessage",
+      "Paziente creato correttamente.",
+      "success"
+    );
+
+    document
+      .getElementById(
+        "newPatientName"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "newPatientEmail"
+      )
+      .value = "";
+
+    await loadPatients();
+
+  }
+  catch(error) {
+
+    showMessage(
+      "patientMessage",
+      error.message,
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ESERCIZI LIBRERIA
+========================================================= */
+
+async function loadExercises() {
+
+  const select =
+    document.getElementById(
+      "exerciseSelect"
+    );
+
+  select.innerHTML =
+    '<option value="">Seleziona esercizio</option>';
+
+  const result =
+    await db
+      .from("exercises")
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending:true
+        }
+      );
+
+  if(
+    result.error ||
+    !result.data
+  )
+    return;
+
+  result.data.forEach(
+    ex => {
+
+      const opt =
+        document.createElement(
+          "option"
+        );
+
+      opt.value =
+        ex.id;
+
+      opt.textContent =
+        ex.name;
+
+      select.appendChild(
+        opt
+      );
+
+    }
+  );
+
+}
+
+
+async function loadExerciseLibrary() {
+
+  const container =
+    document.getElementById(
+      "exerciseLibrary"
+    );
+
+  container.innerHTML =
+    "Caricamento...";
+
+  const result =
+    await db
+      .from("exercises")
+      .select("*")
+      .order(
+        "name",
+        {
+          ascending:true
+        }
+      );
+
+  if(
+    result.error ||
+    !result.data ||
+    result.data.length === 0
+  ) {
+
+    container.innerText =
+      "Nessun esercizio salvato.";
+
+    return;
+
+  }
+
+  container.innerHTML = "";
+
+  result.data.forEach(
+    ex => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "exercise";
+
+      div.innerHTML = `
+
+        <h3>
+          ${escapeHtml(ex.name)}
+        </h3>
+
+        ${
+          ex.description
+          ?
+          `<p style="font-size:13px;color:var(--text-muted);">
+            ${escapeHtml(ex.description)}
+          </p>`
+          :
+          ""
+        }
+
+        ${
+          ex.video_url
+          ?
+          `<p class="video">
+            <a
+              href="${escapeAttribute(ex.video_url)}"
+              target="_blank"
+              rel="noopener"
+            >
+              🎥 Dimostrazione Video
+            </a>
+          </p>`
+          :
+          ""
+        }
+
+        <div class="actions">
+
+          <button
+            class="edit"
+            onclick="showExerciseEdit('${ex.id}')"
+          >
+            ✏️ Modifica
+          </button>
+
+          <button
+            class="danger"
+            onclick="deleteExercise('${ex.id}')"
+          >
+            🗑️ Elimina
+          </button>
+
+        </div>
+
+        <div
+          id="exerciseEdit_${ex.id}"
+          class="edit-box hidden"
+        >
+
+          <label>Nome</label>
+
+          <input
+            id="editExName_${ex.id}"
+            value="${escapeAttribute(ex.name || "")}"
+          >
+
+          <label>Descrizione</label>
+
+          <textarea
+            id="editExDescription_${ex.id}"
+          >${escapeHtml(ex.description || "")}</textarea>
+
+          <label>Video</label>
+
+          <input
+            id="editExVideo_${ex.id}"
+            value="${escapeAttribute(ex.video_url || "")}"
+          >
+
+          <br>
+
+          <div class="actions">
+
+            <button
+              class="primary"
+              onclick="updateExercise('${ex.id}')"
+            >
+              💾 Salva modifiche
+            </button>
+
+            <button
+              class="secondary"
+              onclick="hideExerciseEdit('${ex.id}')"
+            >
+              Annulla
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+function showExerciseEdit(id) {
+
+  const box =
+    document.getElementById(
+      "exerciseEdit_" + id
+    );
+
+  if(box)
+    box.classList.remove(
+      "hidden"
+    );
+
+}
+
+
+function hideExerciseEdit(id) {
+
+  const box =
+    document.getElementById(
+      "exerciseEdit_" + id
+    );
+
+  if(box)
+    box.classList.add(
+      "hidden"
+    );
+
+}
+
+
+async function updateExercise(id) {
+
+  const name =
+    document
+      .getElementById(
+        "editExName_" + id
+      )
+      .value
+      .trim();
+
+  const description =
+    document
+      .getElementById(
+        "editExDescription_" + id
+      )
+      .value
+      .trim();
+
+  const video =
+    document
+      .getElementById(
+        "editExVideo_" + id
+      )
+      .value
+      .trim();
+
+  if(!name) {
+
+    alert(
+      "Inserisci il nome dell'esercizio."
+    );
+
+    return;
+
+  }
+
+  const result =
+    await db
+      .from("exercises")
+      .update({
+        name,
+        description:
+          description || null,
+        video_url:
+          video || null
+      })
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      "Errore: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadExerciseLibrary();
+
+  await loadExercises();
+
+}
+
+
+async function deleteExercise(id) {
+
+  if(
+    !confirm(
+      "Confermi l'eliminazione dell'esercizio?"
+    )
+  )
+    return;
+
+  const result =
+    await db
+      .from("exercises")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      "Errore: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadExerciseLibrary();
+
+  await loadExercises();
+
+}
+
+
+/* =========================================================
+   NUOVO ESERCIZIO
+========================================================= */
+
+document
+  .getElementById(
+    "newExerciseButton"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      showPage(
+        "newExercisePage"
+      )
+  );
+
+
+document
+  .getElementById(
+    "cancelExercise"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      showPage(
+        "therapistPage"
+      )
+  );
+
+
+document
+  .getElementById(
+    "saveExercise"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const name =
+        document
+          .getElementById(
+            "exerciseName"
+          )
+          .value
+          .trim();
+
+      const description =
+        document
+          .getElementById(
+            "exerciseDescription"
+          )
+          .value
+          .trim();
+
+      const video =
+        document
+          .getElementById(
+            "exerciseVideo"
+          )
+          .value
+          .trim();
+
+      if(!name) {
+
+        showMessage(
+          "exerciseMessage",
+          "Inserisci il nome dell'esercizio.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const result =
+        await db
+          .from("exercises")
+          .insert([{
+            name,
+            description:
+              description || null,
+            video_url:
+              video || null
+          }]);
+
+      if(result.error) {
+
+        showMessage(
+          "exerciseMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+      showMessage(
+        "exerciseMessage",
+        "Esercizio salvato.",
+        "success"
+      );
+
+      document
+        .getElementById(
+          "exerciseName"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "exerciseDescription"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "exerciseVideo"
+        )
+        .value = "";
+
+      await loadExerciseLibrary();
+
+      await loadExercises();
+
+    }
+  );
+
+
+/* =========================================================
+   ESERCIZI ASSEGNATI
+========================================================= */
+
+async function loadPatientExercises() {
+
+  const container =
+    document.getElementById(
+      "patientExercises"
+    );
+
+  container.innerHTML =
+    "Caricamento...";
+
+  const result =
+    await db
+      .from("patient_exercises")
+      .select(
+        "*, exercises(*)"
+      )
+      .eq(
+        "patient_id",
+        currentPatient.id
+      );
+
+  if(
+    result.error ||
+    !result.data ||
+    result.data.length === 0
+  ) {
+
+    container.innerText =
+      "Nessun esercizio assegnato.";
+
+    return;
+
+  }
+
+  container.innerHTML = "";
+
+  result.data.forEach(
+    item => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "exercise";
+
+      const exName =
+        item.exercises
+        ? item.exercises.name
+        : "Esercizio";
+
+      div.innerHTML = `
+
+        <h3>
+          ${escapeHtml(exName)}
+        </h3>
+
+        <p style="font-size:14px;">
+          <strong>Parametri:</strong>
+
+          ${
+            item.sets
+            ? `<strong>${item.sets}</strong> serie`
+            : ""
+          }
+
+          ${
+            item.reps
+            ? ` | <strong>${item.reps}</strong> rep`
+            : ""
+          }
+
+          ${
+            item.duration
+            ? ` | <strong>${item.duration}s</strong> tempo`
+            : ""
+          }
+
+          ${
+            item.rest
+            ? ` | <strong>${item.rest}s</strong> rec`
+            : ""
+          }
+
+        </p>
+
+        ${
+          item.notes
+          ?
+          `<p style="font-size:13px;color:var(--text-muted);">
+            <strong>Note:</strong>
+            ${escapeHtml(item.notes)}
+          </p>`
+          :
+          ""
+        }
+
+
+        <div class="actions no-print">
+
+          <button
+            class="edit"
+            onclick="showAssignedEdit('${item.id}')"
+          >
+            ✏️ Modifica
+          </button>
+
+          <button
+            class="danger"
+            onclick="removeAssignedExercise('${item.id}')"
+          >
+            🗑️ Rimuovi
+          </button>
+
+        </div>
+
+
+        <div
+          id="assignedEdit_${item.id}"
+          class="edit-box hidden"
+        >
+
+          <div class="grid">
+
+            <div>
+
+              <label>Serie</label>
+
+              <input
+                id="editSets_${item.id}"
+                type="number"
+                min="0"
+                value="${item.sets ?? ""}"
+              >
+
+            </div>
+
+            <div>
+
+              <label>Ripetizioni</label>
+
+              <input
+                id="editReps_${item.id}"
+                type="number"
+                min="0"
+                value="${item.reps ?? ""}"
+              >
+
+            </div>
+
+            <div>
+
+              <label>Durata (sec)</label>
+
+              <input
+                id="editDuration_${item.id}"
+                type="number"
+                min="0"
+                value="${item.duration ?? ""}"
+              >
+
+            </div>
+
+            <div>
+
+              <label>Recupero (sec)</label>
+
+              <input
+                id="editRest_${item.id}"
+                type="number"
+                min="0"
+                value="${item.rest ?? ""}"
+              >
+
+            </div>
+
+          </div>
+
+
+          <label>
+            Note operative
+          </label>
+
+          <textarea
+            id="editNotes_${item.id}"
+          >${escapeHtml(item.notes || "")}</textarea>
+
+          <br>
+
+          <div class="actions">
+
+            <button
+              class="primary"
+              onclick="updateAssignedExercise('${item.id}')"
+            >
+              💾 Salva modifiche
+            </button>
+
+            <button
+              class="secondary"
+              onclick="hideAssignedEdit('${item.id}')"
+            >
+              Annulla
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+function showAssignedEdit(id) {
+
+  const box =
+    document.getElementById(
+      "assignedEdit_" + id
+    );
+
+  if(box)
+    box.classList.remove(
+      "hidden"
+    );
+
+}
+
+
+function hideAssignedEdit(id) {
+
+  const box =
+    document.getElementById(
+      "assignedEdit_" + id
+    );
+
+  if(box)
+    box.classList.add(
+      "hidden"
+    );
+
+}
+
+
+async function updateAssignedExercise(id) {
+
+  const sets =
+    document
+      .getElementById(
+        "editSets_" + id
+      )
+      .value;
+
+  const reps =
+    document
+      .getElementById(
+        "editReps_" + id
+      )
+      .value;
+
+  const duration =
+    document
+      .getElementById(
+        "editDuration_" + id
+      )
+      .value;
+
+  const rest =
+    document
+      .getElementById(
+        "editRest_" + id
+      )
+      .value;
+
+  const notes =
+    document
+      .getElementById(
+        "editNotes_" + id
+      )
+      .value
+      .trim();
+
+  const result =
+    await db
+      .from("patient_exercises")
+      .update({
+
+        sets:
+          sets !== ""
+          ? parseInt(sets)
+          : null,
+
+        reps:
+          reps !== ""
+          ? parseInt(reps)
+          : null,
+
+        duration:
+          duration !== ""
+          ? parseInt(duration)
+          : null,
+
+        rest:
+          rest !== ""
+          ? parseInt(rest)
+          : null,
+
+        notes:
+          notes || null
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      "Errore: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadPatientExercises();
+
+}
+
+
+document
+  .getElementById(
+    "assignButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const exerciseId =
+        document
+          .getElementById(
+            "exerciseSelect"
+          )
+          .value;
+
+      const sets =
+        document
+          .getElementById(
+            "sets"
+          )
+          .value;
+
+      const reps =
+        document
+          .getElementById(
+            "reps"
+          )
+          .value;
+
+      const duration =
+        document
+          .getElementById(
+            "duration"
+          )
+          .value;
+
+      const rest =
+        document
+          .getElementById(
+            "rest"
+          )
+          .value;
+
+      const notes =
+        document
+          .getElementById(
+            "notes"
+          )
+          .value
+          .trim();
+
+      if(!exerciseId) {
+
+        showMessage(
+          "assignMessage",
+          "Seleziona un esercizio.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const result =
+        await db
+          .from("patient_exercises")
+          .insert([{
+
+            patient_id:
+              currentPatient.id,
+
+            exercise_id:
+              exerciseId,
+
+            sets:
+              sets
+              ? parseInt(sets)
+              : null,
+
+            reps:
+              reps
+              ? parseInt(reps)
+              : null,
+
+            duration:
+              duration
+              ? parseInt(duration)
+              : null,
+
+            rest:
+              rest
+              ? parseInt(rest)
+              : null,
+
+            notes:
+              notes || null
+
+          }]);
+
+      if(result.error) {
+
+        showMessage(
+          "assignMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+      showMessage(
+        "assignMessage",
+        "Esercizio assegnato.",
+        "success"
+      );
+
+      await loadPatientExercises();
+
+    }
+  );
+
+
+async function removeAssignedExercise(id) {
+
+  if(
+    !confirm(
+      "Cancellare questo esercizio dal paziente?"
+    )
+  )
+    return;
+
+  const result =
+    await db
+      .from("patient_exercises")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      "Errore: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadPatientExercises();
+
+}
+
+
+/* =========================================================
+   DOCUMENTI
+========================================================= */
+
+async function loadPatientDocuments() {
+
+  const container =
+    document.getElementById(
+      "patientDocuments"
+    );
+
+  container.innerHTML =
+    "Caricamento...";
+
+  const result =
+    await db
+      .from("patient_documents")
+      .select("*")
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(
+    result.error ||
+    !result.data ||
+    result.data.length === 0
+  ) {
+
+    container.innerText =
+      "Nessun documento inserito.";
+
+    return;
+
+  }
+
+  container.innerHTML = "";
+
+  result.data.forEach(
+    doc => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "document";
+
+      div.innerHTML = `
+
+        <h3>
+          📄 ${escapeHtml(doc.file_name)}
+        </h3>
+
+        <p>
+          <a
+            href="#"
+            onclick="openDocument('${escapeAttribute(doc.file_path)}');return false;"
+          >
+            Visualizza Referto PDF
+          </a>
+        </p>
+
+        <div class="actions no-print">
+
+          <button
+            class="danger"
+            onclick="deleteDocument('${doc.id}','${escapeAttribute(doc.file_path)}')"
+          >
+            🗑️ Elimina
+          </button>
+
+        </div>
+
+      `;
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+async function openDocument(path) {
+
+  const result =
+    await db
+      .storage
+      .from(DOCUMENT_BUCKET)
+      .createSignedUrl(
+        path,
+        3600
+      );
+
+  if(result.error) {
+
+    alert(
+      "Impossibile aprire il documento."
+    );
+
+    return;
+
+  }
+
+  window.open(
+    result.data.signedUrl,
+    "_blank"
+  );
+
+}
+
+
+document
+  .getElementById(
+    "uploadDocumentButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const fileInput =
+        document.getElementById(
+          "documentFile"
+        );
+
+      const file =
+        fileInput.files[0];
+
+      if(!file) {
+
+        showMessage(
+          "documentMessage",
+          "Seleziona un PDF.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(
+        file.type !==
+        "application/pdf"
+      ) {
+
+        showMessage(
+          "documentMessage",
+          "Sono ammessi solo PDF.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const fileName =
+        currentPatient.id +
+        "/" +
+        Date.now() +
+        "_" +
+        file.name;
+
+      const uploadResult =
+        await db
+          .storage
+          .from(DOCUMENT_BUCKET)
+          .upload(
+            fileName,
+            file
+          );
+
+      if(uploadResult.error) {
+
+        showMessage(
+          "documentMessage",
+          uploadResult.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+      const dbResult =
+        await db
+          .from("patient_documents")
+          .insert([{
+
+            patient_id:
+              currentPatient.id,
+
+            file_name:
+              file.name,
+
+            file_path:
+              fileName
+
+          }]);
+
+      if(dbResult.error) {
+
+        showMessage(
+          "documentMessage",
+          dbResult.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+      fileInput.value = "";
+
+      showMessage(
+        "documentMessage",
+        "PDF caricato correttamente.",
+        "success"
+      );
+
+      await loadPatientDocuments();
+
+    }
+  );
+
+
+async function deleteDocument(
+  id,
+  filePath
+) {
+
+  if(
+    !confirm(
+      "Eliminare il PDF selezionato?"
+    )
+  )
+    return;
+
+  await db
+    .storage
+    .from(DOCUMENT_BUCKET)
+    .remove([
+      filePath
+    ]);
+
+  const result =
+    await db
+      .from("patient_documents")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadPatientDocuments();
+
+}
+
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+async function loadPatientNotes() {
+
+  const container =
+    document.getElementById(
+      "patientNotesList"
+    );
+
+  container.innerHTML =
+    "Caricamento...";
+
+  const result =
+    await db
+      .from("patient_notes")
+      .select("*")
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(
+    result.error ||
+    !result.data ||
+    result.data.length === 0
+  ) {
+
+    container.innerText =
+      "Nessuna nota presente.";
+
+    return;
+
+  }
+
+  container.innerHTML = "";
+
+  result.data.forEach(
+    note => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "note-card";
+
+      const date =
+        new Date(
+          note.created_at
+        ).toLocaleDateString(
+          "it-IT"
+        );
+
+      div.innerHTML = `
+
+        <h3>
+
+          ${escapeHtml(
+            note.title || "Nota"
+          )}
+
+          <small>
+            (${date})
+          </small>
+
+        </h3>
+
+        <p>
+          ${escapeHtml(
+            note.content
+          )}
+        </p>
+
+        <button
+          class="danger no-print"
+          onclick="deletePatientNote('${note.id}')"
+        >
+          Elimina
+        </button>
+
+      `;
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+document
+  .getElementById(
+    "savePatientNoteButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const title =
+        document
+          .getElementById(
+            "patientNoteTitle"
+          )
+          .value
+          .trim();
+
+      const content =
+        document
+          .getElementById(
+            "patientNoteContent"
+          )
+          .value
+          .trim();
+
+      if(!content) {
+
+        showMessage(
+          "patientNoteMessage",
+          "Inserisci il contenuto della nota.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const result =
+        await db
+          .from("patient_notes")
+          .insert([{
+
+            patient_id:
+              currentPatient.id,
+
+            title:
+              title || "Nota",
+
+            content
+
+          }]);
+
+      if(result.error) {
+
+        showMessage(
+          "patientNoteMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+      document
+        .getElementById(
+          "patientNoteTitle"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "patientNoteContent"
+        )
+        .value = "";
+
+      await loadPatientNotes();
+
+    }
+  );
+
+
+async function deletePatientNote(id) {
+
+  if(
+    !confirm(
+      "Cancellare nota?"
+    )
+  )
+    return;
+
+  const result =
+    await db
+      .from("patient_notes")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadPatientNotes();
+
+}
+
+
+/* =========================================================
+   CORSA
+========================================================= */
+
+function toggleIntervalInputs(
+  w,
+  s
+) {
+
+  const typeVal =
+    document
+      .getElementById(
+        `run_type_${w}_${s}`
+      )
+      .value;
+
+  const intervalBox =
+    document.getElementById(
+      `interval_box_${w}_${s}`
+    );
+
+  const labelFast =
+    document.getElementById(
+      `label_fast_${w}_${s}`
+    );
+
+  const labelSlow =
+    document.getElementById(
+      `label_slow_${w}_${s}`
+    );
+
+  if(
+    typeVal === "Ripetute"
+  ) {
+
+    intervalBox.classList.remove(
+      "hidden"
+    );
+
+    labelFast.innerText =
+      "Corsa Veloce";
+
+    labelSlow.innerText =
+      "Recupero";
+
+  }
+  else if(
+    typeVal ===
+    "Corsa + Camminata"
+  ) {
+
+    intervalBox.classList.remove(
+      "hidden"
+    );
+
+    labelFast.innerText =
+      "Tempo Corsa";
+
+    labelSlow.innerText =
+      "Tempo Camminata";
+
+  }
+  else {
+
+    intervalBox.classList.add(
+      "hidden"
+    );
+
+  }
+
+}
+
+
+document
+  .getElementById(
+    "generateRunningPlanButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const weeks =
+        parseInt(
+          document
+            .getElementById(
+              "runningWeeks"
+            )
+            .value
+        ) || 4;
+
+      const sessions =
+        parseInt(
+          document
+            .getElementById(
+              "runningSessionsPerWeek"
+            )
+            .value
+        ) || 3;
+
+      const planner =
+        document.getElementById(
+          "runningPlanner"
+        );
+
+      let html =
+        `<table class="running-table">
+          <thead>
+            <tr>
+              <th>Microciclo</th>`;
+
+      for(
+        let s=1;
+        s<=sessions;
+        s++
+      ) {
+
+        html +=
+          `<th>Sessione ${s}</th>`;
+
+      }
+
+      html +=
+        `</tr>
+        </thead>
+        <tbody>`;
+
+
+      for(
+        let w=1;
+        w<=weeks;
+        w++
+      ) {
+
+        html +=
+          `<tr>
+            <td>
+              <strong>
+                Settimana ${w}
+              </strong>
+            </td>`;
+
+
+        for(
+          let s=1;
+          s<=sessions;
+          s++
+        ) {
+
+          html += `
+
+            <td>
+
+              <div class="session-box">
+
+                <label>
+                  Tipologia Corsa
+                </label>
+
+                <select
+                  id="run_type_${w}_${s}"
+                  onchange="toggleIntervalInputs(${w},${s})"
+                >
+
+                  <option value="Corsa Continua">
+                    Corsa Continua
+                  </option>
+
+                  <option value="Corsa + Camminata">
+                    Corsa + Camminata
+                  </option>
+
+                  <option value="Ripetute">
+                    Ripetute
+                  </option>
+
+                  <option value="Fartlek">
+                    Fartlek
+                  </option>
+
+                  <option value="Camminata">
+                    Camminata / Passo
+                  </option>
+
+                  <option value="Riscaldamento">
+                    Riscaldamento / Defaticamento
+                  </option>
+
+                </select>
+
+
+                <label>
+                  Durata Totale (Minuti)
+                </label>
+
+                <input
+                  type="number"
+                  id="run_dur_${w}_${s}"
+                  min="1"
+                  placeholder="Es. 30"
+                >
+
+
+                <div
+                  id="interval_box_${w}_${s}"
+                  class="interval-box hidden"
+                >
+
+                  <label
+                    id="label_fast_${w}_${s}"
+                  >
+                    Tempo Corsa
+                  </label>
+
+                  <input
+                    type="text"
+                    id="run_fast_${w}_${s}"
+                    placeholder="Es. 30 sec"
+                  >
+
+                  <label
+                    id="label_slow_${w}_${s}"
+                  >
+                    Recupero
+                  </label>
+
+                  <input
+                    type="text"
+                    id="run_slow_${w}_${s}"
+                    placeholder="Es. 30 sec"
+                  >
+
+                </div>
+
+
+                <label>
+                  Intensità Target
+                </label>
+
+                <select
+                  id="run_rpe_${w}_${s}"
+                >
+
+                  <option value="">
+                    Seleziona RPE
+                  </option>
+
+                  <option value="1-3 (Leggero)">
+                    1-3 (Rigenerante)
+                  </option>
+
+                  <option value="4-6 (Moderato)">
+                    4-6 (Aerobico Moderato)
+                  </option>
+
+                  <option value="7-8 (Intenso)">
+                    7-8 (Soglia / Intenso)
+                  </option>
+
+                  <option value="9-10 (Massimale)">
+                    9-10 (Massimale)
+                  </option>
+
+                </select>
+
+
+                <label>
+                  Note Tecniche
+                </label>
+
+                <textarea
+                  id="run_notes_${w}_${s}"
+                  rows="2"
+                  placeholder="Indicazioni..."
+                ></textarea>
+
+              </div>
+
+            </td>
+
+          `;
+
+        }
+
+        html +=
+          `</tr>`;
+
+      }
+
+      html +=
+        `</tbody></table>`;
+
+      planner.innerHTML =
+        html;
+
+      document
+        .getElementById(
+          "saveRunningProgramButton"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "saveRunningProgramButton"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const weeks =
+        parseInt(
+          document
+            .getElementById(
+              "runningWeeks"
+            )
+            .value
+        ) || 4;
+
+      const sessions =
+        parseInt(
+          document
+            .getElementById(
+              "runningSessionsPerWeek"
+            )
+            .value
+        ) || 3;
+
+      const planData = [];
+
+
+      for(
+        let w=1;
+        w<=weeks;
+        w++
+      ) {
+
+        const weekSessions = [];
+
+
+        for(
+          let s=1;
+          s<=sessions;
+          s++
+        ) {
+
+          const type =
+            document
+              .getElementById(
+                `run_type_${w}_${s}`
+              )
+              .value;
+
+          const duration =
+            document
+              .getElementById(
+                `run_dur_${w}_${s}`
+              )
+              .value;
+
+          const fast =
+            document
+              .getElementById(
+                `run_fast_${w}_${s}`
+              )
+              .value;
+
+          const slow =
+            document
+              .getElementById(
+                `run_slow_${w}_${s}`
+              )
+              .value;
+
+          const rpe =
+            document
+              .getElementById(
+                `run_rpe_${w}_${s}`
+              )
+              .value;
+
+          const notes =
+            document
+              .getElementById(
+                `run_notes_${w}_${s}`
+              )
+              .value;
+
+
+          weekSessions.push({
+
+            type,
+
+            duration,
+
+            fast:
+              (
+                type === "Ripetute" ||
+                type === "Corsa + Camminata"
+              )
+              ? fast
+              : "",
+
+            slow:
+              (
+                type === "Ripetute" ||
+                type === "Corsa + Camminata"
+              )
+              ? slow
+              : "",
+
+            rpe,
+
+            notes
+
+          });
+
+        }
+
+        planData.push({
+
+          week:w,
+
+          sessions:
+            weekSessions
+
+        });
+
+      }
+
+
+      const result =
+        await db
+          .from("running_plans")
+          .insert([{
+
+            patient_id:
+              currentPatient.id,
+
+            weeks_count:
+              weeks,
+
+            sessions_per_week:
+              sessions,
+
+            plan_data:
+              planData
+
+          }]);
+
+
+      if(result.error) {
+
+        showMessage(
+          "runningMessage",
+          result.error.message,
+          "error"
+        );
+
+        return;
+
+      }
+
+      showMessage(
+        "runningMessage",
+        "Programma di corsa salvato con successo!",
+        "success"
+      );
+
+      await loadRunningPlans();
+
+    }
+  );
+
+
+async function loadRunningPlans() {
+
+  const container =
+    document.getElementById(
+      "runningPlansList"
+    );
+
+  container.innerHTML =
+    "Caricamento...";
+
+  const result =
+    await db
+      .from("running_plans")
+      .select("*")
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(
+    result.error ||
+    !result.data ||
+    result.data.length === 0
+  ) {
+
+    container.innerText =
+      "Nessun programma di corsa trovato.";
+
+    return;
+
+  }
+
+  container.innerHTML = "";
+
+
+  result.data.forEach(
+    plan => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "card";
+
+      let tableHtml =
+        `<table class="running-table">
+          <thead>
+            <tr>
+              <th>Settimana</th>`;
+
+      for(
+        let s=1;
+        s<=plan.sessions_per_week;
+        s++
+      ) {
+
+        tableHtml +=
+          `<th>Sessione ${s}</th>`;
+
+      }
+
+      tableHtml +=
+        `</tr>
+        </thead>
+        <tbody>`;
+
+
+      plan.plan_data.forEach(
+        wData => {
+
+          tableHtml +=
+            `<tr>
+              <td>
+                <strong>
+                  Settimana ${wData.week}
+                </strong>
+              </td>`;
+
+
+          wData.sessions.forEach(
+            (sess,idx) => {
+
+              let content =
+                `<strong>
+                  🏃 Sessione ${idx+1}:
+                  ${escapeHtml(sess.type || "Corsa")}
+                </strong><br>`;
+
+              if(sess.duration)
+                content +=
+                  `⏱️ Durata:
+                  <strong>${escapeHtml(sess.duration)} min</strong><br>`;
+
+              if(sess.type === "Ripetute") {
+
+                if(sess.fast)
+                  content +=
+                    `⚡ Veloce:
+                    ${escapeHtml(sess.fast)}<br>`;
+
+                if(sess.slow)
+                  content +=
+                    `🐢 Rec:
+                    ${escapeHtml(sess.slow)}<br>`;
+
+              }
+              else if(
+                sess.type ===
+                "Corsa + Camminata"
+              ) {
+
+                if(sess.fast)
+                  content +=
+                    `🏃 Corsa:
+                    ${escapeHtml(sess.fast)}<br>`;
+
+                if(sess.slow)
+                  content +=
+                    `🚶 Camminata:
+                    ${escapeHtml(sess.slow)}<br>`;
+
+              }
+
+              if(sess.rpe)
+                content +=
+                  `📊 RPE:
+                  <strong>${escapeHtml(sess.rpe)}</strong><br>`;
+
+              if(sess.notes)
+                content +=
+                  `<small>
+                    📝 ${escapeHtml(sess.notes)}
+                  </small>`;
+
+              tableHtml +=
+                `<td>${content}</td>`;
+
+            }
+          );
+
+          tableHtml +=
+            `</tr>`;
+
+        }
+      );
+
+
+      tableHtml +=
+        `</tbody></table>`;
+
+
+      div.innerHTML = `
+
+        ${tableHtml}
+
+        <br>
+
+        <button
+          class="danger no-print"
+          onclick="deleteRunningPlan('${plan.id}')"
+        >
+          🗑️ Elimina Scheda Corsa
+        </button>
+
+      `;
+
+      container.appendChild(
+        div
+      );
+
+    }
+  );
+
+}
+
+
+async function deleteRunningPlan(id) {
+
+  if(
+    !confirm(
+      "Eliminare definitivamente questa scheda di corsa?"
+    )
+  )
+    return;
+
+  const result =
+    await db
+      .from("running_plans")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+  if(result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return;
+
+  }
+
+  await loadRunningPlans();
+
+}
+
+
+/* =========================================================
+   PORTALE PAZIENTE
+========================================================= */
+
+async function loadPatientPortal() {
+
+  /* ESERCIZI */
+
+  const exContainer =
+    document.getElementById(
+      "patientPortalExercises"
+    );
+
+  exContainer.innerHTML =
+    "Caricamento...";
+
+
+  const exResult =
+    await db
+      .from("patient_exercises")
+      .select(
+        "*, exercises(*)"
+      )
+      .eq(
+        "patient_id",
+        currentPatient.id
+      );
+
+
+  if(
+    !exResult.data ||
+    exResult.data.length === 0
+  ) {
+
+    exContainer.innerText =
+      "Nessun esercizio presente.";
+
+  }
+  else {
+
+    exContainer.innerHTML = "";
+
+    exResult.data.forEach(
+      item => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "exercise";
+
+        const ex =
+          item.exercises || {};
+
+        div.innerHTML = `
+
+          <h3>
+            ${escapeHtml(
+              ex.name || "Esercizio"
+            )}
+          </h3>
+
+          ${
+            ex.description
+            ?
+            `<p style="font-size:13px;color:var(--text-muted);">
+              ${escapeHtml(ex.description)}
+            </p>`
+            :
+            ""
+          }
+
+          <p style="font-size:14px;">
+
+            <strong>
+              Parametri:
+            </strong>
+
+            ${
+              item.sets
+              ? `${item.sets} serie`
+              : ""
+            }
+
+            ${
+              item.reps
+              ? ` | ${item.reps} rep`
+              : ""
+            }
+
+            ${
+              item.duration
+              ? ` | ${item.duration}s`
+              : ""
+            }
+
+            ${
+              item.rest
+              ? ` | rec ${item.rest}s`
+              : ""
+            }
+
+          </p>
+
+          ${
+            item.notes
+            ?
+            `<p style="font-size:13px;color:var(--text-muted);">
+              <strong>Note:</strong>
+              ${escapeHtml(item.notes)}
+            </p>`
+            :
+            ""
+          }
+
+          ${
+            ex.video_url
+            ?
+            `<p class="video no-print">
+              <a
+                href="${escapeAttribute(ex.video_url)}"
+                target="_blank"
+                rel="noopener"
+              >
+                🎥 Guarda Video Dimostrativo
+              </a>
+            </p>`
+            :
+            ""
+          }
+
+        `;
+
+        exContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
+
+
+  /* DOCUMENTI */
+
+  const docContainer =
+    document.getElementById(
+      "patientPortalDocuments"
+    );
+
+  docContainer.innerHTML =
+    "Caricamento...";
+
+
+  const docResult =
+    await db
+      .from("patient_documents")
+      .select("*")
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(
+    !docResult.data ||
+    docResult.data.length === 0
+  ) {
+
+    docContainer.innerText =
+      "Nessun report presente.";
+
+  }
+  else {
+
+    docContainer.innerHTML = "";
+
+    docResult.data.forEach(
+      doc => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "document";
+
+        div.innerHTML = `
+
+          <h3>
+            📄 ${escapeHtml(doc.file_name)}
+          </h3>
+
+          <a
+            href="#"
+            onclick="openDocument('${escapeAttribute(doc.file_path)}');return false;"
+          >
+            Visualizza Report PDF
+          </a>
+
+        `;
+
+        docContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
+
+
+  /* NOTE */
+
+  const notesContainer =
+    document.getElementById(
+      "patientPortalNotes"
+    );
+
+  notesContainer.innerHTML =
+    "Caricamento...";
+
+
+  const notesResult =
+    await db
+      .from("patient_notes")
+      .select("*")
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(
+    !notesResult.data ||
+    notesResult.data.length === 0
+  ) {
+
+    notesContainer.innerText =
+      "Nessuna nota comunicata.";
+
+  }
+  else {
+
+    notesContainer.innerHTML = "";
+
+    notesResult.data.forEach(
+      note => {
+
+        const div =
+          document.createElement(
+            "div"
+          );
+
+        div.className =
+          "note-card";
+
+        div.innerHTML = `
+
+          <h3>
+            ${escapeHtml(
+              note.title
+            )}
+          </h3>
+
+          <p>
+            ${escapeHtml(
+              note.content
+            )}
+          </p>
+
+        `;
+
+        notesContainer.appendChild(
+          div
+        );
+
+      }
+    );
+
+  }
+
+
+  /* CORSA */
+
+  const runContainer =
+    document.getElementById(
+      "patientPortalRunning"
+    );
+
+  runContainer.innerHTML =
+    "Caricamento...";
+
+
+  const runResult =
+    await db
+      .from("running_plans")
+      .select("*")
+      .eq(
+        "patient_id",
+        currentPatient.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(
+    !runResult.data ||
+    runResult.data.length === 0
+  ) {
+
+    runContainer.innerText =
+      "Nessun programma corsa assegnato.";
+
+  }
+  else {
+
+    runContainer.innerHTML = "";
+
+    runResult.data.forEach(
+      plan => {
+
+        let html =
+          `<table class="running-table">
+            <thead>
+              <tr>
+                <th>Settimana</th>`;
+
+        for(
+          let s=1;
+          s<=plan.sessions_per_week;
+          s++
+        ) {
+
+          html +=
+            `<th>Sessione ${s}</th>`;
+
+        }
+
+        html +=
+          `</tr>
+          </thead>
+          <tbody>`;
+
+
+        plan.plan_data.forEach(
+          week => {
+
+            html +=
+              `<tr>
+                <td>
+                  <strong>
+                    Settimana ${week.week}
+                  </strong>
+                </td>`;
+
+
+            week.sessions.forEach(
+              (sess,index) => {
+
+                let content =
+                  `<strong>
+                    🏃 Sessione ${index+1}:
+                    ${escapeHtml(sess.type || "Corsa")}
+                  </strong><br>`;
+
+                if(sess.duration)
+                  content +=
+                    `⏱️ ${escapeHtml(sess.duration)} min<br>`;
+
+                if(sess.type === "Ripetute") {
+
+                  if(sess.fast)
+                    content +=
+                      `⚡ ${escapeHtml(sess.fast)}<br>`;
+
+                  if(sess.slow)
+                    content +=
+                      `🐢 ${escapeHtml(sess.slow)}<br>`;
+
+                }
+                else if(
+                  sess.type ===
+                  "Corsa + Camminata"
+                ) {
+
+                  if(sess.fast)
+                    content +=
+                      `🏃 ${escapeHtml(sess.fast)}<br>`;
+
+                  if(sess.slow)
+                    content +=
+                      `🚶 ${escapeHtml(sess.slow)}<br>`;
+
+                }
+
+                if(sess.rpe)
+                  content +=
+                    `📊 ${escapeHtml(sess.rpe)}<br>`;
+
+                if(sess.notes)
+                  content +=
+                    `<small>
+                      📝 ${escapeHtml(sess.notes)}
+                    </small>`;
+
+                html +=
+                  `<td>${content}</td>`;
+
+              }
+            );
+
+            html +=
+              `</tr>`;
+
+          }
+        );
+
+
+        html +=
+          `</tbody></table>`;
+
+        runContainer.innerHTML +=
+          html;
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   STAMPA
+========================================================= */
+
+async function triggerPrint(
+  patientName,
+  containerId,
+  documentTitle
+) {
+
+  const container =
+    document.getElementById(
+      containerId
+    );
+
+  const printSheet =
+    document.getElementById(
+      "printSheet"
+    );
+
+  if(!container) return;
+
+  const logoUrl =
+    await getLogoUrl();
+
+  const clone =
+    container.cloneNode(
+      true
+    );
+
+  clone
+    .querySelectorAll(
+      ".no-print"
+    )
+    .forEach(
+      el => el.remove()
+    );
+
+
+  printSheet.innerHTML = `
+
+    <div
+      style="
+        font-family:'Plus Jakarta Sans',Arial,sans-serif;
+        padding:15px;
+      "
+    >
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          border-bottom:2px solid #0b192c;
+          padding-bottom:12px;
+          margin-bottom:20px;
+        "
+      >
+
+        <div>
+
+          <h1
+            style="
+              margin:0;
+              font-size:24px;
+              color:#0b192c;
+              text-transform:uppercase;
+              font-weight:800;
+            "
+          >
+            Noceto Lab
+          </h1>
+
+          <p
+            style="
+              margin:4px 0 0;
+              font-size:12px;
+              color:#0075ff;
+              font-weight:700;
+              text-transform:uppercase;
+            "
+          >
+            Fisioterapia & Performance
+          </p>
+
+        </div>
+
+        ${
+          logoUrl
+          ?
+          `<img
+            src="${logoUrl}"
+            style="height:55px;width:auto;"
+            alt="Logo Noceto Lab"
+          >`
+          :
+          ""
+        }
+
+      </div>
+
+
+      <h2
+        style="
+          margin-top:10px;
+          font-size:18px;
+          color:#0b192c;
+        "
+      >
+        ${escapeHtml(documentTitle)}:
+        ${escapeHtml(patientName || "")}
+      </h2>
+
+      ${clone.innerHTML}
+
+    </div>
+
+  `;
+
+  window.print();
+
+}
+
+
+document
+  .getElementById(
+    "printExerciseSheetButton"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      triggerPrint(
+        currentPatient?.name || "",
+        "patientExercises",
+        "Scheda Esercizi"
+      )
+  );
+
+
+document
+  .getElementById(
+    "patientPrintExerciseSheetButton"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      triggerPrint(
+        currentPatient?.name || "",
+        "patientPortalExercises",
+        "Scheda Esercizi"
+      )
+  );
+
+
+document
+  .getElementById(
+    "printRunningSheetButton"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      triggerPrint(
+        currentPatient?.name || "",
+        "runningPlansList",
+        "Programma di Corsa"
+      )
+  );
+
+
+document
+  .getElementById(
+    "patientPrintRunningButton"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      triggerPrint(
+        currentPatient?.name || "",
+        "patientPortalRunning",
+        "Programma di Corsa"
+      )
+  );
+
+
+/* =========================================================
+   SICUREZZA HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+  if(value === null ||
+     value === undefined)
+    return "";
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function escapeAttribute(value) {
+
+  if(value === null ||
+     value === undefined)
+    return "";
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+
+}
+
+
+/* =========================================================
+   INIZIALIZZAZIONE
+========================================================= */
+
+window.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    await loadLogo();
+
+    const isRecovery =
+      await checkRecoverySession();
+
+    if(!isRecovery) {
+
+      await startApp();
+
+    }
+
+  }
+);
+
 </script>
+
 </body>
 </html>

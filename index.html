@@ -2038,10 +2038,6 @@ hr {
         <label>Frequenza / settimana</label>
         <input id="frequencyPerWeek" type="number" min="0" max="14" placeholder="3">
       </div>
-      <div>
-        <label>RPE target</label>
-        <input id="rpeTarget" type="number" min="0" max="10" step="0.5" placeholder="6">
-      </div>
     </div>
 
     <label>Obiettivo dell'esercizio</label>
@@ -4953,7 +4949,6 @@ async function loadPatientExercises() {
     if(item.duration != null) params.push(`${item.duration}s`);
     if(item.rest != null) params.push(`rec ${item.rest}s`);
     if(item.frequency_per_week != null) params.push(`${item.frequency_per_week}×/sett`);
-    if(item.rpe_target != null) params.push(`RPE ${item.rpe_target}`);
 
     div.innerHTML = `
       <h3>${escapeHtml(ex.name || "Esercizio")}</h3>
@@ -4979,7 +4974,6 @@ async function loadPatientExercises() {
           <div><label>Durata (sec)</label><input id="editDuration_${item.id}" type="number" min="0" value="${item.duration ?? ""}"></div>
           <div><label>Recupero (sec)</label><input id="editRest_${item.id}" type="number" min="0" value="${item.rest ?? ""}"></div>
           <div><label>Frequenza / settimana</label><input id="editFrequency_${item.id}" type="number" min="0" max="14" value="${item.frequency_per_week ?? ""}"></div>
-          <div><label>RPE target</label><input id="editRpe_${item.id}" type="number" min="0" max="10" step="0.5" value="${item.rpe_target ?? ""}"></div>
         </div>
         <label>Obiettivo</label>
         <input id="editGoal_${item.id}" value="${escapeAttribute(item.goal || "")}">
@@ -5041,7 +5035,6 @@ async function updateAssignedExercise(id) {
     duration: numberOrNull(val("editDuration_" + id).value),
     rest: numberOrNull(val("editRest_" + id).value),
     frequency_per_week: numberOrNull(val("editFrequency_" + id)?.value || ""),
-    rpe_target: numberOrNull(val("editRpe_" + id)?.value || ""),
     goal: val("editGoal_" + id)?.value.trim() || null,
     notes: val("editNotes_" + id).value.trim() || null
   };
@@ -5174,11 +5167,6 @@ document
             frequency_per_week:
               document.getElementById("frequencyPerWeek")?.value
               ? Number(document.getElementById("frequencyPerWeek").value)
-              : null,
-
-            rpe_target:
-              document.getElementById("rpeTarget")?.value
-              ? Number(document.getElementById("rpeTarget").value)
               : null,
 
             goal:
@@ -5444,22 +5432,18 @@ async function deleteMetric(id){
 function renderRunningAnalytics(plan) {
   const box=document.getElementById("runningAnalyticsContent");
   if(!box || !plan?.plan_data) return;
-  let totalMin=0,totalKm=0,sessionCount=0;
+  let totalMin=0,sessionCount=0;
   const byWeek=[];
   (plan.plan_data||[]).forEach(w=>{
-    let wm=0,wk=0,wc=0;
+    let wm=0,wc=0;
     (w.sessions||[]).forEach(sess=>{
-      const m=Number(sess.duration); const k=Number(sess.distance_km);
+      const m=Number(sess.duration);
       if(Number.isFinite(m)) wm+=m;
-      if(Number.isFinite(k)) wk+=k;
-      if(sess.type || sess.duration || sess.distance_km) wc++;
+      if(sess.type || sess.duration) wc++;
     });
-    totalMin+=wm; totalKm+=wk; sessionCount+=wc; byWeek.push({week:w.week,min:wm,km:wk});
+    totalMin+=wm; sessionCount+=wc; byWeek.push({week:w.week,min:wm});
   });
-  const avgRpe=[];
-  (plan.plan_data||[]).forEach(w=>(w.sessions||[]).forEach(s=>{const match=String(s.rpe||"").match(/^(\d+)/);if(match)avgRpe.push(Number(match[1]));}));
-  const rpeText=avgRpe.length?(avgRpe.reduce((a,b)=>a+b,0)/avgRpe.length).toFixed(1):"—";
-  box.innerHTML=`<div class="grid"><div class="stat-card"><div class="stat-label">Sedute</div><div class="stat-number" style="font-size:24px;">${sessionCount}</div></div><div class="stat-card"><div class="stat-label">Minuti totali</div><div class="stat-number" style="font-size:24px;">${totalMin}</div></div><div class="stat-card"><div class="stat-label">Km target</div><div class="stat-number" style="font-size:24px;">${totalKm.toFixed(1)}</div></div><div class="stat-card"><div class="stat-label">RPE medio</div><div class="stat-number" style="font-size:24px;">${rpeText}</div></div></div><div style="margin-top:15px;display:grid;gap:8px;">${byWeek.map(x=>`<div><strong>Settimana ${x.week}</strong> · ${x.min} min${x.km?` · ${x.km.toFixed(1)} km`:""}</div>`).join("")}</div>`;
+  box.innerHTML=`<div class="grid"><div class="stat-card"><div class="stat-label">Sedute</div><div class="stat-number" style="font-size:24px;">${sessionCount}</div></div><div class="stat-card"><div class="stat-label">Minuti totali</div><div class="stat-number" style="font-size:24px;">${totalMin}</div></div></div><div style="margin-top:15px;display:grid;gap:8px;">${byWeek.map(x=>`<div><strong>Settimana ${x.week}</strong> · ${x.min} min</div>`).join("")}</div>`;
 }
 
 /* =========================================================
@@ -6358,9 +6342,6 @@ function generateRunningPlanner(
         "";
 
 
-      const rpe =
-        existingSession?.rpe ||
-        "";
 
 
       const notes =
@@ -6452,12 +6433,6 @@ function generateRunningPlanner(
               placeholder="Es. 30"
             >
 
-            <label>Distanza target (km)</label>
-            <input type="number" step="0.1" min="0" id="run_dist_${w}_${s}" value="${escapeAttribute(existingSession?.distance_km ?? "")}" placeholder="Es. 5">
-
-            <label>Passo target</label>
-            <input type="text" id="run_pace_${w}_${s}" value="${escapeAttribute(existingSession?.pace ?? "")}" placeholder="Es. 5:00/km">
-
             <div
               id="interval_box_${w}_${s}"
               class="
@@ -6517,57 +6492,6 @@ function generateRunningPlanner(
               >
 
             </div>
-
-
-            <label>
-              Intensità Target
-            </label>
-
-
-            <select
-              id="run_rpe_${w}_${s}"
-            >
-
-              <option
-                value=""
-                ${rpe === "" ? "selected" : ""}
-              >
-                Seleziona RPE
-              </option>
-
-
-              <option
-                value="1-3 (Leggero)"
-                ${rpe === "1-3 (Leggero)" ? "selected" : ""}
-              >
-                1-3 (Rigenerante)
-              </option>
-
-
-              <option
-                value="4-6 (Moderato)"
-                ${rpe === "4-6 (Moderato)" ? "selected" : ""}
-              >
-                4-6 (Aerobico Moderato)
-              </option>
-
-
-              <option
-                value="7-8 (Intenso)"
-                ${rpe === "7-8 (Intenso)" ? "selected" : ""}
-              >
-                7-8 (Soglia / Intenso)
-              </option>
-
-
-              <option
-                value="9-10 (Massimale)"
-                ${rpe === "9-10 (Massimale)" ? "selected" : ""}
-              >
-                9-10 (Massimale)
-              </option>
-
-            </select>
 
 
             <label>
@@ -6703,13 +6627,6 @@ function collectRunningPlanData() {
           )
           .value;
 
-
-      const distanceKm =
-        document.getElementById(`run_dist_${w}_${s}`)?.value || "";
-
-      const pace =
-        document.getElementById(`run_pace_${w}_${s}`)?.value.trim() || "";
-
       const fast =
         document
           .getElementById(
@@ -6728,14 +6645,6 @@ function collectRunningPlanData() {
           .trim();
 
 
-      const rpe =
-        document
-          .getElementById(
-            `run_rpe_${w}_${s}`
-          )
-          .value;
-
-
       const notes =
         document
           .getElementById(
@@ -6751,9 +6660,6 @@ function collectRunningPlanData() {
 
         duration,
 
-        distance_km: distanceKm === "" ? null : Number(distanceKm),
-
-        pace,
 
         fast:
           (
@@ -6775,7 +6681,6 @@ function collectRunningPlanData() {
           :
           "",
 
-        rpe,
 
         notes
 
@@ -7370,16 +7275,6 @@ async function loadRunningPlans() {
                 }
 
 
-                if(sess.rpe)
-                  content +=
-                    `📊 RPE:
-                    <strong>
-                      ${escapeHtml(
-                        sess.rpe
-                      )}
-                    </strong><br>`;
-
-
                 if(sess.notes)
                   content +=
                     `<small>
@@ -7743,7 +7638,6 @@ async function loadPatientPortal() {
             ${item.duration ? ` | ${item.duration}s` : ""}
             ${item.rest ? ` | rec ${item.rest}s` : ""}
             ${item.frequency_per_week != null ? ` | ${item.frequency_per_week}×/sett` : ""}
-            ${item.rpe_target != null ? ` | RPE ${item.rpe_target}` : ""}
           </p>
 
           ${item.goal ? `<p style="font-size:13px;"><strong>🎯 Obiettivo:</strong> ${escapeHtml(item.goal)}</p>` : ""}
@@ -8151,14 +8045,6 @@ async function loadPatientPortal() {
                       )}<br>`;
 
                 }
-
-
-                if(sess.rpe)
-                  content +=
-                    `📊
-                    ${escapeHtml(
-                      sess.rpe
-                    )}<br>`;
 
 
                 if(sess.notes)

@@ -1931,8 +1931,6 @@ hr {
       📝 Note
     </button>
 
-    <button class="section-tab" data-target="therapistTabMessages">💬 Comunicazioni</button>
-
     <button
       class="section-tab"
       data-target="therapistTabRunning"
@@ -2217,7 +2215,7 @@ hr {
     <div class="section-title">
 
       <h2>
-        📝 Diario & Comunicazioni
+        📝 Note Studio & Diario paziente
       </h2>
 
     </div>
@@ -2283,16 +2281,13 @@ hr {
       Caricamento...
     </div>
 
+    <hr>
+    <h3>📔 Diario scritto dal paziente</h3>
+    <p style="color:var(--text-muted);font-size:13px;">Le annotazioni del paziente sono visibili solo al paziente e al terapista.</p>
+    <div id="therapistDiaryList">Caricamento...</div>
+
   </div>
-
-
-  <!-- =====================================================
-       COMUNICAZIONI
-  ====================================================== -->
-
-  <div class="card tab-panel" id="therapistTabMessages">
-    <div class="section-title"><h2>💬 Comunicazioni con il paziente</h2><button id="refreshTherapistMessagesButton" class="secondary">↻ Aggiorna</button></div>
-    <label>Nuovo messaggio</label>
+<label>Nuovo messaggio</label>
     <textarea id="therapistMessageContent" placeholder="Scrivi una comunicazione al paziente..."></textarea>
     <br><br>
     <button id="sendTherapistMessageButton" class="primary">📤 Invia al paziente</button>
@@ -2898,6 +2893,20 @@ hr {
 
     <button
       class="section-tab"
+      data-target="portalProgress"
+    >
+      📈 Progressi
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="portalDiary"
+    >
+      📔 Diario
+    </button>
+
+    <button
+      class="section-tab"
       data-target="portalRunning"
     >
       🏃 Corsa
@@ -3006,18 +3015,34 @@ hr {
 
   </div>
 
-
-  <!-- COMUNICAZIONI PAZIENTE -->
-  <div class="card tab-panel" id="portalMessages">
-    <div class="section-title"><h2>💬 Comunicazioni</h2><button id="refreshPatientMessagesButton" class="secondary">↻ Aggiorna</button></div>
-    <div id="patientMessagesList" class="message-thread">Caricamento...</div>
-    <hr>
-    <label>Nuovo messaggio al fisioterapista</label>
-    <textarea id="patientMessageContent" placeholder="Scrivi qui la tua comunicazione..."></textarea>
-    <br><br><button id="sendPatientMessageButton" class="primary">📤 Invia messaggio</button>
-    <div id="patientMessageStatus" class="message hidden"></div>
+  <!-- PROGRESSI PAZIENTE -->
+  <div class="card tab-panel" id="portalProgress">
+    <div class="section-title"><h2>📈 I miei progressi</h2></div>
+    <p style="color:var(--text-muted);font-size:13px;">Qui trovi solo le misurazioni che il fisioterapista ha scelto di condividere con te.</p>
+    <div id="patientProgressSection">
+      <div id="patientProgressList">Caricamento...</div>
+      <div id="patientProgressEmpty" class="exercise-sheet-empty hidden">Nessun progresso condiviso al momento.</div>
+    </div>
   </div>
 
+  <!-- DIARIO PAZIENTE -->
+  <div class="card tab-panel" id="portalDiary">
+    <div class="section-title">
+      <h2>📔 Il mio diario</h2>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;">
+      Qui puoi annotare domande, dubbi, sintomi, sensazioni dopo gli esercizi o qualsiasi cosa tu voglia ricordare per la prossima seduta.
+    </p>
+    <label>Oggetto (facoltativo)</label>
+    <input id="patientDiaryTitle" placeholder="Es. Domanda sull'esercizio...">
+    <label>La tua nota</label>
+    <textarea id="patientDiaryContent" placeholder="Scrivi qui il tuo dubbio o quello che vuoi ricordare..."></textarea>
+    <br><br>
+    <button id="savePatientDiaryButton" class="primary">＋ Salva nel diario</button>
+    <div id="patientDiaryMessage" class="message hidden"></div>
+    <hr>
+    <div id="patientDiaryList">Caricamento...</div>
+  </div>
 
   <!-- CORSA PAZIENTE -->
 
@@ -3188,12 +3213,23 @@ async function loadLogo() {
   const logoUrl = await getLogoUrl();
   if(!logoUrl) return;
 
+  logo.style.display = "block";
   logo.onload = () => {
     logo.style.display = "block";
   };
-  logo.onerror = () => {
+  logo.onerror = async () => {
     console.error("Il browser non riesce a visualizzare il logo.");
-    logo.style.display = "none";
+    // Secondo tentativo con un nuovo signed URL.
+    try {
+      const retryUrl = await getLogoUrl();
+      if(retryUrl && retryUrl !== logo.src) {
+        logo.src = retryUrl;
+      } else {
+        logo.style.display = "none";
+      }
+    } catch(e) {
+      logo.style.display = "none";
+    }
   };
   logo.src = logoUrl;
 
@@ -3764,6 +3800,10 @@ async function startApp() {
   }
 
 
+  // Il logo viene caricato solo dopo l'autenticazione,
+  // quando Supabase può generare correttamente l'URL firmato.
+  await loadLogo();
+
   if(role === "therapist") {
 
     await startTherapist();
@@ -4148,7 +4188,6 @@ async function openPatient(
 
 
   await loadPatientNotes();
-  await loadTherapistMessages();
 
 
   await loadAssessments();
@@ -5677,169 +5716,46 @@ document.getElementById("generateReportButton")?.addEventListener("click",genera
 
 async function loadPatientNotes() {
 
-  const container =
-    document.getElementById(
-      "patientNotesList"
-    );
+  const container = document.getElementById("patientNotesList");
+  if(!container || !currentPatient) return;
+  container.innerHTML = "Caricamento...";
 
-
-  container.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("patient_notes")
+  try {
+    const query = db.from("patient_notes")
       .select("*")
-      .eq(
-        "patient_id",
-        currentPatient.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:
-            false
-        }
-      );
+      .eq("patient_id", currentPatient.id)
+      .order("created_at", { ascending:false });
 
+    const result = await Promise.race([
+      query,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout nel caricamento delle note")), 10000))
+    ]);
 
-  if(
-    result.error
-  ) {
+    if(result.error) throw result.error;
 
-    container.innerText =
-      "Errore nel caricamento delle note.";
-
-
-    console.error(
-      result.error
-    );
-
-
-    return;
-
-  }
-
-
-  if(
-    !result.data ||
-    result.data.length === 0
-  ) {
-
-    container.innerText =
-      "Nessuna nota presente.";
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    "";
-
-
-  result.data.forEach(
-    note => {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "note-card " +
-        (
-          note.is_private
-          ?
-          "private-note"
-          :
-          "public-note"
-        );
-
-
-      const date =
-        new Date(
-          note.created_at
-        ).toLocaleDateString(
-          "it-IT"
-        );
-
-
-      div.innerHTML = `
-
-        <h3>
-
-          ${
-            note.is_private
-            ?
-            "🔒"
-            :
-            "📢"
-          }
-
-          ${escapeHtml(
-            note.title ||
-            "Nota"
-          )}
-
-          <small>
-            (${date})
-          </small>
-
-        </h3>
-
-
-        <p>
-
-          ${escapeHtml(
-            note.content
-          )}
-
-        </p>
-
-
-        <p
-          style="
-            font-size:11px;
-            font-weight:700;
-            color:var(--text-muted);
-          "
-        >
-
-          ${
-            note.is_private
-            ?
-            "🔒 VISIBILE SOLO AL TERAPISTA"
-            :
-            "📢 VISIBILE AL PAZIENTE"
-          }
-
-        </p>
-
-
-        <button
-          class="danger no-print"
-          onclick="
-            deletePatientNote(
-              '${note.id}'
-            )
-          "
-        >
-          🗑️ Elimina
-        </button>
-
-      `;
-
-
-      container.appendChild(
-        div
-      );
-
+    if(!result.data?.length) {
+      container.innerText = "Nessuna nota presente.";
+      return;
     }
-  );
 
+    container.innerHTML = "";
+    result.data.forEach(note => {
+      const div = document.createElement("div");
+      div.className = "note-card " + (note.is_private ? "private-note" : "public-note");
+      const date = new Date(note.created_at).toLocaleDateString("it-IT");
+      div.innerHTML = `
+        <h3>${note.is_private ? "🔒" : "📢"} ${escapeHtml(note.title || "Nota")} <small>(${date})</small></h3>
+        <p style="white-space:pre-line;">${escapeHtml(note.content)}</p>
+        <p style="font-size:11px;font-weight:700;color:var(--text-muted);">
+          ${note.is_private ? "🔒 VISIBILE SOLO AL TERAPISTA" : "📢 VISIBILE AL PAZIENTE"}
+        </p>
+        <button class="danger no-print" onclick="deletePatientNote('${note.id}')">🗑️ Elimina</button>`;
+      container.appendChild(div);
+    });
+  } catch(error) {
+    console.error("Errore caricamento Note Studio:", error);
+    container.innerHTML = `<div class="message error">Impossibile caricare le note: ${escapeHtml(error.message || "errore")}</div>`;
+  }
 }
 
 
@@ -6010,51 +5926,6 @@ async function deletePatientNote(
 
 
 /* =========================================================
-   COMUNICAZIONI
-========================================================= */
-
-async function loadTherapistMessages(){
-  const box=document.getElementById("therapistMessagesList"); if(!box||!currentPatient)return;
-  box.innerHTML="Caricamento...";
-  const result=await db.from("patient_messages").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:true});
-  if(result.error){box.innerHTML=`<div class="message error">${escapeHtml(result.error.message)}</div>`;return;}
-  if(!result.data?.length){box.innerHTML=`<div class="exercise-sheet-empty">Nessuna comunicazione.</div>`;return;}
-  box.innerHTML=result.data.map(m=>`<div class="chat-message ${m.sender_role==='therapist'?'me':'other'}"><small>${m.sender_role==='therapist'?'👨‍⚕️ Tu':'👤 Paziente'} · ${escapeHtml(formatDateTimeIT(m.created_at))}</small><div style="white-space:pre-line;">${escapeHtml(m.content)}</div></div>`).join("");
-  box.scrollTop=box.scrollHeight;
-}
-
-async function sendTherapistMessage(){
-  const input=document.getElementById("therapistMessageContent"), content=input.value.trim();
-  if(!content||!currentPatient)return;
-  const result=await db.from("patient_messages").insert([{patient_id:currentPatient.id,sender_id:currentUser.id,sender_role:"therapist",content}]);
-  if(result.error){showMessage("therapistMessageStatus",result.error.message,"error");return;}
-  input.value=""; showMessage("therapistMessageStatus","Messaggio inviato.","success"); await loadTherapistMessages();
-}
-
-async function loadPatientMessages(){
-  const box=document.getElementById("patientMessagesList"); if(!box||!currentPatient)return;
-  box.innerHTML="Caricamento...";
-  const result=await db.from("patient_messages").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:true});
-  if(result.error){box.innerHTML=`<div class="message error">${escapeHtml(result.error.message)}</div>`;return;}
-  if(!result.data?.length){box.innerHTML=`<div class="exercise-sheet-empty">Nessuna comunicazione. Puoi scrivere al fisioterapista qui sotto.</div>`;return;}
-  box.innerHTML=result.data.map(m=>`<div class="chat-message ${m.sender_role==='patient'?'me':'other'}"><small>${m.sender_role==='patient'?'👤 Tu':'👨‍⚕️ Fisioterapista'} · ${escapeHtml(formatDateTimeIT(m.created_at))}</small><div style="white-space:pre-line;">${escapeHtml(m.content)}</div></div>`).join("");
-  box.scrollTop=box.scrollHeight;
-}
-
-async function sendPatientMessage(){
-  const input=document.getElementById("patientMessageContent"), content=input.value.trim();
-  if(!content||!currentPatient)return;
-  const result=await db.from("patient_messages").insert([{patient_id:currentPatient.id,sender_id:currentUser.id,sender_role:"patient",content}]);
-  if(result.error){showMessage("patientMessageStatus",result.error.message,"error");return;}
-  input.value=""; showMessage("patientMessageStatus","Messaggio inviato.","success"); await loadPatientMessages();
-}
-
-document.getElementById("sendTherapistMessageButton")?.addEventListener("click",sendTherapistMessage);
-document.getElementById("refreshTherapistMessagesButton")?.addEventListener("click",loadTherapistMessages);
-document.getElementById("sendPatientMessageButton")?.addEventListener("click",sendPatientMessage);
-document.getElementById("refreshPatientMessagesButton")?.addEventListener("click",loadPatientMessages);
-
-/* =========================================================
    STATISTICHE STUDIO
 ========================================================= */
 
@@ -6062,13 +5933,13 @@ async function loadStudioStatistics(){
   const summary=document.getElementById("studioStatsSummary"), recent=document.getElementById("studioStatsRecent"), docs=document.getElementById("studioStatsDocuments");
   if(!summary)return;
   summary.innerHTML="Caricamento...";
-  const tables=["patients","exercises","patient_exercises","patient_documents","patient_assessments","patient_metrics","patient_messages","running_plans"];
+  const tables=["patients","exercises","patient_exercises","patient_documents","patient_assessments","patient_metrics","running_plans"];
   const counts={};
   for(const table of tables){ const r=await db.from(table).select("id",{count:"exact",head:true}); counts[table]=r.error?null:(r.count||0); }
-  const labels={patients:"Pazienti",exercises:"Esercizi",patient_exercises:"Assegnazioni esercizi",patient_documents:"Documenti",patient_assessments:"Valutazioni",patient_metrics:"Misurazioni",patient_messages:"Messaggi",running_plans:"Programmi corsa"};
+  const labels={patients:"Pazienti",exercises:"Esercizi",patient_exercises:"Assegnazioni esercizi",patient_documents:"Documenti",patient_assessments:"Valutazioni",patient_metrics:"Misurazioni",running_plans:"Programmi corsa"};
   summary.innerHTML=`<div class="stats-grid">${tables.map(t=>`<div class="stat-mini"><div>${labels[t]}</div><div class="value">${counts[t]??'—'}</div></div>`).join("")}</div>`;
   const since=new Date(Date.now()-30*24*60*60*1000).toISOString();
-  const recentTables=["patient_documents","patient_assessments","patient_metrics","patient_messages","running_plans","patient_exercises"];
+  const recentTables=["patient_documents","patient_assessments","patient_metrics","running_plans","patient_exercises"];
   const recentCounts={};
   for(const table of recentTables){ const r=await db.from(table).select("id",{count:"exact",head:true}).gte("created_at",since); recentCounts[table]=r.error?null:(r.count||0); }
   recent.innerHTML=`<div class="stats-grid">${recentTables.map(t=>`<div class="stat-mini"><div>${labels[t]}</div><div class="value">${recentCounts[t]??'—'}</div></div>`).join("")}</div>`;
@@ -7540,6 +7411,7 @@ async function deleteRunningPlan(
 
 async function loadPatientPortal() {
   await loadPatientSharedProgress();
+  await loadPatientDiary();
 
 
   /* =======================================================
@@ -7653,9 +7525,6 @@ async function loadPatientPortal() {
       docContainer.appendChild(div);
     });
   }
-
-
-  await loadPatientMessages();
 
 
   /* =======================================================
@@ -8305,6 +8174,79 @@ function escapeAttribute(
 
 
 /* =========================================================
+   DIARIO PAZIENTE
+========================================================= */
+
+async function loadTherapistDiary(){
+  const box=document.getElementById("therapistDiaryList");
+  if(!box || !currentPatient) return;
+  box.innerHTML="Caricamento...";
+  try{
+    const result=await db.from("patient_diary_entries")
+      .select("id, title, content, created_at, read_at")
+      .eq("patient_id",currentPatient.id)
+      .order("created_at",{ascending:false});
+    if(result.error) throw result.error;
+    if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Nessuna annotazione del paziente.</div>'; return; }
+    box.innerHTML=result.data.map(x=>`<div class="note-card public-note">
+      <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
+      <small>${escapeHtml(formatDateTimeIT(x.created_at))}${x.read_at ? " · ✓ Letto" : " · 🆕 Nuovo"}</small>
+      <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
+      ${!x.read_at ? `<button class="secondary no-print" onclick="markDiaryRead('${x.id}')">✓ Segna come letto</button>` : ""}
+    </div>`).join("");
+  }catch(err){
+    console.error("Errore diario paziente:",err);
+    box.innerHTML=`<div class="message error">Impossibile caricare il diario: ${escapeHtml(err.message || "errore")}</div>`;
+  }
+}
+
+async function markDiaryRead(id){
+  const result=await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).eq("id",id);
+  if(result.error){ alert(result.error.message); return; }
+  await loadTherapistDiary();
+}
+
+async function loadPatientDiary(){
+  const box=document.getElementById("patientDiaryList");
+  if(!box || !currentPatient) return;
+  box.innerHTML="Caricamento...";
+  try{
+    const result=await db.from("patient_diary_entries")
+      .select("id, title, content, created_at")
+      .eq("patient_id",currentPatient.id)
+      .order("created_at",{ascending:false});
+    if(result.error) throw result.error;
+    if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto. Puoi scrivere la prima annotazione qui sopra.</div>'; return; }
+    box.innerHTML=result.data.map(x=>`<div class="note-card">
+      <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
+      <small>${escapeHtml(formatDateTimeIT(x.created_at))}</small>
+      <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
+    </div>`).join("");
+  }catch(err){
+    console.error("Errore diario personale:",err);
+    box.innerHTML=`<div class="message error">Impossibile caricare il diario: ${escapeHtml(err.message || "errore")}</div>`;
+  }
+}
+
+document.getElementById("savePatientDiaryButton")?.addEventListener("click",async()=>{
+  if(!currentPatient || !currentUser) return;
+  const title=document.getElementById("patientDiaryTitle").value.trim() || "Annotazione";
+  const content=document.getElementById("patientDiaryContent").value.trim();
+  if(!content){ showMessage("patientDiaryMessage","Scrivi prima il contenuto della nota.","error"); return; }
+  const result=await db.from("patient_diary_entries").insert([{
+    patient_id:currentPatient.id,
+    author_id:currentUser.id,
+    title,
+    content
+  }]);
+  if(result.error){ showMessage("patientDiaryMessage",result.error.message,"error"); return; }
+  document.getElementById("patientDiaryTitle").value="";
+  document.getElementById("patientDiaryContent").value="";
+  showMessage("patientDiaryMessage","Annotazione salvata nel diario.","success");
+  await loadPatientDiary();
+});
+
+/* =========================================================
    EVENTI VALUTAZIONI / PROGRESSI
 ========================================================= */
 
@@ -8326,9 +8268,6 @@ document.getElementById("printAssessmentButton")?.addEventListener("click", ()=>
 window.addEventListener(
   "DOMContentLoaded",
   async () => {
-
-    await loadLogo();
-
 
     const isRecovery =
       await checkRecoverySession();

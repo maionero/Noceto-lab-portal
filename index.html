@@ -914,6 +914,34 @@ hr {
 
 
 /* =========================================================
+   DOCUMENTI / COMUNICAZIONI / STATISTICHE
+========================================================= */
+.document-meta {
+  display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;
+}
+.document-chip {
+  display:inline-flex; padding:4px 8px; border-radius:999px;
+  background:#f1f5f9; border:1px solid var(--border-color);
+  font-size:11px; font-weight:700; color:var(--text-muted);
+}
+.document-preview {
+  width:100%; min-height:520px; border:1px solid var(--border-color);
+  border-radius:10px; margin-top:12px; background:#f8fafc;
+}
+.message-thread { display:grid; gap:10px; margin-top:14px; }
+.chat-message { padding:12px 14px; border:1px solid var(--border-color); border-radius:12px; max-width:85%; }
+.chat-message.me { margin-left:auto; background:#eff6ff; border-color:#bfdbfe; }
+.chat-message.other { margin-right:auto; background:#f8fafc; }
+.chat-message small { display:block; margin-bottom:5px; }
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+.stat-mini { padding:16px; border:1px solid var(--border-color); border-radius:12px; background:#fff; }
+.stat-mini .value { font-size:28px; font-weight:800; color:var(--primary); margin-top:4px; }
+@media (max-width:700px) {
+  .document-preview { min-height:420px; }
+  .chat-message { max-width:95%; }
+}
+
+/* =========================================================
    NOTE
 ========================================================= */
 
@@ -1861,6 +1889,8 @@ hr {
       📝 Note
     </button>
 
+    <button class="section-tab" data-target="therapistTabMessages">💬 Comunicazioni</button>
+
     <button
       class="section-tab"
       data-target="therapistTabRunning"
@@ -1882,12 +1912,9 @@ hr {
       📈 Progressi
     </button>
 
-    <button
-      class="section-tab"
-      data-target="therapistTabDanger"
-    >
-      ⚠️ Gestione
-    </button>
+    <button class="section-tab" data-target="therapistTabStatistics">📊 Statistiche</button>
+
+    <button class="section-tab" data-target="therapistTabDanger">⚠️ Gestione</button>
 
   </div>
 
@@ -2073,57 +2100,68 @@ hr {
        DOCUMENTI
   ====================================================== -->
 
-  <div
-    class="card tab-panel"
-    id="therapistTabDocuments"
-  >
-
+  <div class="card tab-panel" id="therapistTabDocuments">
     <div class="section-title">
-
-      <h2>
-        📄 Clinical Report & PDF
-      </h2>
-
+      <h2>📄 Documenti del paziente</h2>
     </div>
 
-    <p
-      style="
-        color:var(--text-muted);
-        font-size:13px;
-      "
-    >
-      Carica report, referti o schede aggiuntive
-      in formato PDF.
-    </p>
+    <div class="grid">
+      <div>
+        <label>File</label>
+        <input id="documentFile" type="file" accept="application/pdf,.pdf,image/*">
+      </div>
+      <div>
+        <label>Data documento</label>
+        <input id="documentDate" type="date">
+      </div>
+      <div>
+        <label>Categoria</label>
+        <select id="documentCategory">
+          <option value="Referto">📄 Referto</option>
+          <option value="Risonanza">🧲 Risonanza</option>
+          <option value="Radiografia">🩻 Radiografia</option>
+          <option value="Consenso">✍️ Consenso</option>
+          <option value="Relazione">📝 Relazione</option>
+          <option value="Programma">📋 Programma</option>
+          <option value="Altro">📎 Altro</option>
+        </select>
+      </div>
+    </div>
 
-    <input
-      id="documentFile"
-      type="file"
-      accept="application/pdf,.pdf"
-    >
+    <label>Descrizione</label>
+    <input id="documentDescription" placeholder="Es. RM ginocchio destro del 02/09/2026">
 
-    <br><br>
-
-    <button
-      id="uploadDocumentButton"
-      class="primary"
-    >
-      📎 Carica Referto PDF
-    </button>
-
-    <div
-      id="documentMessage"
-      class="message hidden"
-    ></div>
+    <div class="actions" style="margin-top:14px;">
+      <button id="uploadDocumentButton" class="primary">📎 Carica documento</button>
+    </div>
+    <div id="documentMessage" class="message hidden"></div>
 
     <hr>
+    <div id="patientDocuments">Caricamento...</div>
 
-    <div id="patientDocuments">
-      Caricamento...
+    <hr>
+    <h2>📝 Genera relazione fisioterapica</h2>
+    <p style="color:var(--text-muted);font-size:13px;">Compila la relazione e genera una versione pronta per stampa/PDF con il logo Noceto Lab.</p>
+    <div class="grid">
+      <div><label>Data</label><input id="reportDate" type="date"></div>
+      <div><label>Oggetto</label><input id="reportSubject" placeholder="Es. Relazione fisioterapica"> </div>
     </div>
-
+    <label>Motivo della presa in carico</label>
+    <textarea id="reportReason" placeholder="Motivo dell'accesso, sintomi e limitazioni riferite..."></textarea>
+    <label>Valutazione clinico-funzionale</label>
+    <textarea id="reportAssessment" placeholder="Anamnesi, esame obiettivo, test, misure e principali reperti..."></textarea>
+    <label>Trattamento / percorso svolto</label>
+    <textarea id="reportTreatment" placeholder="Interventi, esercizio terapeutico, educazione, progressioni..."></textarea>
+    <label>Esito / andamento</label>
+    <textarea id="reportOutcome" placeholder="Evoluzione, risposta al carico, capacità funzionali..."></textarea>
+    <label>Indicazioni / raccomandazioni</label>
+    <textarea id="reportRecommendations" placeholder="Prosecuzione del programma, gestione del carico, controlli o indicazioni finali..."></textarea>
+    <label>Firma / qualifica</label>
+    <input id="reportSignature" placeholder="Matteo Riva – Fisioterapista">
+    <br><br>
+    <button id="generateReportButton" class="primary">🖨️ Genera relazione PDF</button>
+    <div id="reportMessage" class="message hidden"></div>
   </div>
-
 
   <!-- =====================================================
        NOTE
@@ -2205,6 +2243,20 @@ hr {
 
   </div>
 
+
+  <!-- =====================================================
+       COMUNICAZIONI
+  ====================================================== -->
+
+  <div class="card tab-panel" id="therapistTabMessages">
+    <div class="section-title"><h2>💬 Comunicazioni con il paziente</h2><button id="refreshTherapistMessagesButton" class="secondary">↻ Aggiorna</button></div>
+    <label>Nuovo messaggio</label>
+    <textarea id="therapistMessageContent" placeholder="Scrivi una comunicazione al paziente..."></textarea>
+    <br><br>
+    <button id="sendTherapistMessageButton" class="primary">📤 Invia al paziente</button>
+    <div id="therapistMessageStatus" class="message hidden"></div>
+    <div id="therapistMessagesList" class="message-thread">Caricamento...</div>
+  </div>
 
   <!-- =====================================================
        CORSA
@@ -2482,6 +2534,25 @@ hr {
     <div id="progressChart" style="margin-top:15px;"></div>
     <hr>
     <div id="metricsList">Caricamento...</div>
+  </div>
+
+  <!-- =====================================================
+       STATISTICHE STUDIO
+  ====================================================== -->
+
+  <div class="card tab-panel" id="therapistTabStatistics">
+    <div class="section-title">
+      <h2>📊 Statistiche studio</h2>
+      <button id="refreshStudioStatsButton" class="secondary">↻ Aggiorna</button>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;">Solo dati aggregati del gestionale. Non vengono mostrati dati clinici nei riepiloghi.</p>
+    <div id="studioStatsSummary">Caricamento...</div>
+    <hr>
+    <h3>Attività ultimi 30 giorni</h3>
+    <div id="studioStatsRecent">Caricamento...</div>
+    <hr>
+    <h3>Documenti per categoria</h3>
+    <div id="studioStatsDocuments">Caricamento...</div>
   </div>
 
   <!-- =====================================================
@@ -2891,6 +2962,18 @@ hr {
       Caricamento...
     </div>
 
+  </div>
+
+
+  <!-- COMUNICAZIONI PAZIENTE -->
+  <div class="card tab-panel" id="portalMessages">
+    <div class="section-title"><h2>💬 Comunicazioni</h2><button id="refreshPatientMessagesButton" class="secondary">↻ Aggiorna</button></div>
+    <div id="patientMessagesList" class="message-thread">Caricamento...</div>
+    <hr>
+    <label>Nuovo messaggio al fisioterapista</label>
+    <textarea id="patientMessageContent" placeholder="Scrivi qui la tua comunicazione..."></textarea>
+    <br><br><button id="sendPatientMessageButton" class="primary">📤 Invia messaggio</button>
+    <div id="patientMessageStatus" class="message hidden"></div>
   </div>
 
 
@@ -3719,6 +3802,7 @@ async function startTherapist() {
 
 
   await loadDashboardStats();
+  await loadStudioStatistics();
 
 }
 
@@ -4022,6 +4106,7 @@ async function openPatient(
 
 
   await loadPatientNotes();
+  await loadTherapistMessages();
 
 
   await loadAssessments();
@@ -5451,322 +5536,98 @@ function renderRunningAnalytics(plan) {
 ========================================================= */
 
 async function loadPatientDocuments() {
-
-  const container =
-    document.getElementById(
-      "patientDocuments"
-    );
-
-
-  container.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("patient_documents")
-      .select("*")
-      .eq(
-        "patient_id",
-        currentPatient.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:
-            false
-        }
-      );
-
-
-  if(
-    result.error ||
-    !result.data ||
-    result.data.length === 0
-  ) {
-
-    container.innerText =
-      "Nessun documento inserito.";
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    "";
-
-
-  result.data.forEach(
-    doc => {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "document";
-
-
-      div.innerHTML = `
-
-        <h3>
-          📄 ${escapeHtml(doc.file_name)}
-        </h3>
-
-
-        <p>
-
-          <a
-            href="#"
-            onclick="
-              openDocument(
-                '${escapeAttribute(doc.file_path)}'
-              );
-              return false;
-            "
-          >
-            Visualizza Referto PDF
-          </a>
-
-        </p>
-
-
-        <div class="actions no-print">
-
-          <button
-            class="danger"
-            onclick="
-              deleteDocument(
-                '${doc.id}',
-                '${escapeAttribute(doc.file_path)}'
-              )
-            "
-          >
-            🗑️ Elimina
-          </button>
-
-        </div>
-
-      `;
-
-
-      container.appendChild(
-        div
-      );
-
-    }
-  );
-
+  const container = document.getElementById("patientDocuments");
+  if(!container || !currentPatient) return;
+  container.innerHTML = "Caricamento...";
+  const result = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("document_date", {ascending:false}).order("created_at", {ascending:false});
+  if(result.error){ container.innerHTML=`<div class="message error">${escapeHtml(result.error.message)}</div>`; return; }
+  if(!result.data?.length){ container.innerText="Nessun documento inserito."; return; }
+  container.innerHTML="";
+  result.data.forEach(doc=>{
+    const div=document.createElement("div"); div.className="document";
+    const date=doc.document_date ? formatDateIT(doc.document_date) : formatDateIT(doc.created_at);
+    div.innerHTML=`
+      <h3>📄 ${escapeHtml(doc.file_name || "Documento")}</h3>
+      <div class="document-meta">
+        <span class="document-chip">${escapeHtml(doc.category || "Altro")}</span>
+        <span class="document-chip">📅 ${escapeHtml(date)}</span>
+      </div>
+      ${doc.description ? `<p style="color:var(--text-muted);">${escapeHtml(doc.description)}</p>` : ""}
+      <div class="actions no-print">
+        <button class="secondary" onclick="openDocument('${escapeAttribute(doc.file_path)}')">👁️ Anteprima</button>
+        <button class="secondary" onclick="downloadDocument('${escapeAttribute(doc.file_path)}','${escapeAttribute(doc.file_name || 'documento')}')">⬇️ Download</button>
+        <button class="danger" onclick="deleteDocument('${doc.id}','${escapeAttribute(doc.file_path)}')">🗑️ Elimina</button>
+      </div>`;
+    container.appendChild(div);
+  });
 }
 
-
-async function openDocument(
-  path
-) {
-
-  const result =
-    await db
-      .storage
-      .from(DOCUMENT_BUCKET)
-      .createSignedUrl(
-        path,
-        3600
-      );
-
-
-  if(result.error) {
-
-    alert(
-      "Impossibile aprire il documento."
-    );
-
-    return;
-
-  }
-
-
-  window.open(
-    result.data.signedUrl,
-    "_blank"
-  );
-
+async function openDocument(path){
+  const result=await db.storage.from(DOCUMENT_BUCKET).createSignedUrl(path,3600);
+  if(result.error){alert("Impossibile aprire il documento.");return;}
+  window.open(result.data.signedUrl,"_blank","noopener");
 }
 
+async function downloadDocument(path,fileName){
+  const result=await db.storage.from(DOCUMENT_BUCKET).createSignedUrl(path,3600,{download:fileName});
+  if(result.error){alert("Impossibile scaricare il documento.");return;}
+  const a=document.createElement("a"); a.href=result.data.signedUrl; a.download=fileName; a.target="_blank"; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove();
+}
 
-document
-  .getElementById(
-    "uploadDocumentButton"
-  )
-  .addEventListener(
-    "click",
-    async () => {
-
-      const fileInput =
-        document.getElementById(
-          "documentFile"
-        );
-
-
-      const file =
-        fileInput.files[0];
-
-
-      if(!file) {
-
-        showMessage(
-          "documentMessage",
-          "Seleziona un PDF.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      if(
-        file.type !==
-        "application/pdf"
-      ) {
-
-        showMessage(
-          "documentMessage",
-          "Sono ammessi solo PDF.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const fileName =
-        currentPatient.id +
-        "/" +
-        Date.now() +
-        "_" +
-        file.name;
-
-
-      const uploadResult =
-        await db
-          .storage
-          .from(DOCUMENT_BUCKET)
-          .upload(
-            fileName,
-            file
-          );
-
-
-      if(uploadResult.error) {
-
-        showMessage(
-          "documentMessage",
-          uploadResult.error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const dbResult =
-        await db
-          .from("patient_documents")
-          .insert([{
-
-            patient_id:
-              currentPatient.id,
-
-            file_name:
-              file.name,
-
-            file_path:
-              fileName
-
-          }]);
-
-
-      if(dbResult.error) {
-
-        showMessage(
-          "documentMessage",
-          dbResult.error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      fileInput.value =
-        "";
-
-
-      showMessage(
-        "documentMessage",
-        "PDF caricato correttamente.",
-        "success"
-      );
-
-
-      await loadPatientDocuments();
-
-    }
-  );
-
-
-async function deleteDocument(
-  id,
-  filePath
-) {
-
-  if(
-    !confirm(
-      "Eliminare il PDF selezionato?"
-    )
-  )
-    return;
-
-
-  await db
-    .storage
-    .from(DOCUMENT_BUCKET)
-    .remove([
-      filePath
-    ]);
-
-
-  const result =
-    await db
-      .from("patient_documents")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error) {
-
-    alert(
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
+document.getElementById("uploadDocumentButton")?.addEventListener("click", async()=>{
+  const fileInput=document.getElementById("documentFile"), file=fileInput?.files?.[0];
+  if(!file){showMessage("documentMessage","Seleziona un documento.","error");return;}
+  const allowed=file.type==="application/pdf" || file.type.startsWith("image/");
+  if(!allowed){showMessage("documentMessage","Sono ammessi PDF o immagini.","error");return;}
+  if(file.size>25*1024*1024){showMessage("documentMessage","File troppo grande. Limite 25 MB.","error");return;}
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  const filePath=`${currentPatient.id}/${Date.now()}_${safeName}`;
+  const upload=await db.storage.from(DOCUMENT_BUCKET).upload(filePath,file,{upsert:false});
+  if(upload.error){showMessage("documentMessage",upload.error.message,"error");return;}
+  const insert=await db.from("patient_documents").insert([{
+    patient_id:currentPatient.id,file_name:file.name,file_path:filePath,
+    document_date:document.getElementById("documentDate").value||todayISO(),
+    category:document.getElementById("documentCategory").value||"Altro",
+    description:document.getElementById("documentDescription").value.trim()||null
+  }]);
+  if(insert.error){await db.storage.from(DOCUMENT_BUCKET).remove([filePath]);showMessage("documentMessage",insert.error.message,"error");return;}
+  fileInput.value=""; document.getElementById("documentDescription").value="";
+  showMessage("documentMessage","Documento caricato correttamente.","success");
   await loadPatientDocuments();
+});
 
+async function deleteDocument(id,filePath){
+  if(!confirm("Eliminare definitivamente questo documento?")) return;
+  const storage=await db.storage.from(DOCUMENT_BUCKET).remove([filePath]);
+  if(storage.error){alert(storage.error.message);return;}
+  const result=await db.from("patient_documents").delete().eq("id",id);
+  if(result.error){alert(result.error.message);return;}
+  await loadPatientDocuments();
 }
 
+async function generatePhysioReport(){
+  if(!currentPatient) return;
+  const fields=["reportReason","reportAssessment","reportTreatment","reportOutcome","reportRecommendations"];
+  const subject=document.getElementById("reportSubject").value.trim()||"Relazione fisioterapica";
+  const date=document.getElementById("reportDate").value||todayISO();
+  const signature=document.getElementById("reportSignature").value.trim()||"Matteo Riva – Fisioterapista";
+  const logoDataUrl=await getLogoDataUrl();
+  const section=(title,id)=>{const v=document.getElementById(id).value.trim();return v?`<section style="margin:20px 0;"><h3 style="margin:0 0 7px;color:#0b192c;">${title}</h3><div style="white-space:pre-line;line-height:1.65;">${escapeHtml(v)}</div></section>`:"";};
+  document.getElementById("printSheet").innerHTML=`<div style="font-family:'Plus Jakarta Sans',Arial,sans-serif;padding:25px;color:#0f172a;">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #0b192c;padding-bottom:15px;">
+      <div>${logoDataUrl?`<img src="${logoDataUrl}" style="height:55px;width:auto;max-width:220px;object-fit:contain;" alt="Noceto Lab">`:"<h1 style=\"margin:0;color:#0b192c;\">Noceto Lab</h1>"}</div>
+      <div style="text-align:right;font-size:12px;color:#64748b;">${escapeHtml(formatDateIT(date))}</div>
+    </div>
+    <h2 style="color:#0b192c;margin:25px 0 5px;">${escapeHtml(subject)}</h2>
+    <p><strong>Paziente:</strong> ${escapeHtml(currentPatient.name)}</p>
+    ${fields.map((id,i)=>section(["Motivo della presa in carico","Valutazione clinico-funzionale","Trattamento / percorso svolto","Esito / andamento","Indicazioni / raccomandazioni"][i],id)).join("")}
+    <div style="margin-top:45px;border-top:1px solid #e2e8f0;padding-top:15px;">${escapeHtml(signature)}</div>
+  </div>`;
+  const imgs=[...document.getElementById("printSheet").querySelectorAll("img")]; await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;})));
+  window.print();
+  showMessage("reportMessage","Relazione pronta per stampa/PDF.","success");
+}
+document.getElementById("generateReportButton")?.addEventListener("click",generatePhysioReport);
 
 /* =========================================================
    NOTE
@@ -6105,6 +5966,77 @@ async function deletePatientNote(
 
 }
 
+
+/* =========================================================
+   COMUNICAZIONI
+========================================================= */
+
+async function loadTherapistMessages(){
+  const box=document.getElementById("therapistMessagesList"); if(!box||!currentPatient)return;
+  box.innerHTML="Caricamento...";
+  const result=await db.from("patient_messages").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:true});
+  if(result.error){box.innerHTML=`<div class="message error">${escapeHtml(result.error.message)}</div>`;return;}
+  if(!result.data?.length){box.innerHTML=`<div class="exercise-sheet-empty">Nessuna comunicazione.</div>`;return;}
+  box.innerHTML=result.data.map(m=>`<div class="chat-message ${m.sender_role==='therapist'?'me':'other'}"><small>${m.sender_role==='therapist'?'👨‍⚕️ Tu':'👤 Paziente'} · ${escapeHtml(formatDateTimeIT(m.created_at))}</small><div style="white-space:pre-line;">${escapeHtml(m.content)}</div></div>`).join("");
+  box.scrollTop=box.scrollHeight;
+}
+
+async function sendTherapistMessage(){
+  const input=document.getElementById("therapistMessageContent"), content=input.value.trim();
+  if(!content||!currentPatient)return;
+  const result=await db.from("patient_messages").insert([{patient_id:currentPatient.id,sender_id:currentUser.id,sender_role:"therapist",content}]);
+  if(result.error){showMessage("therapistMessageStatus",result.error.message,"error");return;}
+  input.value=""; showMessage("therapistMessageStatus","Messaggio inviato.","success"); await loadTherapistMessages();
+}
+
+async function loadPatientMessages(){
+  const box=document.getElementById("patientMessagesList"); if(!box||!currentPatient)return;
+  box.innerHTML="Caricamento...";
+  const result=await db.from("patient_messages").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:true});
+  if(result.error){box.innerHTML=`<div class="message error">${escapeHtml(result.error.message)}</div>`;return;}
+  if(!result.data?.length){box.innerHTML=`<div class="exercise-sheet-empty">Nessuna comunicazione. Puoi scrivere al fisioterapista qui sotto.</div>`;return;}
+  box.innerHTML=result.data.map(m=>`<div class="chat-message ${m.sender_role==='patient'?'me':'other'}"><small>${m.sender_role==='patient'?'👤 Tu':'👨‍⚕️ Fisioterapista'} · ${escapeHtml(formatDateTimeIT(m.created_at))}</small><div style="white-space:pre-line;">${escapeHtml(m.content)}</div></div>`).join("");
+  box.scrollTop=box.scrollHeight;
+}
+
+async function sendPatientMessage(){
+  const input=document.getElementById("patientMessageContent"), content=input.value.trim();
+  if(!content||!currentPatient)return;
+  const result=await db.from("patient_messages").insert([{patient_id:currentPatient.id,sender_id:currentUser.id,sender_role:"patient",content}]);
+  if(result.error){showMessage("patientMessageStatus",result.error.message,"error");return;}
+  input.value=""; showMessage("patientMessageStatus","Messaggio inviato.","success"); await loadPatientMessages();
+}
+
+document.getElementById("sendTherapistMessageButton")?.addEventListener("click",sendTherapistMessage);
+document.getElementById("refreshTherapistMessagesButton")?.addEventListener("click",loadTherapistMessages);
+document.getElementById("sendPatientMessageButton")?.addEventListener("click",sendPatientMessage);
+document.getElementById("refreshPatientMessagesButton")?.addEventListener("click",loadPatientMessages);
+
+/* =========================================================
+   STATISTICHE STUDIO
+========================================================= */
+
+async function loadStudioStatistics(){
+  const summary=document.getElementById("studioStatsSummary"), recent=document.getElementById("studioStatsRecent"), docs=document.getElementById("studioStatsDocuments");
+  if(!summary)return;
+  summary.innerHTML="Caricamento...";
+  const tables=["patients","exercises","patient_exercises","patient_documents","patient_assessments","patient_metrics","patient_messages","running_plans"];
+  const counts={};
+  for(const table of tables){ const r=await db.from(table).select("id",{count:"exact",head:true}); counts[table]=r.error?null:(r.count||0); }
+  const labels={patients:"Pazienti",exercises:"Esercizi",patient_exercises:"Assegnazioni esercizi",patient_documents:"Documenti",patient_assessments:"Valutazioni",patient_metrics:"Misurazioni",patient_messages:"Messaggi",running_plans:"Programmi corsa"};
+  summary.innerHTML=`<div class="stats-grid">${tables.map(t=>`<div class="stat-mini"><div>${labels[t]}</div><div class="value">${counts[t]??'—'}</div></div>`).join("")}</div>`;
+  const since=new Date(Date.now()-30*24*60*60*1000).toISOString();
+  const recentTables=["patient_documents","patient_assessments","patient_metrics","patient_messages","running_plans","patient_exercises"];
+  const recentCounts={};
+  for(const table of recentTables){ const r=await db.from(table).select("id",{count:"exact",head:true}).gte("created_at",since); recentCounts[table]=r.error?null:(r.count||0); }
+  recent.innerHTML=`<div class="stats-grid">${recentTables.map(t=>`<div class="stat-mini"><div>${labels[t]}</div><div class="value">${recentCounts[t]??'—'}</div></div>`).join("")}</div>`;
+  const dr=await db.from("patient_documents").select("category");
+  if(dr.error){docs.innerHTML=`<div class="message error">${escapeHtml(dr.error.message)}</div>`;return;}
+  const map={}; (dr.data||[]).forEach(x=>{const k=x.category||"Altro";map[k]=(map[k]||0)+1;});
+  docs.innerHTML=Object.keys(map).length?Object.entries(map).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-color);"><span>${escapeHtml(k)}</span><strong>${v}</strong></div>`).join(""):"Nessun documento.";
+}
+
+document.getElementById("refreshStudioStatsButton")?.addEventListener("click",loadStudioStatistics);
 
 /* =========================================================
    CORSA
@@ -7660,101 +7592,26 @@ async function loadPatientPortal() {
      DOCUMENTI
   ====================================================== */
 
-  const docContainer =
-    document.getElementById(
-      "patientPortalDocuments"
-    );
-
-
-  docContainer.innerHTML =
-    "Caricamento...";
-
-
-  const docResult =
-    await db
-      .from("patient_documents")
-      .select("*")
-      .eq(
-        "patient_id",
-        currentPatient.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:
-            false
-        }
-      );
-
-
-  if(
-    docResult.error
-  ) {
-
-    docContainer.innerText =
-      "Errore nel caricamento dei report.";
-
-  }
-  else if(
-    !docResult.data ||
-    docResult.data.length === 0
-  ) {
-
-    docContainer.innerText =
-      "Nessun report presente.";
-
-  }
+  const docContainer = document.getElementById("patientPortalDocuments");
+  docContainer.innerHTML = "Caricamento...";
+  const docResult = await db.from("patient_documents").select("*").eq("patient_id", currentPatient.id).order("document_date", {ascending:false}).order("created_at", {ascending:false});
+  if(docResult.error){ docContainer.innerHTML=`<div class="message error">${escapeHtml(docResult.error.message)}</div>`; }
+  else if(!docResult.data?.length){ docContainer.innerText="Nessun documento presente."; }
   else {
-
-    docContainer.innerHTML =
-      "";
-
-
-    docResult.data.forEach(
-      doc => {
-
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "document";
-
-
-        div.innerHTML = `
-
-          <h3>
-            📄 ${escapeHtml(
-              doc.file_name
-            )}
-          </h3>
-
-
-          <a
-            href="#"
-            onclick="
-              openDocument(
-                '${escapeAttribute(doc.file_path)}'
-              );
-              return false;
-            "
-          >
-            Visualizza Report PDF
-          </a>
-
-        `;
-
-
-        docContainer.appendChild(
-          div
-        );
-
-      }
-    );
-
+    docContainer.innerHTML="";
+    docResult.data.forEach(doc=>{
+      const div=document.createElement("div"); div.className="document";
+      const date=doc.document_date ? formatDateIT(doc.document_date) : formatDateIT(doc.created_at);
+      div.innerHTML=`<h3>📄 ${escapeHtml(doc.file_name || "Documento")}</h3>
+        <div class="document-meta"><span class="document-chip">${escapeHtml(doc.category || "Altro")}</span><span class="document-chip">📅 ${escapeHtml(date)}</span></div>
+        ${doc.description?`<p style="color:var(--text-muted);">${escapeHtml(doc.description)}</p>`:""}
+        <div class="actions no-print"><button class="secondary" onclick="openDocument('${escapeAttribute(doc.file_path)}')">👁️ Anteprima</button><button class="secondary" onclick="downloadDocument('${escapeAttribute(doc.file_path)}','${escapeAttribute(doc.file_name || 'documento')}')">⬇️ Download</button></div>`;
+      docContainer.appendChild(div);
+    });
   }
+
+
+  await loadPatientMessages();
 
 
   /* =======================================================
@@ -8409,6 +8266,8 @@ function escapeAttribute(
 
 if(document.getElementById("assessmentDate")) document.getElementById("assessmentDate").value=todayISO();
 if(document.getElementById("metricDate")) document.getElementById("metricDate").value=todayISO();
+if(document.getElementById("documentDate")) document.getElementById("documentDate").value=todayISO();
+if(document.getElementById("reportDate")) document.getElementById("reportDate").value=todayISO();
 document.getElementById("saveAssessmentButton")?.addEventListener("click", saveAssessment);
 document.getElementById("saveMetricButton")?.addEventListener("click", saveMetric);
 document.getElementById("refreshProgressButton")?.addEventListener("click", loadMetrics);

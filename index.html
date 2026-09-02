@@ -970,11 +970,6 @@ hr {
   width:100%; min-height:520px; border:1px solid var(--border-color);
   border-radius:10px; margin-top:12px; background:#f8fafc;
 }
-.message-thread { display:grid; gap:10px; margin-top:14px; }
-.chat-message { padding:12px 14px; border:1px solid var(--border-color); border-radius:12px; max-width:85%; }
-.chat-message.me { margin-left:auto; background:#eff6ff; border-color:#bfdbfe; }
-.chat-message.other { margin-right:auto; background:#f8fafc; }
-.chat-message small { display:block; margin-bottom:5px; }
 .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
 .stat-mini { padding:16px; border:1px solid var(--border-color); border-radius:12px; background:#fff; }
 .stat-mini .value { font-size:28px; font-weight:800; color:var(--primary); margin-top:4px; }
@@ -1099,11 +1094,12 @@ hr {
 
 }
 
-.tab-panel.hidden-panel {
+.tab-panel {
+  display: none !important;
+}
 
-  display:
-    none !important;
-
+.tab-panel.active-panel {
+  display: block !important;
 }
 
 
@@ -2283,16 +2279,9 @@ hr {
 
     <hr>
     <h3>📔 Diario scritto dal paziente</h3>
-    <p style="color:var(--text-muted);font-size:13px;">Le annotazioni del paziente sono visibili solo al paziente e al terapista.</p>
+    <p style="color:var(--text-muted);font-size:13px;">Le annotazioni sono visibili a te e al fisioterapista. Il fisioterapista può segnarle come lette.</p>
     <div id="therapistDiaryList">Caricamento...</div>
 
-  </div>
-<label>Nuovo messaggio</label>
-    <textarea id="therapistMessageContent" placeholder="Scrivi una comunicazione al paziente..."></textarea>
-    <br><br>
-    <button id="sendTherapistMessageButton" class="primary">📤 Invia al paziente</button>
-    <div id="therapistMessageStatus" class="message hidden"></div>
-    <div id="therapistMessagesList" class="message-thread">Caricamento...</div>
   </div>
 
   <!-- =====================================================
@@ -3242,116 +3231,36 @@ async function loadLogo() {
    TABS
 ========================================================= */
 
-function setupSectionTabs(
-  containerId
-) {
+function setupSectionTabs(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-  const container =
-    document.getElementById(
-      containerId
-    );
+  const buttons = Array.from(container.querySelectorAll(".section-tab"));
+  const root = container.closest("section");
+  if (!root) return;
 
+  const panels = Array.from(root.querySelectorAll(".tab-panel"));
 
-  if(!container)
-    return;
+  function activate(targetId) {
+    buttons.forEach(b => b.classList.toggle("active", b.dataset.target === targetId));
+    panels.forEach(panel => panel.classList.remove("active-panel"));
 
+    const target = document.getElementById(targetId);
+    if (target && root.contains(target)) target.classList.add("active-panel");
 
-  const buttons =
-    container.querySelectorAll(
-      ".section-tab"
-    );
-
-
-  buttons.forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          buttons.forEach(
-            b =>
-              b.classList.remove(
-                "active"
-              )
-          );
-
-
-          button.classList.add(
-            "active"
-          );
-
-
-          const targetId =
-            button.dataset.target;
-
-
-          const section =
-            document.getElementById(
-              targetId
-            );
-
-
-          if(!section)
-            return;
-
-
-          const root =
-            container.closest(
-              "section"
-            );
-
-
-          root
-            .querySelectorAll(
-              ".tab-panel"
-            )
-            .forEach(
-              panel =>
-                panel.classList.add(
-                  "hidden-panel"
-                )
-            );
-
-
-          section.classList.remove(
-            "hidden-panel"
-          );
-
-
-          if(
-            containerId ===
-            "therapistPatientTabs"
-          ) {
-
-            const assignPanel =
-              document.getElementById(
-                "therapistTabProgramAssign"
-              );
-
-
-            if(assignPanel) {
-
-              assignPanel.classList.toggle(
-                "hidden-panel",
-                targetId !==
-                "therapistTabProgram"
-              );
-
-            }
-
-          }
-
-        }
-      );
-
+    if (containerId === "therapistPatientTabs") {
+      const assignPanel = document.getElementById("therapistTabProgramAssign");
+      if (assignPanel && root.contains(assignPanel)) {
+        assignPanel.classList.toggle("active-panel", targetId === "therapistTabProgram");
+      }
     }
-  );
+  }
 
+  buttons.forEach(button => {
+    button.addEventListener("click", () => activate(button.dataset.target));
+  });
 
-  if(buttons[0])
-    buttons[0].click();
-
+  if (buttons[0]) activate(buttons[0].dataset.target);
 }
 
 

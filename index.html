@@ -6668,124 +6668,163 @@ document
 async function saveRunningProgram() {
 
   if(!currentPatient) {
-
-    alert(
-      "Nessun paziente selezionato."
-    );
-
+    alert("Nessun paziente selezionato.");
     return;
-
   }
 
+  const data = collectRunningPlanData();
 
-  const data =
-    collectRunningPlanData();
-
+  // Validazione minima prima del salvataggio
+  if(!data.weeks || !data.sessions || !Array.isArray(data.planData)) {
+    showMessage(
+      "runningMessage",
+      "La scheda corsa non contiene dati validi.",
+      "error"
+    );
+    return;
+  }
 
   let result;
 
+  if(editingRunningPlanId !== null && editingRunningPlanId !== undefined) {
 
-  if(editingRunningPlanId) {
+    const planId = Number(editingRunningPlanId);
 
-    result =
-      await db
-        .from("running_plans")
-        .update({
+    if(!Number.isFinite(planId)) {
+      showMessage(
+        "runningMessage",
+        "ID della scheda corsa non valido.",
+        "error"
+      );
+      return;
+    }
 
-          weeks_count:
-            data.weeks,
+    console.log("Salvataggio modifica scheda corsa", {
+      planId,
+      patientId: currentPatient.id,
+      weeks: data.weeks,
+      sessions: data.sessions,
+      planData: data.planData
+    });
 
-          sessions_per_week:
-            data.sessions,
+    // UPDATE senza SELECT: in questo modo il salvataggio non dipende
+    // dalla risposta REST della riga aggiornata.
+    result = await db
+      .from("running_plans")
+      .update({
+        weeks_count: Number(data.weeks),
+        sessions_per_week: Number(data.sessions),
+        plan_data: data.planData
+      })
+      .eq("id", planId);
 
-          plan_data:
-            data.planData
+    if(result.error) {
+      console.error("Errore UPDATE running_plans:", result.error);
+      showMessage(
+        "runningMessage",
+        "Errore nel salvataggio: " + result.error.message,
+        "error"
+      );
+      return;
+    }
 
-        })
-        .eq(
-          "id",
-          editingRunningPlanId
-        );
+    // Verifica reale leggendo la scheda appena salvata.
+    const verify = await db
+      .from("running_plans")
+      .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
+      .eq("id", planId)
+      .maybeSingle();
+
+    if(verify.error) {
+      console.error("Errore verifica salvataggio running_plans:", verify.error);
+      showMessage(
+        "runningMessage",
+        "La modifica è stata inviata ma non riesco a verificarla: " + verify.error.message,
+        "error"
+      );
+      return;
+    }
+
+    if(!verify.data) {
+      console.error("Scheda corsa non trovata dopo UPDATE", planId);
+      showMessage(
+        "runningMessage",
+        "La scheda corsa non è stata trovata dopo il salvataggio. Controlla le policy RLS.",
+        "error"
+      );
+      return;
+    }
+
+    if(
+      Number(verify.data.weeks_count) !== Number(data.weeks) ||
+      Number(verify.data.sessions_per_week) !== Number(data.sessions) ||
+      JSON.stringify(verify.data.plan_data) !== JSON.stringify(data.planData)
+    ) {
+      console.error("Verifica modifica fallita", {
+        salvato: verify.data,
+        atteso: data
+      });
+      showMessage(
+        "runningMessage",
+        "La modifica non coincide con i dati inviati. Controlla la tabella running_plans.",
+        "error"
+      );
+      return;
+    }
 
   }
   else {
 
-    result =
-      await db
-        .from("running_plans")
-        .insert([{
+    console.log("Creazione nuova scheda corsa", {
+      patientId: currentPatient.id,
+      weeks: data.weeks,
+      sessions: data.sessions
+    });
 
-          patient_id:
-            currentPatient.id,
+    result = await db
+      .from("running_plans")
+      .insert([{
+        patient_id: currentPatient.id,
+        weeks_count: Number(data.weeks),
+        sessions_per_week: Number(data.sessions),
+        plan_data: data.planData
+      }])
+      .select("id")
+      .single();
 
-          weeks_count:
-            data.weeks,
-
-          sessions_per_week:
-            data.sessions,
-
-          plan_data:
-            data.planData
-
-        }]);
-
+    if(result.error) {
+      console.error("Errore INSERT running_plans:", result.error);
+      showMessage(
+        "runningMessage",
+        "Errore nel salvataggio: " + result.error.message,
+        "error"
+      );
+      return;
+    }
   }
 
-
-  if(result.error) {
-
-    showMessage(
-      "runningMessage",
-      result.error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  const message =
-    editingRunningPlanId
-    ?
-    "Programma modificato con successo!"
-    :
-    "Programma di corsa salvato con successo!";
-
+  const wasEditing = editingRunningPlanId !== null && editingRunningPlanId !== undefined;
 
   showMessage(
     "runningMessage",
-    message,
+    wasEditing
+      ? "Programma modificato con successo!"
+      : "Programma di corsa salvato con successo!",
     "success"
   );
 
-
-  editingRunningPlanId =
-    null;
-
+  editingRunningPlanId = null;
 
   document
-    .getElementById(
-      "cancelRunningEditButton"
-    )
-    .classList.add(
-      "hidden"
-    );
-
+    .getElementById("cancelRunningEditButton")
+    .classList.add("hidden");
 
   document
-    .getElementById(
-      "saveRunningProgramButton"
-    )
-    .innerText =
-      "💾 Salva Scheda Corsa";
-
+    .getElementById("saveRunningProgramButton")
+    .innerText = "💾 Salva Scheda Corsa";
 
   await loadRunningPlans();
-
-
   await loadDashboardStats();
-
 }
 
 

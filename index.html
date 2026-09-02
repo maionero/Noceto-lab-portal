@@ -1564,6 +1564,29 @@ hr {
 
 }
 
+
+/* =========================================================
+   FASE A/B/C — UI EVOLUTA
+========================================================= */
+.patient-search { margin: 0 0 16px; }
+.dashboard-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.activity-item { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--border-color); }
+.activity-item:last-child { border-bottom:0; }
+.activity-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); margin-top:6px; flex:0 0 auto; }
+.timeline { position:relative; padding-left:18px; }
+.timeline:before { content:""; position:absolute; left:5px; top:8px; bottom:8px; width:2px; background:var(--border-color); }
+.timeline-item { position:relative; padding:0 0 18px 18px; }
+.timeline-item:before { content:""; position:absolute; left:-17px; top:5px; width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid white; box-shadow:0 0 0 1px var(--border-color); }
+.timeline-date { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; }
+.timeline-title { font-weight:800; margin-top:3px; }
+.timeline-body { font-size:13px; color:var(--text-muted); margin-top:4px; white-space:pre-line; }
+.phase-chip { display:inline-flex; padding:4px 9px; border-radius:999px; background:var(--accent-light); color:var(--accent); font-size:11px; font-weight:800; margin:6px 0; }
+.unread-badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:var(--danger); color:#fff; font-size:10px; font-weight:800; margin-left:5px; }
+.todo-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
+.todo-card { border:1px solid var(--border-color); border-radius:10px; padding:13px; background:#fff; }
+.running-session-card { border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:10px; background:#fff; }
+@media(max-width:700px){ .patient-search{position:sticky;top:64px;z-index:20;background:var(--bg-color);padding-top:6px;} .timeline{padding-left:10px;} .timeline-item{padding-left:15px;} }
+
 </style>
 
 </head>
@@ -1854,6 +1877,10 @@ hr {
       👥 Registro Pazienti
     </h2>
 
+    <div class="patient-search">
+      <input id="patientSearchInput" type="search" placeholder="🔎 Cerca paziente per nome...">
+    </div>
+
     <div
       id="patientsList"
       class="grid"
@@ -1863,6 +1890,10 @@ hr {
 
   </div>
 
+  <div class="card">
+    <div class="section-title"><h2>⚡ Attività recenti</h2><button id="refreshDashboardActivityButton" class="secondary">↻ Aggiorna</button></div>
+    <div id="dashboardActivity">Caricamento...</div>
+  </div>
 
   <!-- LIBRERIA ESERCIZI -->
 
@@ -1905,6 +1936,8 @@ hr {
 
   <div class="section-tabs"
        id="therapistPatientTabs">
+
+    <button class="section-tab" data-target="therapistTabTimeline">🧭 Timeline</button>
 
     <button
       class="section-tab active"
@@ -1963,6 +1996,13 @@ hr {
 
   </div>
 
+
+  <!-- TIMELINE CLINICA -->
+  <div class="card tab-panel" id="therapistTabTimeline">
+    <div class="section-title"><h2>🧭 Timeline clinica</h2><button id="refreshTimelineButton" class="secondary">↻ Aggiorna</button></div>
+    <p style="color:var(--text-muted);font-size:13px;">Vista cronologica unica di valutazioni, progressi, esercizi, documenti, corsa e diario.</p>
+    <div id="patientTimeline">Caricamento...</div>
+  </div>
 
   <!-- =====================================================
        ESERCIZI
@@ -2097,6 +2137,15 @@ hr {
 
 
     <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+      <div>
+        <label>Fase riabilitativa</label>
+        <select id="exercisePhase">
+          <option value="">Nessuna fase</option>
+          <option value="Fase 1 — Controllo / tolleranza">Fase 1 — Controllo / tolleranza</option>
+          <option value="Fase 2 — Forza / capacità">Fase 2 — Forza / capacità</option>
+          <option value="Fase 3 — Funzione / return to sport">Fase 3 — Funzione / return to sport</option>
+        </select>
+      </div>
       <div>
         <label>Frequenza / settimana</label>
         <input id="frequencyPerWeek" type="number" min="0" max="14" placeholder="3">
@@ -2438,6 +2487,9 @@ hr {
     <div id="runningPlansList">
       Caricamento...
     </div>
+    <hr>
+    <h2>🏃 Diario delle corse del paziente</h2>
+    <div id="therapistRunningSessions">Caricamento...</div>
 
   </div>
 
@@ -2496,6 +2548,19 @@ hr {
     <div id="assessmentMessage" class="message hidden"></div>
     <hr>
     <div id="assessmentsList">Caricamento...</div>
+
+    <hr>
+    <h2>🧪 Test strutturati</h2>
+    <div class="grid">
+      <div><label>Test</label><select id="clinicalTestSelect"><option value="">Seleziona test</option><option value="VAS">Dolore VAS/NRS</option><option value="5xSTS">5x Sit-to-Stand</option><option value="TUG">Timed Up and Go</option><option value="Single Leg Squat">Single Leg Squat</option><option value="Hop Test">Hop Test</option><option value="6MWT">6 Minute Walk Test</option><option value="Altro">Altro</option></select></div>
+      <div><label>Valore</label><input id="clinicalTestValue" type="number" step="any" placeholder="Es. 12.4"></div>
+      <div><label>Unità</label><input id="clinicalTestUnit" placeholder="sec, rep, m, /10..."></div>
+      <div><label>Condividi col paziente</label><select id="clinicalTestShared"><option value="true">Sì</option><option value="false">No</option></select></div>
+    </div>
+    <label>Note test</label><input id="clinicalTestNote" placeholder="Condizioni, lato, variante, osservazioni...">
+    <button id="saveClinicalTestButton" class="primary">＋ Salva test</button>
+    <div id="clinicalTestMessage" class="message hidden"></div>
+    <div id="clinicalTestResultsList" style="margin-top:12px;">Caricamento...</div>
   </div>
 
   <!-- =====================================================
@@ -2863,7 +2928,7 @@ hr {
       class="section-tab"
       data-target="portalDiary"
     >
-      📔 Diario
+      📔 Diario <span id="patientDiaryUnreadBadge" class="unread-badge hidden">0</span>
     </button>
 
     <button
@@ -2873,8 +2938,15 @@ hr {
       🏃 Corsa
     </button>
 
+    <button class="section-tab" data-target="portalRunningDiary">📓 Diario corsa</button>
+
   </div>
 
+
+  <div class="card">
+    <div class="section-title"><h2>✅ Da fare</h2></div>
+    <div id="patientTodo" class="todo-grid"><div class="todo-card">Caricamento...</div></div>
+  </div>
 
   <div
     class="card"
@@ -3003,6 +3075,24 @@ hr {
     <div id="patientDiaryMessage" class="message hidden"></div>
     <hr>
     <div id="patientDiaryList">Caricamento...</div>
+  </div>
+
+  <!-- DIARIO CORSA PAZIENTE -->
+  <div class="card tab-panel" id="portalRunningDiary" style="display:none !important;">
+    <h2>🏃 Diario delle corse</h2>
+    <p style="color:var(--text-muted);font-size:13px;">Registra una seduta di corsa per aiutare il fisioterapista a monitorare carico e risposta.</p>
+    <div class="grid">
+      <div><label>Data</label><input id="runningSessionDate" type="date"></div>
+      <div><label>Durata (min)</label><input id="runningSessionDuration" type="number" min="0" step="1"></div>
+      <div><label>Distanza (km)</label><input id="runningSessionDistance" type="number" min="0" step="0.01"></div>
+      <div><label>RPE 0–10</label><input id="runningSessionRpe" type="number" min="0" max="10" step="1"></div>
+      <div><label>Dolore 0–10</label><input id="runningSessionPain" type="number" min="0" max="10" step="0.5"></div>
+    </div>
+    <label>Tipo / struttura seduta</label><input id="runningSessionType" placeholder="Es. lento, ripetute, progressivo, partita...">
+    <label>Sensazioni / note</label><textarea id="runningSessionNotes" placeholder="Come è andata? Sintomi, fatica, risposta il giorno dopo..."></textarea>
+    <button id="saveRunningSessionButton" class="primary">＋ Registra corsa</button>
+    <div id="runningSessionMessage" class="message hidden"></div>
+    <hr><div id="runningSessionsList">Caricamento...</div>
   </div>
 
   <!-- CORSA PAZIENTE -->
@@ -3606,6 +3696,116 @@ async function saveNewPassword() {
 
 
 /* =========================================================
+   FASE A/B/C — FUNZIONI EVOLUTE
+========================================================= */
+
+async function loadDashboardActivity(){
+  const box=document.getElementById("dashboardActivity");
+  if(!box) return;
+  box.innerHTML="Caricamento...";
+  const tasks=[
+    ["patient_assessments","🩺","Valutazione"],
+    ["patient_metrics","📈","Misurazione"],
+    ["patient_documents","📄","Documento"],
+    ["patient_diary_entries","📔","Diario paziente"],
+    ["patient_exercises","🏋️","Esercizio assegnato"],
+    ["running_plans","🏃","Programma corsa"]
+  ];
+  const all=[];
+  for(const [table,icon,label] of tasks){
+    const r=await db.from(table).select("id,patient_id,created_at").order("created_at",{ascending:false}).limit(8);
+    if(r.error) continue;
+    (r.data||[]).forEach(x=>all.push({...x,icon,label}));
+  }
+  const patientIds=[...new Set(all.map(x=>x.patient_id).filter(Boolean))];
+  let names={};
+  if(patientIds.length){ const r=await db.from("patients").select("id,name").in("id",patientIds); (r.data||[]).forEach(p=>names[p.id]=p.name); }
+  all.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
+  const rows=all.slice(0,12);
+  box.innerHTML=rows.length?rows.map(x=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${x.icon} ${escapeHtml(x.label)}</strong><div style="font-size:13px;">${escapeHtml(names[x.patient_id]||"Paziente")}</div><small>${escapeHtml(formatDateTimeIT(x.created_at))}</small></div></div>`).join(""):"Nessuna attività recente.";
+}
+
+function filterPatients(){
+  const q=(document.getElementById("patientSearchInput")?.value||"").trim().toLowerCase();
+  document.querySelectorAll("#patientsList .patient").forEach(el=>{ el.style.display=el.innerText.toLowerCase().includes(q)?"":"none"; });
+}
+
+async function loadPatientTimeline(){
+  const box=document.getElementById("patientTimeline");
+  if(!box||!currentPatient) return;
+  box.innerHTML="Caricamento timeline...";
+  const p=currentPatient.id;
+  const events=[];
+  const push=(rows,type,icon,title,body,dateField="created_at")=>(rows||[]).forEach(r=>events.push({date:r[dateField]||r.created_at||r.assessment_date||r.recorded_at, type,icon,title:typeof title==="function"?title(r):title,body:typeof body==="function"?body(r):body}));
+  const [a,m,d,e,rp,di,rs,ct]=await Promise.all([
+    db.from("patient_assessments").select("*").eq("patient_id",p),
+    db.from("patient_metrics").select("*").eq("patient_id",p),
+    db.from("patient_documents").select("*").eq("patient_id",p),
+    db.from("patient_exercises").select("*, exercises(name)").eq("patient_id",p),
+    db.from("running_plans").select("*").eq("patient_id",p),
+    db.from("patient_diary_entries").select("*").eq("patient_id",p),
+    db.from("patient_running_diary").select("*").eq("patient_id",p),
+    db.from("patient_test_results").select("*").eq("patient_id",p)
+  ]);
+  push(a.data,"assessment","🩺",x=>x.assessment_type||"Valutazione",x=>x.subjective||x.interpretation||x.plan||"", "assessment_date");
+  push(m.data,"metric","📈",x=>x.metric_name||"Misurazione",x=>`${x.value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
+  push(d.data,"document","📄",x=>x.file_name||"Documento",x=>`${x.category||"Altro"}${x.description?" · "+x.description:""}`,"document_date");
+  push(e.data,"exercise","🏋️",x=>x.exercises?.name||"Esercizio assegnato",x=>[x.phase_name,x.goal].filter(Boolean).join(" · "));
+  push(rp.data,"running","🏃",x=>x.title||"Programma corsa",x=>x.workout||x.notes||"", "date");
+  push(di.data,"diary","📔",x=>x.title||"Diario",x=>x.content||"");
+  push(rs.data,"running-session","🏃",x=>x.session_type||"Seduta di corsa",x=>[x.duration_min?x.duration_min+" min":null,x.distance_km?x.distance_km+" km":null,x.rpe!=null?"RPE "+x.rpe:null,x.pain_score!=null?"Dolore "+x.pain_score+"/10":null].filter(Boolean).join(" · "),"session_date");
+  push(ct.data,"test","🧪",x=>x.test_name||"Test",x=>`${x.test_value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
+  events.sort((x,y)=>String(y.date||"").localeCompare(String(x.date||"")));
+  box.innerHTML=events.length?`<div class="timeline">${events.map(x=>`<div class="timeline-item"><div class="timeline-date">${escapeHtml(formatDateTimeIT(x.date))} · ${escapeHtml(x.type)}</div><div class="timeline-title">${x.icon} ${escapeHtml(x.title)}</div><div class="timeline-body">${escapeHtml(x.body||"")}</div></div>`).join("")}</div>`:`<div class="exercise-sheet-empty">Nessun evento clinico registrato.</div>`;
+}
+
+async function loadPatientTodo(){
+  const box=document.getElementById("patientTodo"); if(!box||!currentPatient) return;
+  const [ex,doc,run,di]=await Promise.all([
+    db.from("patient_exercises").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
+    db.from("patient_documents").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
+    db.from("running_plans").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
+    db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id)
+  ]);
+  const unread=await db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).is("read_at",null);
+  const badge=document.getElementById("patientDiaryUnreadBadge");
+  if(badge){ badge.textContent=String(unread.count||0); badge.classList.toggle("hidden",!(unread.count||0)); }
+  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unread.count||0} ${unread.count===1?"voce da leggere":"voci da leggere"}</div></div>`;
+}
+
+async function loadRunningSessions(){
+  const box=document.getElementById("therapistRunningSessions"); if(!box||!currentPatient)return;
+  const r=await db.from("patient_running_diary").select("*").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false});
+  if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
+  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>🏃 ${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;font-size:13px;">${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:7px;white-space:pre-line;color:var(--text-muted);">${escapeHtml(s.notes)}</div>`:""}</div>`).join(""):"Nessuna seduta di corsa registrata.";
+}
+
+async function saveRunningSession(){
+  const payload={patient_id:currentPatient.id,session_date:document.getElementById("runningSessionDate")?.value||todayISO(),duration_min:Number(document.getElementById("runningSessionDuration")?.value)||null,distance_km:Number(document.getElementById("runningSessionDistance")?.value)||null,rpe:document.getElementById("runningSessionRpe")?.value===""?null:Number(document.getElementById("runningSessionRpe").value),pain_score:document.getElementById("runningSessionPain")?.value===""?null:Number(document.getElementById("runningSessionPain").value),session_type:document.getElementById("runningSessionType")?.value.trim()||null,notes:document.getElementById("runningSessionNotes")?.value.trim()||null,created_by:(await db.auth.getUser()).data.user?.id||null};
+  const r=await db.from("patient_running_diary").insert(payload);
+  if(r.error){showMessage("runningSessionMessage",r.error.message,"error");return;}
+  ["runningSessionDuration","runningSessionDistance","runningSessionRpe","runningSessionPain","runningSessionType","runningSessionNotes"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+  showMessage("runningSessionMessage","Seduta registrata.","success"); await loadRunningSessions(); await loadPatientTimeline();
+}
+
+async function saveClinicalTest(){
+  if(!currentPatient)return;
+  const name=document.getElementById("clinicalTestSelect")?.value||"";
+  const value=document.getElementById("clinicalTestValue")?.value;
+  if(!name||value===""){showMessage("clinicalTestMessage","Inserisci test e valore.","error");return;}
+  const r=await db.from("patient_test_results").insert({patient_id:currentPatient.id,test_name:name,test_value:Number(value),unit:document.getElementById("clinicalTestUnit")?.value.trim()||null,note:document.getElementById("clinicalTestNote")?.value.trim()||null,is_shared:document.getElementById("clinicalTestShared")?.value==="true",recorded_at:todayISO()});
+  if(r.error){showMessage("clinicalTestMessage",r.error.message,"error");return;}
+  showMessage("clinicalTestMessage","Test salvato.","success"); await loadClinicalTests(); await loadPatientTimeline();
+}
+async function loadClinicalTests(){
+  const box=document.getElementById("clinicalTestResultsList"); if(!box||!currentPatient)return;
+  const r=await db.from("patient_test_results").select("*").eq("patient_id",currentPatient.id).order("recorded_at",{ascending:false}).order("created_at",{ascending:false});
+  if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
+  box.innerHTML=r.data?.length?r.data.map(x=>`<div class="note-card"><strong>🧪 ${escapeHtml(x.test_name)}</strong><div style="font-size:20px;font-weight:800;margin:6px 0;">${escapeHtml(String(x.test_value))} ${escapeHtml(x.unit||"")}</div><small>${escapeHtml(formatDateIT(x.recorded_at))} · ${x.is_shared?"👤 condiviso":"🔒 privato"}</small>${x.note?`<div style="margin-top:6px;">${escapeHtml(x.note)}</div>`:""}<div class="actions no-print"><button class="danger" onclick="deleteClinicalTest('${x.id}')">🗑️</button></div></div>`).join(""):"Nessun test strutturato registrato.";
+}
+async function deleteClinicalTest(id){if(!confirm("Eliminare questo risultato?"))return;const r=await db.from("patient_test_results").delete().eq("id",id);if(r.error)alert(r.error.message);else await loadClinicalTests();}
+
+/* =========================================================
    START APP
 ========================================================= */
 
@@ -3766,6 +3966,7 @@ async function startTherapist() {
 
   await loadDashboardStats();
   await loadStudioStatistics();
+  await loadDashboardActivity();
 
 }
 
@@ -4078,6 +4279,9 @@ async function openPatient(
 
 
   await loadRunningPlans();
+  await loadPatientTimeline();
+  await loadRunningSessions();
+  await loadClinicalTests();
 
 }
 
@@ -5003,6 +5207,7 @@ async function loadPatientExercises() {
       ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
       ${params.length ? `<p style="font-size:14px;"><strong>Prescrizione:</strong> ${params.map(escapeHtml).join(" · ")}</p>` : ""}
       ${item.goal ? `<p style="font-size:13px;"><strong>🎯 Obiettivo:</strong> ${escapeHtml(item.goal)}</p>` : ""}
+      ${item.phase_name ? `<div class="phase-chip">${escapeHtml(item.phase_name)}</div>` : ""}
       ${ex.instructions ? `<div class="exercise-instructions"><strong>▶ Esecuzione</strong><div style="margin-top:5px;white-space:pre-line;">${escapeHtml(ex.instructions)}</div></div>` : ""}
       ${ex.common_errors ? `<div style="margin-top:10px;font-size:13px;"><strong>⚠️ Cue / errori:</strong><div style="white-space:pre-line;margin-top:4px;">${escapeHtml(ex.common_errors)}</div></div>` : ""}
       ${item.notes ? `<p style="font-size:13px;color:var(--text-muted);"><strong>Note:</strong> ${escapeHtml(item.notes)}</p>` : ""}
@@ -5021,6 +5226,7 @@ async function loadPatientExercises() {
           <div><label>Durata (sec)</label><input id="editDuration_${item.id}" type="number" min="0" value="${item.duration ?? ""}"></div>
           <div><label>Recupero (sec)</label><input id="editRest_${item.id}" type="number" min="0" value="${item.rest ?? ""}"></div>
           <div><label>Frequenza / settimana</label><input id="editFrequency_${item.id}" type="number" min="0" max="14" value="${item.frequency_per_week ?? ""}"></div>
+          <div><label>Fase riabilitativa</label><select id="editPhase_${item.id}"><option value="">Nessuna fase</option><option value="Fase 1 — Controllo / tolleranza" ${item.phase_name==="Fase 1 — Controllo / tolleranza"?"selected":""}>Fase 1 — Controllo / tolleranza</option><option value="Fase 2 — Forza / capacità" ${item.phase_name==="Fase 2 — Forza / capacità"?"selected":""}>Fase 2 — Forza / capacità</option><option value="Fase 3 — Funzione / return to sport" ${item.phase_name==="Fase 3 — Funzione / return to sport"?"selected":""}>Fase 3 — Funzione / return to sport</option></select></div>
         </div>
         <label>Obiettivo</label>
         <input id="editGoal_${item.id}" value="${escapeAttribute(item.goal || "")}">
@@ -5083,7 +5289,8 @@ async function updateAssignedExercise(id) {
     rest: numberOrNull(val("editRest_" + id).value),
     frequency_per_week: numberOrNull(val("editFrequency_" + id)?.value || ""),
     goal: val("editGoal_" + id)?.value.trim() || null,
-    notes: val("editNotes_" + id).value.trim() || null
+    notes: val("editNotes_" + id).value.trim() || null,
+    phase_name: val("editPhase_" + id)?.value || null
   };
 
   const result = await db
@@ -5216,6 +5423,9 @@ document
               ? Number(document.getElementById("frequencyPerWeek").value)
               : null,
 
+            phase_name:
+              document.getElementById("exercisePhase")?.value || null,
+
             goal:
               document.getElementById("exerciseGoal")?.value.trim() || null,
 
@@ -5278,7 +5488,7 @@ document
         .value =
           "";
 
-      ["frequencyPerWeek", "rpeTarget", "exerciseGoal"].forEach(id => {
+      ["frequencyPerWeek", "rpeTarget", "exerciseGoal", "exercisePhase"].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.value = "";
       });
@@ -7387,9 +7597,19 @@ async function deleteRunningPlan(
    PORTALE PAZIENTE
 ========================================================= */
 
+
+async function loadPatientRunningSessions(){
+  const box=document.getElementById("runningSessionsList"); if(!box||!currentPatient)return;
+  const r=await db.from("patient_running_diary").select("*").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false});
+  if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
+  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;">${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(s.notes)}</div>`:""}</div>`).join(""):"Nessuna seduta registrata.";
+}
+
 async function loadPatientPortal() {
   await loadPatientSharedProgress();
   await loadPatientDiary();
+  await loadPatientTodo();
+  await loadPatientRunningSessions();
 
 
   /* =======================================================
@@ -7467,6 +7687,7 @@ async function loadPatientPortal() {
           </p>
 
           ${item.goal ? `<p style="font-size:13px;"><strong>🎯 Obiettivo:</strong> ${escapeHtml(item.goal)}</p>` : ""}
+          ${item.phase_name ? `<div class="phase-chip">${escapeHtml(item.phase_name)}</div>` : ""}
 
           ${item.notes ? `<p style="font-size:13px;color:var(--text-muted);"><strong>Note:</strong> ${escapeHtml(item.notes)}</p>` : ""}
 
@@ -8240,6 +8461,16 @@ document.getElementById("refreshProgressButton")?.addEventListener("click", load
 document.getElementById("showMetricTrendButton")?.addEventListener("click", renderMetricTrend);
 document.getElementById("metricFilter")?.addEventListener("change", renderMetricTrend);
 document.getElementById("printAssessmentButton")?.addEventListener("click", ()=>triggerPrint("therapistTabAssessment"));
+
+/* =========================================================
+   EVENTI FASE A/B/C
+========================================================= */
+document.getElementById("patientSearchInput")?.addEventListener("input",filterPatients);
+document.getElementById("refreshDashboardActivityButton")?.addEventListener("click",loadDashboardActivity);
+document.getElementById("refreshTimelineButton")?.addEventListener("click",loadPatientTimeline);
+document.getElementById("saveRunningSessionButton")?.addEventListener("click",saveRunningSession);
+document.getElementById("saveClinicalTestButton")?.addEventListener("click",saveClinicalTest);
+if(document.getElementById("runningSessionDate")) document.getElementById("runningSessionDate").value=todayISO();
 
 /* =========================================================
    INIZIALIZZAZIONE

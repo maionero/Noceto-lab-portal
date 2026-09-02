@@ -230,6 +230,48 @@ header {
 }
 
 
+
+/* =========================================================
+   LOGO MOBILE ROBUSTO
+========================================================= */
+@media (max-width: 700px) {
+  header {
+    padding: 10px 12px;
+    min-height: 64px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 8px;
+    flex: 1 1 auto;
+  }
+
+  .logo {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: 38px !important;
+    width: auto !important;
+    max-width: 135px !important;
+    flex: 0 0 auto;
+    object-fit: contain;
+  }
+
+  .brand-text {
+    min-width: 0;
+  }
+
+  .brand-text h1 {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  .brand-text p {
+    font-size: 9px;
+    white-space: nowrap;
+  }
+}
+
 /* =========================================================
    CONTAINER
 ========================================================= */
@@ -7497,6 +7539,8 @@ async function deleteRunningPlan(
 ========================================================= */
 
 async function loadPatientPortal() {
+  await loadPatientSharedProgress();
+
 
   /* =======================================================
      ESERCIZI
@@ -8298,6 +8342,85 @@ window.addEventListener(
 
   }
 );
+
+/* =========================================================
+   V8 — PROGRESSI CONDIVISI AL PAZIENTE
+========================================================= */
+async function loadPatientSharedProgress() {
+  const section = document.getElementById("patientProgressSection");
+  const list = document.getElementById("patientProgressList");
+  const empty = document.getElementById("patientProgressEmpty");
+
+  if (!section || !list || !empty || !currentUser || !currentUser.id) return;
+
+  section.classList.remove("hidden");
+  list.innerHTML = '<small>Caricamento progressi...</small>';
+  empty.classList.add("hidden");
+
+  try {
+    const { data: patient, error: patientError } = await db
+      .from("patients")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if (patientError) throw patientError;
+
+    if (!patient) {
+      list.innerHTML = "";
+      empty.classList.remove("hidden");
+      return;
+    }
+
+    const { data, error } = await db
+      .from("patient_metrics")
+      .select("id, recorded_at, category, metric_name, value, unit, note")
+      .eq("patient_id", patient.id)
+      .eq("is_shared", true)
+      .order("recorded_at", { ascending: false })
+      .order("id", { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || !data.length) {
+      list.innerHTML = "";
+      empty.classList.remove("hidden");
+      return;
+    }
+
+    list.innerHTML = data.map(m => `
+      <div class="note-card public-note">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <strong>${escapeHtml(m.metric_name || "Parametro")}</strong>
+          <small>${formatDateIT(m.recorded_at)}</small>
+        </div>
+        <div style="font-size:24px;font-weight:800;margin:8px 0">
+          ${escapeHtml(String(m.value))}${m.unit ? " " + escapeHtml(m.unit) : ""}
+        </div>
+        <small>${escapeHtml(m.category || "Altro")}</small>
+        ${m.note ? `<div style="margin-top:8px">${escapeHtml(m.note)}</div>` : ""}
+      </div>
+    `).join("");
+  } catch (err) {
+    console.error("Errore caricamento progressi paziente:", err);
+    list.innerHTML = '<div class="message error">Impossibile caricare i progressi condivisi.</div>';
+  }
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatDateIT(value) {
+  if (!value) return "";
+  const d = new Date(value + "T00:00:00");
+  return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString("it-IT");
+}
 
 </script>
 

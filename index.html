@@ -737,6 +737,39 @@ small {
 }
 
 
+
+/* =========================================================
+   MEDIA ESERCIZI
+========================================================= */
+.exercise-media {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+.exercise-media img {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: #f8fafc;
+}
+.exercise-media video {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 10px;
+  background: #000;
+}
+@media print {
+  .exercise-media img {
+    max-height: 300px;
+    page-break-inside: avoid;
+  }
+}
+
 /* =========================================================
    MESSAGE
 ========================================================= */
@@ -998,7 +1031,7 @@ hr {
 .dashboard-stats {
 
   display:
-    grid;
+    none !important;
 
   grid-template-columns:
     repeat(
@@ -1363,6 +1396,13 @@ hr {
 }
 
 @media(max-width:600px) {
+
+  .logo {
+    display: block;
+    height: 40px;
+    max-width: 150px;
+    flex-shrink: 0;
+  }
 
   header {
 
@@ -2436,7 +2476,7 @@ hr {
 
 
     <label>
-      Link Video
+      Link Video esterno (facoltativo)
     </label>
 
     <input
@@ -2444,6 +2484,30 @@ hr {
       type="url"
       placeholder="https://..."
     >
+
+    <label>
+      Foto esercizio (facoltativa)
+    </label>
+
+    <input
+      id="exerciseImageFile"
+      type="file"
+      accept="image/*"
+    >
+
+    <label>
+      Video esercizio (facoltativo)
+    </label>
+
+    <input
+      id="exerciseVideoFile"
+      type="file"
+      accept="video/*"
+    >
+
+    <small>
+      Foto fino a 10 MB · video fino a 100 MB.
+    </small>
 
 
     <br><br>
@@ -2685,6 +2749,9 @@ const db =
 const DOCUMENT_BUCKET =
   "patient-documents";
 
+const EXERCISE_MEDIA_BUCKET =
+  "exercise-media";
+
 
 const LOGO_PATH =
   "logo-noceto-lab.PNG";
@@ -2739,56 +2806,59 @@ async function getLogoUrl() {
         3600
       );
 
-
-  if(result.error) {
-
+  if(result.error || !result.data?.signedUrl) {
     console.error(
       "Errore caricamento logo:",
-      result.error
+      result.error || "URL logo non disponibile"
     );
-
     return "";
-
   }
 
-
   return result.data.signedUrl;
-
 }
 
+async function getLogoDataUrl() {
+  const logoUrl = await getLogoUrl();
+  if(!logoUrl) return "";
+
+  try {
+    const response = await fetch(logoUrl, { cache: "no-store" });
+    if(!response.ok) throw new Error("Impossibile scaricare il logo");
+
+    const blob = await response.blob();
+
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result || "");
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch(error) {
+    console.error("Errore conversione logo per stampa:", error);
+    return "";
+  }
+}
 
 async function loadLogo() {
+  const logo = document.getElementById("siteLogo");
+  const favicon = document.getElementById("favicon");
+  if(!logo) return;
 
-  const logoUrl =
-    await getLogoUrl();
+  const logoUrl = await getLogoUrl();
+  if(!logoUrl) return;
 
+  logo.onload = () => {
+    logo.style.display = "block";
+  };
+  logo.onerror = () => {
+    console.error("Il browser non riesce a visualizzare il logo.");
+    logo.style.display = "none";
+  };
+  logo.src = logoUrl;
 
-  if(!logoUrl)
-    return;
-
-
-  const logo =
-    document.getElementById(
-      "siteLogo"
-    );
-
-
-  if(logo)
-    logo.src =
-      logoUrl;
-
-
-  const favicon =
-    document.getElementById(
-      "favicon"
-    );
-
-
-  if(favicon)
-    favicon.href =
-      logoUrl;
-
+  if(favicon) favicon.href = logoUrl;
 }
+
 
 
 /* =========================================================
@@ -4249,188 +4319,109 @@ async function loadExercises() {
 
 async function loadExerciseLibrary() {
 
-  const container =
-    document.getElementById(
-      "exerciseLibrary"
-    );
+  const container = document.getElementById("exerciseLibrary");
+  container.innerHTML = "Caricamento...";
 
+  const result = await db
+    .from("exercises")
+    .select("*")
+    .order("name", { ascending: true });
 
-  container.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("exercises")
-      .select("*")
-      .order(
-        "name",
-        {
-          ascending:
-            true
-        }
-      );
-
-
-  if(
-    result.error ||
-    !result.data ||
-    result.data.length === 0
-  ) {
-
-    container.innerText =
-      "Nessun esercizio salvato.";
-
+  if(result.error || !result.data || result.data.length === 0) {
+    container.innerText = "Nessun esercizio salvato.";
     return;
-
   }
 
+  container.innerHTML = "";
 
-  container.innerHTML =
-    "";
+  result.data.forEach(ex => {
+    const div = document.createElement("div");
+    div.className = "exercise";
 
+    div.innerHTML = `
+      <h3>${escapeHtml(ex.name)}</h3>
+      ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
+      ${exerciseMediaHtml(ex)}
+      ${ex.video_url ? `<p class="video"><a href="${escapeAttribute(ex.video_url)}" target="_blank" rel="noopener">🎥 Link Video</a></p>` : ""}
 
-  result.data.forEach(
-    ex => {
+      <div class="actions">
+        <button class="edit" onclick="showExerciseEdit('${ex.id}')">✏️ Modifica</button>
+        <button class="danger" onclick="deleteExercise('${ex.id}')">🗑️ Elimina</button>
+      </div>
 
-      const div =
-        document.createElement(
-          "div"
-        );
+      <div id="exerciseEdit_${ex.id}" class="edit-box hidden">
+        <label>Nome</label>
+        <input id="editExName_${ex.id}" value="${escapeAttribute(ex.name || "")}">
 
+        <label>Descrizione</label>
+        <textarea id="editExDescription_${ex.id}">${escapeHtml(ex.description || "")}</textarea>
 
-      div.className =
-        "exercise";
+        <label>Link Video esterno (facoltativo)</label>
+        <input id="editExVideo_${ex.id}" value="${escapeAttribute(ex.video_url || "")}" placeholder="https://...">
 
+        <label>Nuova foto (facoltativa)</label>
+        <input id="editExImageFile_${ex.id}" type="file" accept="image/*">
+        ${ex.image_url ? `<small>Foto attuale presente. Se scegli una nuova foto verrà sostituita.</small>` : ""}
 
-      div.innerHTML = `
+        <label>Nuovo video (facoltativo)</label>
+        <input id="editExVideoFile_${ex.id}" type="file" accept="video/*">
+        ${ex.video_file_url ? `<small>Video attuale presente. Se scegli un nuovo video verrà sostituito.</small>` : ""}
 
-        <h3>
-          ${escapeHtml(ex.name)}
-        </h3>
-
-
-        ${
-          ex.description
-          ?
-          `<p
-            style="
-              font-size:13px;
-              color:var(--text-muted);
-            "
-          >
-            ${escapeHtml(ex.description)}
-          </p>`
-          :
-          ""
-        }
-
-
-        ${
-          ex.video_url
-          ?
-          `<p class="video">
-            <a
-              href="${escapeAttribute(ex.video_url)}"
-              target="_blank"
-              rel="noopener"
-            >
-              🎥 Dimostrazione Video
-            </a>
-          </p>`
-          :
-          ""
-        }
-
-
+        <br>
         <div class="actions">
-
-          <button
-            class="edit"
-            onclick="showExerciseEdit('${ex.id}')"
-          >
-            ✏️ Modifica
-          </button>
-
-
-          <button
-            class="danger"
-            onclick="deleteExercise('${ex.id}')"
-          >
-            🗑️ Elimina
-          </button>
-
+          <button class="primary" onclick="updateExercise('${ex.id}')">💾 Salva modifiche</button>
+          <button class="secondary" onclick="hideExerciseEdit('${ex.id}')">Annulla</button>
         </div>
+      </div>
+    `;
 
+    container.appendChild(div);
+  });
+}
 
-        <div
-          id="exerciseEdit_${ex.id}"
-          class="edit-box hidden"
-        >
+function exerciseMediaHtml(ex) {
+  let html = "";
 
-          <label>
-            Nome
-          </label>
+  if(ex.image_url) {
+    html += `<div class="exercise-media"><img src="${escapeAttribute(ex.image_url)}" alt="${escapeAttribute(ex.name || "Esercizio")}" loading="lazy"></div>`;
+  }
 
-          <input
-            id="editExName_${ex.id}"
-            value="${escapeAttribute(ex.name || "")}"
-          >
+  if(ex.video_file_url) {
+    html += `<div class="exercise-media no-print"><video controls preload="metadata" playsinline src="${escapeAttribute(ex.video_file_url)}"></video></div>`;
+  }
 
+  return html;
+}
 
-          <label>
-            Descrizione
-          </label>
+async function uploadExerciseMedia(file, kind, exerciseId) {
+  if(!file) return null;
 
-          <textarea
-            id="editExDescription_${ex.id}"
-          >${escapeHtml(ex.description || "")}</textarea>
+  const limits = { image: 10 * 1024 * 1024, video: 100 * 1024 * 1024 };
+  const max = limits[kind];
 
+  if(max && file.size > max) {
+    throw new Error(kind === "image" ? "La foto supera i 10 MB." : "Il video supera i 100 MB.");
+  }
 
-          <label>
-            Video
-          </label>
+  const extension = (file.name.split(".").pop() || "bin").toLowerCase();
+  const safeName = (file.name.replace(/[^a-zA-Z0-9._-]/g, "_") || `${kind}.${extension}`);
+  const path = `exercises/${exerciseId || crypto.randomUUID()}/${crypto.randomUUID()}-${safeName}`;
 
-          <input
-            id="editExVideo_${ex.id}"
-            value="${escapeAttribute(ex.video_url || "")}"
-          >
+  const upload = await db.storage
+    .from(EXERCISE_MEDIA_BUCKET)
+    .upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type
+    });
 
+  if(upload.error) throw upload.error;
 
-          <br>
+  const publicResult = db.storage
+    .from(EXERCISE_MEDIA_BUCKET)
+    .getPublicUrl(path);
 
-
-          <div class="actions">
-
-            <button
-              class="primary"
-              onclick="updateExercise('${ex.id}')"
-            >
-              💾 Salva modifiche
-            </button>
-
-
-            <button
-              class="secondary"
-              onclick="hideExerciseEdit('${ex.id}')"
-            >
-              Annulla
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-
-
-      container.appendChild(
-        div
-      );
-
-    }
-  );
-
+  return publicResult.data.publicUrl;
 }
 
 
@@ -4470,89 +4461,49 @@ function hideExerciseEdit(id) {
 
 async function updateExercise(id) {
 
-  const name =
-    document
-      .getElementById(
-        "editExName_" +
-        id
-      )
-      .value
-      .trim();
-
-
-  const description =
-    document
-      .getElementById(
-        "editExDescription_" +
-        id
-      )
-      .value
-      .trim();
-
-
-  const video =
-    document
-      .getElementById(
-        "editExVideo_" +
-        id
-      )
-      .value
-      .trim();
-
+  const name = document.getElementById("editExName_" + id).value.trim();
+  const description = document.getElementById("editExDescription_" + id).value.trim();
+  const video = document.getElementById("editExVideo_" + id).value.trim();
+  const imageFile = document.getElementById("editExImageFile_" + id)?.files?.[0] || null;
+  const videoFile = document.getElementById("editExVideoFile_" + id)?.files?.[0] || null;
 
   if(!name) {
-
-    alert(
-      "Inserisci il nome dell'esercizio."
-    );
-
+    alert("Inserisci il nome dell'esercizio.");
     return;
-
   }
 
+  try {
+    const current = await db.from("exercises").select("image_url, video_file_url").eq("id", id).single();
+    if(current.error) throw current.error;
 
-  const result =
-    await db
+    let imageUrl = current.data?.image_url || null;
+    let videoFileUrl = current.data?.video_file_url || null;
+
+    if(imageFile) imageUrl = await uploadExerciseMedia(imageFile, "image", id);
+    if(videoFile) videoFileUrl = await uploadExerciseMedia(videoFile, "video", id);
+
+    const result = await db
       .from("exercises")
       .update({
-
         name,
-
-        description:
-          description ||
-          null,
-
-        video_url:
-          video ||
-          null
-
+        description: description || null,
+        video_url: video || null,
+        image_url: imageUrl,
+        video_file_url: videoFileUrl
       })
-      .eq(
-        "id",
-        id
-      );
+      .eq("id", id)
+      .select("id")
+      .single();
 
+    if(result.error) throw result.error;
 
-  if(result.error) {
-
-    alert(
-      "Errore: " +
-      result.error.message
-    );
-
-    return;
-
+    showMessage("exerciseMessage", "Esercizio aggiornato.", "success");
+    await loadExerciseLibrary();
+    await loadExercises();
+    await loadDashboardStats();
+  } catch(error) {
+    alert("Errore: " + (error.message || error));
   }
-
-
-  await loadExerciseLibrary();
-
-
-  await loadExercises();
-
-
-  await loadDashboardStats();
-
 }
 
 
@@ -4642,125 +4593,72 @@ document
 
 
 document
-  .getElementById(
-    "saveExercise"
-  )
-  .addEventListener(
-    "click",
-    async () => {
+  .getElementById("saveExercise")
+  .addEventListener("click", async () => {
 
-      const name =
-        document
-          .getElementById(
-            "exerciseName"
-          )
-          .value
-          .trim();
+    const name = document.getElementById("exerciseName").value.trim();
+    const description = document.getElementById("exerciseDescription").value.trim();
+    const video = document.getElementById("exerciseVideo").value.trim();
+    const imageFile = document.getElementById("exerciseImageFile")?.files?.[0] || null;
+    const videoFile = document.getElementById("exerciseVideoFile")?.files?.[0] || null;
 
+    if(!name) {
+      showMessage("exerciseMessage", "Inserisci il nome dell'esercizio.", "error");
+      return;
+    }
 
-      const description =
-        document
-          .getElementById(
-            "exerciseDescription"
-          )
-          .value
-          .trim();
+    try {
+      // Prima creiamo l'esercizio per ottenere il suo ID.
+      const inserted = await db
+        .from("exercises")
+        .insert([{
+          name,
+          description: description || null,
+          video_url: video || null,
+          image_url: null,
+          video_file_url: null
+        }])
+        .select("id")
+        .single();
 
+      if(inserted.error) throw inserted.error;
 
-      const video =
-        document
-          .getElementById(
-            "exerciseVideo"
-          )
-          .value
-          .trim();
+      const exerciseId = inserted.data.id;
+      let imageUrl = null;
+      let videoFileUrl = null;
 
+      if(imageFile) imageUrl = await uploadExerciseMedia(imageFile, "image", exerciseId);
+      if(videoFile) videoFileUrl = await uploadExerciseMedia(videoFile, "video", exerciseId);
 
-      if(!name) {
-
-        showMessage(
-          "exerciseMessage",
-          "Inserisci il nome dell'esercizio.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      const result =
-        await db
+      if(imageUrl || videoFileUrl) {
+        const mediaUpdate = await db
           .from("exercises")
-          .insert([{
+          .update({ image_url: imageUrl, video_file_url: videoFileUrl })
+          .eq("id", exerciseId)
+          .select("id")
+          .single();
 
-            name,
-
-            description:
-              description ||
-              null,
-
-            video_url:
-              video ||
-              null
-
-          }]);
-
-
-      if(result.error) {
-
-        showMessage(
-          "exerciseMessage",
-          result.error.message,
-          "error"
-        );
-
-        return;
-
+        if(mediaUpdate.error) throw mediaUpdate.error;
       }
 
+      showMessage("exerciseMessage", "Esercizio salvato.", "success");
 
-      showMessage(
-        "exerciseMessage",
-        "Esercizio salvato.",
-        "success"
-      );
-
-
-      document
-        .getElementById(
-          "exerciseName"
-        )
-        .value =
-          "";
-
-
-      document
-        .getElementById(
-          "exerciseDescription"
-        )
-        .value =
-          "";
-
-
-      document
-        .getElementById(
-          "exerciseVideo"
-        )
-        .value =
-          "";
-
+      ["exerciseName", "exerciseDescription", "exerciseVideo"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = "";
+      });
+      const imageInput = document.getElementById("exerciseImageFile");
+      const videoInput = document.getElementById("exerciseVideoFile");
+      if(imageInput) imageInput.value = "";
+      if(videoInput) videoInput.value = "";
 
       await loadExerciseLibrary();
-
-
       await loadExercises();
-
-
       await loadDashboardStats();
-
+    } catch(error) {
+      showMessage("exerciseMessage", error.message || String(error), "error");
     }
-  );
+  });
 
 
 /* =========================================================
@@ -7600,143 +7498,36 @@ async function loadPatientPortal() {
     exResult.data.forEach(
       item => {
 
-        const div =
-          document.createElement(
-            "div"
-          );
-
-
-        div.className =
-          "exercise";
-
-
-        const ex =
-          item.exercises ||
-          {};
-
+        const div = document.createElement("div");
+        div.className = "exercise";
+        const ex = item.exercises || {};
 
         div.innerHTML = `
+          <h3>${escapeHtml(ex.name || "Esercizio")}</h3>
 
-          <h3>
-            ${escapeHtml(
-              ex.name ||
-              "Esercizio"
-            )}
-          </h3>
-
-
-          ${
-            ex.description
-            ?
-            `<p
-              style="
-                font-size:13px;
-                color:var(--text-muted);
-              "
-            >
-              ${escapeHtml(
-                ex.description
-              )}
-            </p>`
-            :
-            ""
-          }
-
+          ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
 
           <p style="font-size:14px;">
-
-            <strong>
-              Parametri:
-            </strong>
-
-            ${
-              item.sets
-              ?
-              `${item.sets} serie`
-              :
-              ""
-            }
-
-            ${
-              item.reps
-              ?
-              ` | ${item.reps} rep`
-              :
-              ""
-            }
-
-            ${
-              item.duration
-              ?
-              ` | ${item.duration}s`
-              :
-              ""
-            }
-
-            ${
-              item.rest
-              ?
-              ` | rec ${item.rest}s`
-              :
-              ""
-            }
-
+            <strong>Parametri:</strong>
+            ${item.sets ? `${item.sets} serie` : ""}
+            ${item.reps ? ` | ${item.reps} rep` : ""}
+            ${item.duration ? ` | ${item.duration}s` : ""}
+            ${item.rest ? ` | rec ${item.rest}s` : ""}
           </p>
 
+          ${item.notes ? `<p style="font-size:13px;color:var(--text-muted);"><strong>Note:</strong> ${escapeHtml(item.notes)}</p>` : ""}
 
-          ${
-            item.notes
-            ?
-            `<p
-              style="
-                font-size:13px;
-                color:var(--text-muted);
-              "
-            >
-              <strong>
-                Note:
-              </strong>
+          ${exerciseMediaHtml(ex)}
 
-              ${escapeHtml(
-                item.notes
-              )}
-
-            </p>`
-            :
-            ""
-          }
-
-
-          ${
-            ex.video_url
-            ?
-            `<p class="video no-print">
-
-              <a
-                href="${escapeAttribute(ex.video_url)}"
-                target="_blank"
-                rel="noopener"
-              >
-                🎥 Guarda Video Dimostrativo
-              </a>
-
-            </p>`
-            :
-            ""
-          }
-
+          ${ex.video_url ? `<p class="video no-print"><a href="${escapeAttribute(ex.video_url)}" target="_blank" rel="noopener">🎥 Guarda Video Dimostrativo</a></p>` : ""}
         `;
 
-
-        exContainer.appendChild(
-          div
-        );
-
+        exContainer.appendChild(div);
       }
     );
 
-  }
 
+  }
 
   /* =======================================================
      DOCUMENTI
@@ -8207,8 +7998,8 @@ async function triggerPrint(
     return;
 
 
-  const logoUrl =
-    await getLogoUrl();
+  const logoDataUrl =
+    await getLogoDataUrl();
 
 
   const clone =
@@ -8287,10 +8078,10 @@ async function triggerPrint(
 
 
         ${
-          logoUrl
+          logoDataUrl
           ?
           `<img
-            src="${logoUrl}"
+            src="${logoDataUrl}"
             style="
               height:55px;
               width:auto;
@@ -8327,6 +8118,15 @@ async function triggerPrint(
 
   `;
 
+
+  const printImages = Array.from(printSheet.querySelectorAll("img"));
+  await Promise.all(printImages.map(img => {
+    if(img.complete) return Promise.resolve();
+    return new Promise(resolve => {
+      img.onload = resolve;
+      img.onerror = resolve;
+    });
+  }));
 
   window.print();
 

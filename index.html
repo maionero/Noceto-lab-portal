@@ -700,6 +700,44 @@ small {
 
 }
 
+.exercise-library-meta {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:10px 0;
+}
+.exercise-chip {
+  display:inline-flex;
+  align-items:center;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#f1f5f9;
+  border:1px solid var(--border-color);
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-muted);
+}
+.exercise-instructions {
+  background:#f8fafc;
+  border-left:3px solid var(--accent);
+  padding:10px 12px;
+  border-radius:8px;
+  margin-top:10px;
+}
+.exercise-sheet-header {
+  padding:14px 16px;
+  margin-bottom:14px;
+  border:1px solid var(--border-color);
+  border-radius:10px;
+  background:#f8fafc;
+}
+.exercise-sheet-header h3 { margin:0 0 5px; }
+.exercise-sheet-empty { padding:20px; text-align:center; color:var(--text-muted); }
+@media print {
+  .exercise { break-inside: avoid; page-break-inside: avoid; }
+  .exercise-sheet-header { break-inside: avoid; }
+}
+
 .exercise h3,
 .document h3 {
 
@@ -1981,6 +2019,20 @@ hr {
     </div>
 
 
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+      <div>
+        <label>Frequenza / settimana</label>
+        <input id="frequencyPerWeek" type="number" min="0" max="14" placeholder="3">
+      </div>
+      <div>
+        <label>RPE target</label>
+        <input id="rpeTarget" type="number" min="0" max="10" step="0.5" placeholder="6">
+      </div>
+    </div>
+
+    <label>Obiettivo dell'esercizio</label>
+    <input id="exerciseGoal" placeholder="Es. forza quadricipite, controllo, tolleranza al carico...">
+
     <label>
       Note operative per il paziente
     </label>
@@ -2474,6 +2526,35 @@ hr {
       placeholder="Fasi di esecuzione, biomeccanica e raccomandazioni..."
     ></textarea>
 
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+      <div>
+        <label>Categoria</label>
+        <select id="exerciseCategory">
+          <option value="">Seleziona categoria</option>
+          <option>Mobilità</option><option>Forza</option><option>Controllo motorio</option>
+          <option>Core</option><option>Equilibrio</option><option>Running</option>
+          <option>Recupero</option><option>Altro</option>
+        </select>
+      </div>
+      <div>
+        <label>Difficoltà</label>
+        <select id="exerciseDifficulty">
+          <option value="">Seleziona difficoltà</option>
+          <option>Base</option><option>Intermedia</option><option>Avanzata</option>
+        </select>
+      </div>
+      <div>
+        <label>Attrezzatura</label>
+        <input id="exerciseEquipment" placeholder="Es. elastico, manubrio, nessuna">
+      </div>
+    </div>
+
+    <label>Istruzioni operative</label>
+    <textarea id="exerciseInstructions" placeholder="Posizione iniziale, esecuzione, respirazione, ritmo..."></textarea>
+
+    <label>Errori da evitare / cue</label>
+    <textarea id="exerciseCommonErrors" placeholder="Es. evita di compensare con il tronco..."></textarea>
 
     <label>
       Link Video esterno (facoltativo)
@@ -4318,7 +4399,6 @@ async function loadExercises() {
 
 
 async function loadExerciseLibrary() {
-
   const container = document.getElementById("exerciseLibrary");
   container.innerHTML = "Caricamento...";
 
@@ -4340,21 +4420,49 @@ async function loadExerciseLibrary() {
 
     div.innerHTML = `
       <h3>${escapeHtml(ex.name)}</h3>
+      ${exerciseMetaHtml(ex)}
       ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
+      ${ex.instructions ? `<div class="exercise-instructions"><strong>▶ Esecuzione</strong><div style="margin-top:5px;white-space:pre-line;">${escapeHtml(ex.instructions)}</div></div>` : ""}
+      ${ex.common_errors ? `<div style="margin-top:10px;font-size:13px;"><strong>⚠️ Errori / cue:</strong><div style="white-space:pre-line;margin-top:4px;">${escapeHtml(ex.common_errors)}</div></div>` : ""}
       ${exerciseMediaHtml(ex)}
       ${ex.video_url ? `<p class="video"><a href="${escapeAttribute(ex.video_url)}" target="_blank" rel="noopener">🎥 Link Video</a></p>` : ""}
 
-      <div class="actions">
+      <div class="actions no-print">
         <button class="edit" onclick="showExerciseEdit('${ex.id}')">✏️ Modifica</button>
         <button class="danger" onclick="deleteExercise('${ex.id}')">🗑️ Elimina</button>
       </div>
 
-      <div id="exerciseEdit_${ex.id}" class="edit-box hidden">
+      <div id="exerciseEdit_${ex.id}" class="edit-box hidden no-print">
         <label>Nome</label>
         <input id="editExName_${ex.id}" value="${escapeAttribute(ex.name || "")}">
 
         <label>Descrizione</label>
         <textarea id="editExDescription_${ex.id}">${escapeHtml(ex.description || "")}</textarea>
+
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+          <div>
+            <label>Categoria</label>
+            <select id="editExCategory_${ex.id}">
+              ${exerciseSelectOptions(["", "Mobilità", "Forza", "Controllo motorio", "Core", "Equilibrio", "Running", "Recupero", "Altro"], ex.category || "")}
+            </select>
+          </div>
+          <div>
+            <label>Difficoltà</label>
+            <select id="editExDifficulty_${ex.id}">
+              ${exerciseSelectOptions(["", "Base", "Intermedia", "Avanzata"], ex.difficulty || "")}
+            </select>
+          </div>
+          <div>
+            <label>Attrezzatura</label>
+            <input id="editExEquipment_${ex.id}" value="${escapeAttribute(ex.equipment || "")}">
+          </div>
+        </div>
+
+        <label>Istruzioni operative</label>
+        <textarea id="editExInstructions_${ex.id}">${escapeHtml(ex.instructions || "")}</textarea>
+
+        <label>Errori da evitare / cue</label>
+        <textarea id="editExCommonErrors_${ex.id}">${escapeHtml(ex.common_errors || "")}</textarea>
 
         <label>Link Video esterno (facoltativo)</label>
         <input id="editExVideo_${ex.id}" value="${escapeAttribute(ex.video_url || "")}" placeholder="https://...">
@@ -4379,6 +4487,19 @@ async function loadExerciseLibrary() {
   });
 }
 
+function exerciseSelectOptions(options, selected) {
+  return options.map(value => `<option value="${escapeAttribute(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(value || "Seleziona")}</option>`).join("");
+}
+
+function exerciseMetaHtml(ex) {
+  const chips = [];
+  if(ex.category) chips.push(`🏷️ ${escapeHtml(ex.category)}`);
+  if(ex.difficulty) chips.push(`📊 ${escapeHtml(ex.difficulty)}`);
+  if(ex.equipment) chips.push(`🧰 ${escapeHtml(ex.equipment)}`);
+  if(!chips.length) return "";
+  return `<div class="exercise-library-meta">${chips.map(c => `<span class="exercise-chip">${c}</span>`).join("")}</div>`;
+}
+
 function exerciseMediaHtml(ex) {
   let html = "";
 
@@ -4391,37 +4512,6 @@ function exerciseMediaHtml(ex) {
   }
 
   return html;
-}
-
-async function uploadExerciseMedia(file, kind, exerciseId) {
-  if(!file) return null;
-
-  const limits = { image: 10 * 1024 * 1024, video: 100 * 1024 * 1024 };
-  const max = limits[kind];
-
-  if(max && file.size > max) {
-    throw new Error(kind === "image" ? "La foto supera i 10 MB." : "Il video supera i 100 MB.");
-  }
-
-  const extension = (file.name.split(".").pop() || "bin").toLowerCase();
-  const safeName = (file.name.replace(/[^a-zA-Z0-9._-]/g, "_") || `${kind}.${extension}`);
-  const path = `exercises/${exerciseId || crypto.randomUUID()}/${crypto.randomUUID()}-${safeName}`;
-
-  const upload = await db.storage
-    .from(EXERCISE_MEDIA_BUCKET)
-    .upload(path, file, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: file.type
-    });
-
-  if(upload.error) throw upload.error;
-
-  const publicResult = db.storage
-    .from(EXERCISE_MEDIA_BUCKET)
-    .getPublicUrl(path);
-
-  return publicResult.data.publicUrl;
 }
 
 
@@ -4460,9 +4550,13 @@ function hideExerciseEdit(id) {
 
 
 async function updateExercise(id) {
-
   const name = document.getElementById("editExName_" + id).value.trim();
   const description = document.getElementById("editExDescription_" + id).value.trim();
+  const category = document.getElementById("editExCategory_" + id)?.value || null;
+  const difficulty = document.getElementById("editExDifficulty_" + id)?.value || null;
+  const equipment = document.getElementById("editExEquipment_" + id)?.value.trim() || null;
+  const instructions = document.getElementById("editExInstructions_" + id)?.value.trim() || null;
+  const commonErrors = document.getElementById("editExCommonErrors_" + id)?.value.trim() || null;
   const video = document.getElementById("editExVideo_" + id).value.trim();
   const imageFile = document.getElementById("editExImageFile_" + id)?.files?.[0] || null;
   const videoFile = document.getElementById("editExVideoFile_" + id)?.files?.[0] || null;
@@ -4487,6 +4581,11 @@ async function updateExercise(id) {
       .update({
         name,
         description: description || null,
+        category,
+        difficulty,
+        equipment,
+        instructions,
+        common_errors: commonErrors,
         video_url: video || null,
         image_url: imageUrl,
         video_file_url: videoFileUrl
@@ -4598,6 +4697,11 @@ document
 
     const name = document.getElementById("exerciseName").value.trim();
     const description = document.getElementById("exerciseDescription").value.trim();
+    const category = document.getElementById("exerciseCategory")?.value || null;
+    const difficulty = document.getElementById("exerciseDifficulty")?.value || null;
+    const equipment = document.getElementById("exerciseEquipment")?.value.trim() || null;
+    const instructions = document.getElementById("exerciseInstructions")?.value.trim() || null;
+    const commonErrors = document.getElementById("exerciseCommonErrors")?.value.trim() || null;
     const video = document.getElementById("exerciseVideo").value.trim();
     const imageFile = document.getElementById("exerciseImageFile")?.files?.[0] || null;
     const videoFile = document.getElementById("exerciseVideoFile")?.files?.[0] || null;
@@ -4608,12 +4712,16 @@ document
     }
 
     try {
-      // Prima creiamo l'esercizio per ottenere il suo ID.
       const inserted = await db
         .from("exercises")
         .insert([{
           name,
           description: description || null,
+          category,
+          difficulty,
+          equipment,
+          instructions,
+          common_errors: commonErrors,
           video_url: video || null,
           image_url: null,
           video_file_url: null
@@ -4637,13 +4745,16 @@ document
           .eq("id", exerciseId)
           .select("id")
           .single();
-
         if(mediaUpdate.error) throw mediaUpdate.error;
       }
 
       showMessage("exerciseMessage", "Esercizio salvato.", "success");
 
-      ["exerciseName", "exerciseDescription", "exerciseVideo"].forEach(id => {
+      ["exerciseName", "exerciseDescription", "exerciseEquipment", "exerciseInstructions", "exerciseCommonErrors", "exerciseVideo"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = "";
+      });
+      ["exerciseCategory", "exerciseDifficulty"].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.value = "";
       });
@@ -4666,285 +4777,78 @@ document
 ========================================================= */
 
 async function loadPatientExercises() {
+  const container = document.getElementById("patientExercises");
+  container.innerHTML = "Caricamento...";
 
-  const container =
-    document.getElementById(
-      "patientExercises"
-    );
+  const result = await db
+    .from("patient_exercises")
+    .select("*, exercises(*)")
+    .eq("patient_id", currentPatient.id)
+    .order("id", { ascending: true });
 
-
-  container.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("patient_exercises")
-      .select(
-        "*, exercises(*)"
-      )
-      .eq(
-        "patient_id",
-        currentPatient.id
-      );
-
-
-  if(
-    result.error ||
-    !result.data ||
-    result.data.length === 0
-  ) {
-
-    container.innerText =
-      "Nessun esercizio assegnato.";
-
+  if(result.error || !result.data || result.data.length === 0) {
+    container.innerHTML = `<div class="exercise-sheet-empty">Nessun esercizio assegnato.</div>`;
     return;
-
   }
 
+  container.innerHTML = `
+    <div class="exercise-sheet-header">
+      <h3>📋 Programma di esercizi</h3>
+      <div style="font-size:13px;color:var(--text-muted);">Scheda aggiornata automaticamente dagli esercizi assegnati.</div>
+    </div>
+  `;
 
-  container.innerHTML =
-    "";
+  result.data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "exercise";
+    const ex = item.exercises || {};
+    const params = [];
+    if(item.sets != null) params.push(`${item.sets} serie`);
+    if(item.reps != null) params.push(`${item.reps} rep`);
+    if(item.duration != null) params.push(`${item.duration}s`);
+    if(item.rest != null) params.push(`rec ${item.rest}s`);
+    if(item.frequency_per_week != null) params.push(`${item.frequency_per_week}×/sett`);
+    if(item.rpe_target != null) params.push(`RPE ${item.rpe_target}`);
 
+    div.innerHTML = `
+      <h3>${escapeHtml(ex.name || "Esercizio")}</h3>
+      ${exerciseMetaHtml(ex)}
+      ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
+      ${params.length ? `<p style="font-size:14px;"><strong>Prescrizione:</strong> ${params.map(escapeHtml).join(" · ")}</p>` : ""}
+      ${item.goal ? `<p style="font-size:13px;"><strong>🎯 Obiettivo:</strong> ${escapeHtml(item.goal)}</p>` : ""}
+      ${ex.instructions ? `<div class="exercise-instructions"><strong>▶ Esecuzione</strong><div style="margin-top:5px;white-space:pre-line;">${escapeHtml(ex.instructions)}</div></div>` : ""}
+      ${ex.common_errors ? `<div style="margin-top:10px;font-size:13px;"><strong>⚠️ Cue / errori:</strong><div style="white-space:pre-line;margin-top:4px;">${escapeHtml(ex.common_errors)}</div></div>` : ""}
+      ${item.notes ? `<p style="font-size:13px;color:var(--text-muted);"><strong>Note:</strong> ${escapeHtml(item.notes)}</p>` : ""}
+      ${exerciseMediaHtml(ex)}
+      ${ex.video_url ? `<p class="video no-print"><a href="${escapeAttribute(ex.video_url)}" target="_blank" rel="noopener">🎥 Guarda Video Dimostrativo</a></p>` : ""}
 
-  result.data.forEach(
-    item => {
+      <div class="actions no-print">
+        <button class="edit" onclick="showAssignedEdit('${item.id}')">✏️ Modifica</button>
+        <button class="danger" onclick="removeAssignedExercise('${item.id}')">🗑️ Rimuovi</button>
+      </div>
 
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "exercise";
-
-
-      const exName =
-        item.exercises
-        ?
-        item.exercises.name
-        :
-        "Esercizio";
-
-
-      div.innerHTML = `
-
-        <h3>
-          ${escapeHtml(exName)}
-        </h3>
-
-
-        <p style="font-size:14px;">
-
-          <strong>
-            Parametri:
-          </strong>
-
-          ${
-            item.sets
-            ?
-            `<strong>
-              ${item.sets}
-            </strong> serie`
-            :
-            ""
-          }
-
-          ${
-            item.reps
-            ?
-            ` |
-            <strong>
-              ${item.reps}
-            </strong>
-            rep`
-            :
-            ""
-          }
-
-          ${
-            item.duration
-            ?
-            ` |
-            <strong>
-              ${item.duration}s
-            </strong>
-            tempo`
-            :
-            ""
-          }
-
-          ${
-            item.rest
-            ?
-            ` |
-            <strong>
-              ${item.rest}s
-            </strong>
-            rec`
-            :
-            ""
-          }
-
-        </p>
-
-
-        ${
-          item.notes
-          ?
-          `<p
-            style="
-              font-size:13px;
-              color:var(--text-muted);
-            "
-          >
-            <strong>
-              Note:
-            </strong>
-            ${escapeHtml(item.notes)}
-          </p>`
-          :
-          ""
-        }
-
-
-        <div class="actions no-print">
-
-          <button
-            class="edit"
-            onclick="showAssignedEdit('${item.id}')"
-          >
-            ✏️ Modifica
-          </button>
-
-
-          <button
-            class="danger"
-            onclick="removeAssignedExercise('${item.id}')"
-          >
-            🗑️ Rimuovi
-          </button>
-
+      <div id="assignedEdit_${item.id}" class="edit-box hidden no-print">
+        <div class="grid">
+          <div><label>Serie</label><input id="editSets_${item.id}" type="number" min="0" value="${item.sets ?? ""}"></div>
+          <div><label>Ripetizioni</label><input id="editReps_${item.id}" type="number" min="0" value="${item.reps ?? ""}"></div>
+          <div><label>Durata (sec)</label><input id="editDuration_${item.id}" type="number" min="0" value="${item.duration ?? ""}"></div>
+          <div><label>Recupero (sec)</label><input id="editRest_${item.id}" type="number" min="0" value="${item.rest ?? ""}"></div>
+          <div><label>Frequenza / settimana</label><input id="editFrequency_${item.id}" type="number" min="0" max="14" value="${item.frequency_per_week ?? ""}"></div>
+          <div><label>RPE target</label><input id="editRpe_${item.id}" type="number" min="0" max="10" step="0.5" value="${item.rpe_target ?? ""}"></div>
         </div>
-
-
-        <div
-          id="assignedEdit_${item.id}"
-          class="edit-box hidden"
-        >
-
-          <div class="grid">
-
-            <div>
-
-              <label>
-                Serie
-              </label>
-
-              <input
-                id="editSets_${item.id}"
-                type="number"
-                min="0"
-                value="${item.sets ?? ""}"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Ripetizioni
-              </label>
-
-              <input
-                id="editReps_${item.id}"
-                type="number"
-                min="0"
-                value="${item.reps ?? ""}"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Durata (sec)
-              </label>
-
-              <input
-                id="editDuration_${item.id}"
-                type="number"
-                min="0"
-                value="${item.duration ?? ""}"
-              >
-
-            </div>
-
-
-            <div>
-
-              <label>
-                Recupero (sec)
-              </label>
-
-              <input
-                id="editRest_${item.id}"
-                type="number"
-                min="0"
-                value="${item.rest ?? ""}"
-              >
-
-            </div>
-
-          </div>
-
-
-          <label>
-            Note operative
-          </label>
-
-          <textarea
-            id="editNotes_${item.id}"
-          >${escapeHtml(item.notes || "")}</textarea>
-
-
-          <br>
-
-
-          <div class="actions">
-
-            <button
-              class="primary"
-              onclick="updateAssignedExercise('${item.id}')"
-            >
-              💾 Salva modifiche
-            </button>
-
-
-            <button
-              class="secondary"
-              onclick="hideAssignedEdit('${item.id}')"
-            >
-              Annulla
-            </button>
-
-          </div>
-
+        <label>Obiettivo</label>
+        <input id="editGoal_${item.id}" value="${escapeAttribute(item.goal || "")}">
+        <label>Note operative</label>
+        <textarea id="editNotes_${item.id}">${escapeHtml(item.notes || "")}</textarea>
+        <br>
+        <div class="actions">
+          <button class="primary" onclick="updateAssignedExercise('${item.id}')">💾 Salva modifiche</button>
+          <button class="secondary" onclick="hideAssignedEdit('${item.id}')">Annulla</button>
         </div>
-
-      `;
-
-
-      container.appendChild(
-        div
-      );
-
-    }
-  );
-
+      </div>
+    `;
+    container.appendChild(div);
+  });
 }
 
 
@@ -4983,111 +4887,33 @@ function hideAssignedEdit(id) {
 
 
 async function updateAssignedExercise(id) {
+  const val = id => document.getElementById(id);
+  const numberOrNull = value => value === "" ? null : Number(value);
 
-  const sets =
-    document
-      .getElementById(
-        "editSets_" +
-        id
-      )
-      .value;
+  const payload = {
+    sets: numberOrNull(val("editSets_" + id).value),
+    reps: numberOrNull(val("editReps_" + id).value),
+    duration: numberOrNull(val("editDuration_" + id).value),
+    rest: numberOrNull(val("editRest_" + id).value),
+    frequency_per_week: numberOrNull(val("editFrequency_" + id)?.value || ""),
+    rpe_target: numberOrNull(val("editRpe_" + id)?.value || ""),
+    goal: val("editGoal_" + id)?.value.trim() || null,
+    notes: val("editNotes_" + id).value.trim() || null
+  };
 
-
-  const reps =
-    document
-      .getElementById(
-        "editReps_" +
-        id
-      )
-      .value;
-
-
-  const duration =
-    document
-      .getElementById(
-        "editDuration_" +
-        id
-      )
-      .value;
-
-
-  const rest =
-    document
-      .getElementById(
-        "editRest_" +
-        id
-      )
-      .value;
-
-
-  const notes =
-    document
-      .getElementById(
-        "editNotes_" +
-        id
-      )
-      .value
-      .trim();
-
-
-  const result =
-    await db
-      .from("patient_exercises")
-      .update({
-
-        sets:
-          sets !== ""
-          ?
-          parseInt(sets)
-          :
-          null,
-
-        reps:
-          reps !== ""
-          ?
-          parseInt(reps)
-          :
-          null,
-
-        duration:
-          duration !== ""
-          ?
-          parseInt(duration)
-          :
-          null,
-
-        rest:
-          rest !== ""
-          ?
-          parseInt(rest)
-          :
-          null,
-
-        notes:
-          notes ||
-          null
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
+  const result = await db
+    .from("patient_exercises")
+    .update(payload)
+    .eq("id", id)
+    .select("id")
+    .single();
 
   if(result.error) {
-
-    alert(
-      "Errore: " +
-      result.error.message
-    );
-
+    alert("Errore: " + result.error.message);
     return;
-
   }
 
-
   await loadPatientExercises();
-
 }
 
 
@@ -5200,6 +5026,19 @@ document
               :
               null,
 
+            frequency_per_week:
+              document.getElementById("frequencyPerWeek")?.value
+              ? Number(document.getElementById("frequencyPerWeek").value)
+              : null,
+
+            rpe_target:
+              document.getElementById("rpeTarget")?.value
+              ? Number(document.getElementById("rpeTarget").value)
+              : null,
+
+            goal:
+              document.getElementById("exerciseGoal")?.value.trim() || null,
+
             notes:
               notes ||
               null
@@ -5258,6 +5097,11 @@ document
         )
         .value =
           "";
+
+      ["frequencyPerWeek", "rpeTarget", "exerciseGoal"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = "";
+      });
 
 
       document
@@ -7569,7 +7413,11 @@ async function loadPatientPortal() {
         div.innerHTML = `
           <h3>${escapeHtml(ex.name || "Esercizio")}</h3>
 
+          ${exerciseMetaHtml(ex)}
+
           ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
+
+          ${ex.instructions ? `<div class="exercise-instructions"><strong>▶ Esecuzione</strong><div style="margin-top:5px;white-space:pre-line;">${escapeHtml(ex.instructions)}</div></div>` : ""}
 
           <p style="font-size:14px;">
             <strong>Parametri:</strong>
@@ -7577,7 +7425,11 @@ async function loadPatientPortal() {
             ${item.reps ? ` | ${item.reps} rep` : ""}
             ${item.duration ? ` | ${item.duration}s` : ""}
             ${item.rest ? ` | rec ${item.rest}s` : ""}
+            ${item.frequency_per_week != null ? ` | ${item.frequency_per_week}×/sett` : ""}
+            ${item.rpe_target != null ? ` | RPE ${item.rpe_target}` : ""}
           </p>
+
+          ${item.goal ? `<p style="font-size:13px;"><strong>🎯 Obiettivo:</strong> ${escapeHtml(item.goal)}</p>` : ""}
 
           ${item.notes ? `<p style="font-size:13px;color:var(--text-muted);"><strong>Note:</strong> ${escapeHtml(item.notes)}</p>` : ""}
 

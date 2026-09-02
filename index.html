@@ -1870,6 +1870,20 @@ hr {
 
     <button
       class="section-tab"
+      data-target="therapistTabAssessment"
+    >
+      🩺 Valutazioni
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="therapistTabProgress"
+    >
+      📈 Progressi
+    </button>
+
+    <button
+      class="section-tab"
       data-target="therapistTabDanger"
     >
       ⚠️ Gestione
@@ -2326,6 +2340,11 @@ hr {
     <hr>
 
 
+    <div id="runningAnalytics" class="card" style="margin-top:18px;">
+      <h3>📊 Analisi del programma</h3>
+      <div id="runningAnalyticsContent">Genera o seleziona un programma per vedere volume e intensità.</div>
+    </div>
+
     <div class="section-title">
 
       <h3>
@@ -2348,6 +2367,126 @@ hr {
 
   </div>
 
+
+
+  <!-- =====================================================
+       VALUTAZIONI
+  ====================================================== -->
+
+  <div class="card tab-panel" id="therapistTabAssessment">
+    <div class="section-title">
+      <h2>🩺 Valutazioni e Rivalutazioni</h2>
+      <button id="printAssessmentButton" class="secondary">🖨️ Stampa Valutazione</button>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Data</label>
+        <input id="assessmentDate" type="date">
+      </div>
+      <div>
+        <label>Tipo di valutazione</label>
+        <select id="assessmentType">
+          <option value="Valutazione iniziale">Valutazione iniziale</option>
+          <option value="Rivalutazione">Rivalutazione</option>
+          <option value="Running assessment">Running assessment</option>
+          <option value="Spalla">Spalla</option>
+          <option value="Ginocchio">Ginocchio</option>
+          <option value="Colonna">Colonna</option>
+          <option value="Caviglia/Piede">Caviglia/Piede</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+      <div>
+        <label>Dolore 0–10</label>
+        <input id="assessmentPain" type="number" min="0" max="10" step="0.5" placeholder="0">
+      </div>
+    </div>
+
+    <label>Valutazione soggettiva</label>
+    <textarea id="assessmentSubjective" placeholder="Sintomi, andamento, attività, limitazioni, percezione del paziente..."></textarea>
+
+    <label>Esame obiettivo</label>
+    <textarea id="assessmentObjective" placeholder="ROM, forza, test funzionali, osservazioni cliniche..."></textarea>
+
+    <label>Interpretazione / ipotesi funzionale</label>
+    <textarea id="assessmentInterpretation" placeholder="Sintesi clinica e principali fattori modificabili..."></textarea>
+
+    <label>Piano / obiettivi</label>
+    <textarea id="assessmentPlan" placeholder="Obiettivi, carichi, esercizio, educazione, criteri di progressione..."></textarea>
+
+    <label>Misure e test (uno per riga: nome = valore unità)</label>
+    <textarea id="assessmentMeasures" placeholder="Squat = 10 rep\nDolore = 3/10\nROM flessione = 130 °"></textarea>
+
+    <button id="saveAssessmentButton" class="primary">💾 Salva valutazione</button>
+    <div id="assessmentMessage" class="message hidden"></div>
+    <hr>
+    <div id="assessmentsList">Caricamento...</div>
+  </div>
+
+  <!-- =====================================================
+       PROGRESSI
+  ====================================================== -->
+
+  <div class="card tab-panel" id="therapistTabProgress">
+    <div class="section-title">
+      <h2>📈 Progressi del paziente</h2>
+      <button id="refreshProgressButton" class="secondary">↻ Aggiorna</button>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Data</label>
+        <input id="metricDate" type="date">
+      </div>
+      <div>
+        <label>Categoria</label>
+        <select id="metricCategory">
+          <option value="Dolore">Dolore</option>
+          <option value="Forza">Forza</option>
+          <option value="ROM">ROM</option>
+          <option value="Test funzionale">Test funzionale</option>
+          <option value="Running">Running</option>
+          <option value="Carico">Carico</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+      <div>
+        <label>Nome parametro</label>
+        <input id="metricName" placeholder="Es. dolore, squat, 5 km, ROM...">
+      </div>
+      <div>
+        <label>Valore numerico</label>
+        <input id="metricValue" type="number" step="any" placeholder="Es. 4.5">
+      </div>
+      <div>
+        <label>Unità</label>
+        <input id="metricUnit" placeholder="/10, kg, °, min, km..."></input>
+      </div>
+      <div style="display:flex;align-items:end;gap:8px;">
+        <label style="display:flex;align-items:center;gap:8px;margin:0 0 10px 0;">
+          <input id="metricShared" type="checkbox" style="width:auto;"> Mostra al paziente
+        </label>
+      </div>
+    </div>
+    <label>Nota</label>
+    <textarea id="metricNote" placeholder="Contesto della misurazione..."></textarea>
+    <button id="saveMetricButton" class="primary">＋ Aggiungi dato</button>
+    <div id="metricMessage" class="message hidden"></div>
+
+    <hr>
+    <div class="grid" style="grid-template-columns:minmax(220px,1fr) auto;align-items:end;">
+      <div>
+        <label>Parametro da visualizzare</label>
+        <select id="metricFilter"></select>
+      </div>
+      <div><button id="showMetricTrendButton" class="secondary">📊 Mostra andamento</button></div>
+    </div>
+    <div id="progressSummary" style="margin-top:15px;"></div>
+    <div id="progressChart" style="margin-top:15px;"></div>
+    <hr>
+    <div id="metricsList">Caricamento...</div>
+  </div>
 
   <!-- =====================================================
        GESTIONE / ELIMINA PAZIENTE
@@ -3889,6 +4028,12 @@ async function openPatient(
   await loadPatientNotes();
 
 
+  await loadAssessments();
+
+
+  await loadMetrics();
+
+
   await loadRunningPlans();
 
 }
@@ -5162,6 +5307,161 @@ async function removeAssignedExercise(id) {
 }
 
 
+
+/* =========================================================
+   VALUTAZIONI + PROGRESSI
+========================================================= */
+
+function todayISO() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function parseAssessmentMeasures(text) {
+  const measures = {};
+  String(text || "").split(/\r?\n/).forEach(line => {
+    const idx = line.indexOf("=");
+    if(idx < 1) return;
+    const key = line.slice(0, idx).trim();
+    const raw = line.slice(idx + 1).trim();
+    if(key) measures[key] = raw;
+  });
+  return measures;
+}
+
+function formatDateIT(value) {
+  if(!value) return "";
+  const d = new Date(value + (String(value).length === 10 ? "T00:00:00" : ""));
+  return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString("it-IT");
+}
+
+async function loadAssessments() {
+  const box = document.getElementById("assessmentsList");
+  if(!box || !currentPatient) return;
+  box.innerHTML = "Caricamento...";
+  const result = await db.from("patient_assessments").select("*").eq("patient_id", currentPatient.id).order("assessment_date", {ascending:false}).order("created_at", {ascending:false});
+  if(result.error) { box.innerHTML = `<div class="message error">${escapeHtml(result.error.message)}</div>`; return; }
+  if(!result.data?.length) { box.innerHTML = `<div class="exercise-sheet-empty">Nessuna valutazione registrata.</div>`; return; }
+  box.innerHTML = result.data.map(a => `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-title"><h3>🩺 ${escapeHtml(a.assessment_type || "Valutazione")}</h3><span style="color:var(--text-muted);">${escapeHtml(formatDateIT(a.assessment_date))}${a.pain_score != null ? ` · Dolore ${escapeHtml(a.pain_score)}/10` : ""}</span></div>
+      ${a.subjective ? `<p><strong>Soggettivo:</strong><br>${escapeHtml(a.subjective).replaceAll("\n","<br>")}</p>` : ""}
+      ${a.objective ? `<p><strong>Obiettivo:</strong><br>${escapeHtml(a.objective).replaceAll("\n","<br>")}</p>` : ""}
+      ${a.interpretation ? `<p><strong>Interpretazione:</strong><br>${escapeHtml(a.interpretation).replaceAll("\n","<br>")}</p>` : ""}
+      ${a.plan ? `<p><strong>Piano:</strong><br>${escapeHtml(a.plan).replaceAll("\n","<br>")}</p>` : ""}
+      ${a.measures && Object.keys(a.measures).length ? `<p><strong>Misure:</strong> ${Object.entries(a.measures).map(([k,v])=>`${escapeHtml(k)} = ${escapeHtml(v)}`).join(" · ")}</p>` : ""}
+      <div class="actions no-print"><button class="danger" onclick="deleteAssessment('${a.id}')">🗑️ Elimina</button></div>
+    </div>`).join("");
+}
+
+async function deleteAssessment(id) {
+  if(!confirm("Eliminare questa valutazione?")) return;
+  const result = await db.from("patient_assessments").delete().eq("id", id);
+  if(result.error) return alert(result.error.message);
+  await loadAssessments();
+}
+
+async function saveAssessment() {
+  if(!currentPatient) return;
+  const payload = {
+    patient_id: currentPatient.id,
+    assessment_date: document.getElementById("assessmentDate").value || todayISO(),
+    assessment_type: document.getElementById("assessmentType").value,
+    pain_score: document.getElementById("assessmentPain").value === "" ? null : Number(document.getElementById("assessmentPain").value),
+    subjective: document.getElementById("assessmentSubjective").value.trim() || null,
+    objective: document.getElementById("assessmentObjective").value.trim() || null,
+    interpretation: document.getElementById("assessmentInterpretation").value.trim() || null,
+    plan: document.getElementById("assessmentPlan").value.trim() || null,
+    measures: parseAssessmentMeasures(document.getElementById("assessmentMeasures").value)
+  };
+  const result = await db.from("patient_assessments").insert([payload]).select("id").single();
+  if(result.error) { showMessage("assessmentMessage", result.error.message, "error"); return; }
+  showMessage("assessmentMessage", "Valutazione salvata.", "success");
+  ["assessmentSubjective","assessmentObjective","assessmentInterpretation","assessmentPlan","assessmentMeasures","assessmentPain"].forEach(id=>document.getElementById(id).value="");
+  await loadAssessments();
+}
+
+let currentMetrics = [];
+
+async function loadMetrics() {
+  const box = document.getElementById("metricsList");
+  if(!box || !currentPatient) return;
+  box.innerHTML = "Caricamento...";
+  const result = await db.from("patient_metrics").select("*").eq("patient_id", currentPatient.id).order("recorded_at", {ascending:false}).order("created_at", {ascending:false});
+  if(result.error) { box.innerHTML = `<div class="message error">${escapeHtml(result.error.message)}</div>`; return; }
+  currentMetrics = result.data || [];
+  const filter = document.getElementById("metricFilter");
+  const names = [...new Set(currentMetrics.map(x => x.metric_name).filter(Boolean))];
+  filter.innerHTML = names.length ? names.map(n=>`<option value="${escapeAttribute(n)}">${escapeHtml(n)}</option>`).join("") : `<option value="">Nessun parametro</option>`;
+  if(!currentMetrics.length) { box.innerHTML = `<div class="exercise-sheet-empty">Nessun dato di progresso registrato.</div>`; renderMetricTrend(); return; }
+  box.innerHTML = currentMetrics.map(m => `
+    <div class="card" style="margin-bottom:10px;padding:14px;">
+      <strong>${escapeHtml(m.metric_name)}</strong> · ${escapeHtml(m.value)} ${escapeHtml(m.unit || "")}<br>
+      <small>${escapeHtml(formatDateIT(m.recorded_at))} · ${escapeHtml(m.category || "")}${m.is_shared ? " · 👤 visibile al paziente" : " · 🔒 privato"}</small>
+      ${m.note ? `<div style="margin-top:5px;color:var(--text-muted);">${escapeHtml(m.note)}</div>` : ""}
+      <div class="actions no-print"><button class="danger" onclick="deleteMetric('${m.id}')">🗑️</button></div>
+    </div>`).join("");
+  renderMetricTrend();
+}
+
+function renderMetricTrend() {
+  const name = document.getElementById("metricFilter")?.value;
+  const chart = document.getElementById("progressChart");
+  const summary = document.getElementById("progressSummary");
+  if(!chart || !summary) return;
+  const rows = currentMetrics.filter(m => m.metric_name === name).sort((a,b)=>String(a.recorded_at).localeCompare(String(b.recorded_at)));
+  if(!rows.length) { summary.innerHTML = ""; chart.innerHTML = `<div class="exercise-sheet-empty">Seleziona un parametro con almeno una misurazione.</div>`; return; }
+  const vals = rows.map(r=>Number(r.value)).filter(Number.isFinite);
+  const min=Math.min(...vals), max=Math.max(...vals);
+  const first=vals[0], last=vals[vals.length-1];
+  const delta=last-first;
+  summary.innerHTML = `<div class="grid"><div class="stat-card"><div class="stat-label">Prima</div><div class="stat-number" style="font-size:24px;">${escapeHtml(first)}</div></div><div class="stat-card"><div class="stat-label">Ultima</div><div class="stat-number" style="font-size:24px;">${escapeHtml(last)}</div></div><div class="stat-card"><div class="stat-label">Variazione</div><div class="stat-number" style="font-size:24px;">${delta>0?"+":""}${escapeHtml(delta.toFixed(2))}</div></div></div>`;
+  chart.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">${rows.map(r=>{
+    const v=Number(r.value); const pct=max===min?50:10+((v-min)/(max-min))*80;
+    return `<div><div style="display:flex;justify-content:space-between;font-size:13px;"><span>${escapeHtml(formatDateIT(r.recorded_at))}</span><strong>${escapeHtml(r.value)} ${escapeHtml(r.unit||"")}</strong></div><div style="height:14px;background:var(--border);border-radius:8px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--primary);border-radius:8px;"></div></div></div>`;
+  }).join("")}</div>`;
+}
+
+async function saveMetric() {
+  if(!currentPatient) return;
+  const name=document.getElementById("metricName").value.trim();
+  const value=document.getElementById("metricValue").value;
+  if(!name || value === "") { showMessage("metricMessage","Inserisci nome e valore.","error"); return; }
+  const payload={patient_id:currentPatient.id, recorded_at:document.getElementById("metricDate").value||todayISO(), category:document.getElementById("metricCategory").value, metric_name:name, value:Number(value), unit:document.getElementById("metricUnit").value.trim()||null, note:document.getElementById("metricNote").value.trim()||null, is_shared:document.getElementById("metricShared").checked};
+  const result=await db.from("patient_metrics").insert([payload]).select("id").single();
+  if(result.error){showMessage("metricMessage",result.error.message,"error");return;}
+  showMessage("metricMessage","Dato registrato.","success");
+  ["metricName","metricValue","metricUnit","metricNote"].forEach(id=>document.getElementById(id).value="");
+  await loadMetrics();
+}
+
+async function deleteMetric(id){
+  if(!confirm("Eliminare questo dato?")) return;
+  const result=await db.from("patient_metrics").delete().eq("id",id);
+  if(result.error)return alert(result.error.message);
+  await loadMetrics();
+}
+
+function renderRunningAnalytics(plan) {
+  const box=document.getElementById("runningAnalyticsContent");
+  if(!box || !plan?.plan_data) return;
+  let totalMin=0,totalKm=0,sessionCount=0;
+  const byWeek=[];
+  (plan.plan_data||[]).forEach(w=>{
+    let wm=0,wk=0,wc=0;
+    (w.sessions||[]).forEach(sess=>{
+      const m=Number(sess.duration); const k=Number(sess.distance_km);
+      if(Number.isFinite(m)) wm+=m;
+      if(Number.isFinite(k)) wk+=k;
+      if(sess.type || sess.duration || sess.distance_km) wc++;
+    });
+    totalMin+=wm; totalKm+=wk; sessionCount+=wc; byWeek.push({week:w.week,min:wm,km:wk});
+  });
+  const avgRpe=[];
+  (plan.plan_data||[]).forEach(w=>(w.sessions||[]).forEach(s=>{const match=String(s.rpe||"").match(/^(\d+)/);if(match)avgRpe.push(Number(match[1]));}));
+  const rpeText=avgRpe.length?(avgRpe.reduce((a,b)=>a+b,0)/avgRpe.length).toFixed(1):"—";
+  box.innerHTML=`<div class="grid"><div class="stat-card"><div class="stat-label">Sedute</div><div class="stat-number" style="font-size:24px;">${sessionCount}</div></div><div class="stat-card"><div class="stat-label">Minuti totali</div><div class="stat-number" style="font-size:24px;">${totalMin}</div></div><div class="stat-card"><div class="stat-label">Km target</div><div class="stat-number" style="font-size:24px;">${totalKm.toFixed(1)}</div></div><div class="stat-card"><div class="stat-label">RPE medio</div><div class="stat-number" style="font-size:24px;">${rpeText}</div></div></div><div style="margin-top:15px;display:grid;gap:8px;">${byWeek.map(x=>`<div><strong>Settimana ${x.week}</strong> · ${x.min} min${x.km?` · ${x.km.toFixed(1)} km`:""}</div>`).join("")}</div>`;
+}
+
 /* =========================================================
    DOCUMENTI
 ========================================================= */
@@ -6152,6 +6452,11 @@ function generateRunningPlanner(
               placeholder="Es. 30"
             >
 
+            <label>Distanza target (km)</label>
+            <input type="number" step="0.1" min="0" id="run_dist_${w}_${s}" value="${escapeAttribute(existingSession?.distance_km ?? "")}" placeholder="Es. 5">
+
+            <label>Passo target</label>
+            <input type="text" id="run_pace_${w}_${s}" value="${escapeAttribute(existingSession?.pace ?? "")}" placeholder="Es. 5:00/km">
 
             <div
               id="interval_box_${w}_${s}"
@@ -6399,6 +6704,12 @@ function collectRunningPlanData() {
           .value;
 
 
+      const distanceKm =
+        document.getElementById(`run_dist_${w}_${s}`)?.value || "";
+
+      const pace =
+        document.getElementById(`run_pace_${w}_${s}`)?.value.trim() || "";
+
       const fast =
         document
           .getElementById(
@@ -6439,6 +6750,10 @@ function collectRunningPlanData() {
         type,
 
         duration,
+
+        distance_km: distanceKm === "" ? null : Number(distanceKm),
+
+        pace,
 
         fast:
           (
@@ -6901,6 +7216,8 @@ async function loadRunningPlans() {
     return;
 
   }
+
+  renderRunningAnalytics(result.data[0]);
 
 
   if(
@@ -8198,6 +8515,20 @@ function escapeAttribute(
 
 }
 
+
+
+/* =========================================================
+   EVENTI VALUTAZIONI / PROGRESSI
+========================================================= */
+
+if(document.getElementById("assessmentDate")) document.getElementById("assessmentDate").value=todayISO();
+if(document.getElementById("metricDate")) document.getElementById("metricDate").value=todayISO();
+document.getElementById("saveAssessmentButton")?.addEventListener("click", saveAssessment);
+document.getElementById("saveMetricButton")?.addEventListener("click", saveMetric);
+document.getElementById("refreshProgressButton")?.addEventListener("click", loadMetrics);
+document.getElementById("showMetricTrendButton")?.addEventListener("click", renderMetricTrend);
+document.getElementById("metricFilter")?.addEventListener("change", renderMetricTrend);
+document.getElementById("printAssessmentButton")?.addEventListener("click", ()=>triggerPrint("therapistTabAssessment"));
 
 /* =========================================================
    INIZIALIZZAZIONE

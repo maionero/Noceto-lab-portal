@@ -6755,18 +6755,43 @@ async function saveRunningProgram() {
       return;
     }
 
-    if(
-      Number(verify.data.weeks_count) !== Number(data.weeks) ||
-      Number(verify.data.sessions_per_week) !== Number(data.sessions) ||
-      JSON.stringify(verify.data.plan_data) !== JSON.stringify(data.planData)
-    ) {
+    // Confronto robusto del JSON: Supabase/PostgREST può restituire
+    // lo stesso JSON con differenze di rappresentazione/ordine delle chiavi.
+    const normalizeRunningJson = (value) => {
+      if (Array.isArray(value)) return value.map(normalizeRunningJson);
+      if (value && typeof value === "object") {
+        return Object.keys(value).sort().reduce((obj, key) => {
+          obj[key] = normalizeRunningJson(value[key]);
+          return obj;
+        }, {});
+      }
+      return value;
+    };
+
+    const savedPlanData = normalizeRunningJson(verify.data.plan_data);
+    const sentPlanData = normalizeRunningJson(data.planData);
+
+    const weeksMatch =
+      Number(verify.data.weeks_count) === Number(data.weeks);
+
+    const sessionsMatch =
+      Number(verify.data.sessions_per_week) === Number(data.sessions);
+
+    const planDataMatch =
+      JSON.stringify(savedPlanData) === JSON.stringify(sentPlanData);
+
+    if(!weeksMatch || !sessionsMatch || !planDataMatch) {
       console.error("Verifica modifica fallita", {
         salvato: verify.data,
-        atteso: data
+        inviato: {
+          weeks_count: Number(data.weeks),
+          sessions_per_week: Number(data.sessions),
+          plan_data: data.planData
+        }
       });
       showMessage(
         "runningMessage",
-        "La modifica non coincide con i dati inviati. Controlla la tabella running_plans.",
+        "Supabase ha ricevuto la modifica ma i dati letti dopo il salvataggio non coincidono. Controlla console e tabella running_plans.",
         "error"
       );
       return;

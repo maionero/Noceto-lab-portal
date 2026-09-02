@@ -2508,44 +2508,16 @@ hr {
       <button id="refreshProgressButton" class="secondary">↻ Aggiorna</button>
     </div>
 
-    <div class="grid">
-      <div>
-        <label>Data</label>
-        <input id="metricDate" type="date">
-      </div>
-      <div>
-        <label>Categoria</label>
-        <select id="metricCategory">
-          <option value="Dolore">Dolore</option>
-          <option value="Forza">Forza</option>
-          <option value="ROM">ROM</option>
-          <option value="Test funzionale">Test funzionale</option>
-          <option value="Running">Running</option>
-          <option value="Carico">Carico</option>
-          <option value="Altro">Altro</option>
-        </select>
-      </div>
-      <div>
-        <label>Nome parametro</label>
-        <input id="metricName" placeholder="Es. dolore, squat, 5 km, ROM...">
-      </div>
-      <div>
-        <label>Valore numerico</label>
-        <input id="metricValue" type="number" step="any" placeholder="Es. 4.5">
-      </div>
-      <div>
-        <label>Unità</label>
-        <input id="metricUnit" placeholder="/10, kg, °, min, km..."></input>
-      </div>
-      <div style="display:flex;align-items:end;gap:8px;">
-        <label style="display:flex;align-items:center;gap:8px;margin:0 0 10px 0;">
-          <input id="metricShared" type="checkbox" style="width:auto;"> Mostra al paziente
-        </label>
-      </div>
+    <p style="color:var(--text-muted);font-size:13px;">
+      Puoi registrare più misurazioni insieme. Ogni riga corrisponde a un parametro/test.
+    </p>
+
+    <div id="metricsBulkRows"></div>
+
+    <div class="actions" style="margin-top:12px;">
+      <button id="addMetricRowButton" class="secondary">＋ Aggiungi parametro</button>
+      <button id="saveMetricsButton" class="primary">💾 Salva tutti i dati</button>
     </div>
-    <label>Nota</label>
-    <textarea id="metricNote" placeholder="Contesto della misurazione..."></textarea>
-    <button id="saveMetricButton" class="primary">＋ Aggiungi dato</button>
     <div id="metricMessage" class="message hidden"></div>
 
     <hr>
@@ -5397,6 +5369,15 @@ function formatDateIT(value) {
   return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString("it-IT");
 }
 
+function formatDateTimeIT(value) {
+  if(!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString("it-IT", {
+    day:"2-digit", month:"2-digit", year:"numeric",
+    hour:"2-digit", minute:"2-digit"
+  });
+}
+
 async function loadAssessments() {
   const box = document.getElementById("assessmentsList");
   if(!box || !currentPatient) return;
@@ -5471,7 +5452,13 @@ function renderMetricTrend() {
   const chart = document.getElementById("progressChart");
   const summary = document.getElementById("progressSummary");
   if(!chart || !summary) return;
-  const rows = currentMetrics.filter(m => m.metric_name === name).sort((a,b)=>String(a.recorded_at).localeCompare(String(b.recorded_at)));
+  const rows = currentMetrics
+    .filter(m => m.metric_name === name)
+    .sort((a,b)=> {
+      const dateCompare = String(a.recorded_at).localeCompare(String(b.recorded_at));
+      if(dateCompare !== 0) return dateCompare;
+      return String(a.created_at || "").localeCompare(String(b.created_at || ""));
+    });
   if(!rows.length) { summary.innerHTML = ""; chart.innerHTML = `<div class="exercise-sheet-empty">Seleziona un parametro con almeno una misurazione.</div>`; return; }
   const vals = rows.map(r=>Number(r.value)).filter(Number.isFinite);
   const min=Math.min(...vals), max=Math.max(...vals);
@@ -5484,16 +5471,98 @@ function renderMetricTrend() {
   }).join("")}</div>`;
 }
 
-async function saveMetric() {
+function addMetricRow(values={}) {
+  const container=document.getElementById("metricsBulkRows");
+  if(!container) return;
+  const row=document.createElement("div");
+  row.className="metric-bulk-row card";
+  row.style="margin-bottom:10px;padding:12px;";
+  row.innerHTML=`
+    <div class="grid">
+      <div>
+        <label>Data</label>
+        <input class="bulk-metric-date" type="date" value="${escapeAttribute(values.date || todayISO())}">
+      </div>
+      <div>
+        <label>Categoria</label>
+        <select class="bulk-metric-category">
+          ${["Dolore","Forza","ROM","Test funzionale","Running","Carico","Altro"].map(x=>`<option value="${escapeAttribute(x)}" ${x===(values.category||"Forza")?"selected":""}>${escapeHtml(x)}</option>`).join("")}
+        </select>
+      </div>
+      <div>
+        <label>Nome parametro</label>
+        <input class="bulk-metric-name" placeholder="Es. forza quadricipite, squat, ROM..." value="${escapeAttribute(values.name||"")}">
+      </div>
+      <div>
+        <label>Valore</label>
+        <input class="bulk-metric-value" type="number" step="any" placeholder="Es. 26" value="${escapeAttribute(values.value ?? "")} ">
+      </div>
+      <div>
+        <label>Unità</label>
+        <input class="bulk-metric-unit" placeholder="kg, °, /10, min..." value="${escapeAttribute(values.unit||"")}">
+      </div>
+      <div style="display:flex;align-items:end;gap:8px;">
+        <label style="display:flex;align-items:center;gap:8px;margin:0 0 10px 0;">
+          <input class="bulk-metric-shared" type="checkbox" style="width:auto;" ${values.shared!==false?"checked":""}> Mostra al paziente
+        </label>
+      </div>
+    </div>
+    <label>Nota</label>
+    <textarea class="bulk-metric-note" placeholder="Contesto della misurazione...">${escapeHtml(values.note||"")}</textarea>
+    <div style="text-align:right;margin-top:8px;">
+      <button type="button" class="secondary remove-metric-row">🗑️ Rimuovi riga</button>
+    </div>`;
+  container.appendChild(row);
+  row.querySelector(".remove-metric-row").addEventListener("click",()=>{
+    row.remove();
+    if(!container.children.length) addMetricRow();
+  });
+}
+
+function resetMetricRows(){
+  const container=document.getElementById("metricsBulkRows");
+  if(!container) return;
+  container.innerHTML="";
+  addMetricRow();
+}
+
+async function saveMetricsBulk() {
   if(!currentPatient) return;
-  const name=document.getElementById("metricName").value.trim();
-  const value=document.getElementById("metricValue").value;
-  if(!name || value === "") { showMessage("metricMessage","Inserisci nome e valore.","error"); return; }
-  const payload={patient_id:currentPatient.id, recorded_at:document.getElementById("metricDate").value||todayISO(), category:document.getElementById("metricCategory").value, metric_name:name, value:Number(value), unit:document.getElementById("metricUnit").value.trim()||null, note:document.getElementById("metricNote").value.trim()||null, is_shared:document.getElementById("metricShared").checked};
-  const result=await db.from("patient_metrics").insert([payload]).select("id").single();
+  const rows=[...document.querySelectorAll("#metricsBulkRows .metric-bulk-row")];
+  const payloads=[];
+  for(let i=0;i<rows.length;i++){
+    const row=rows[i];
+    const name=row.querySelector(".bulk-metric-name").value.trim();
+    const value=row.querySelector(".bulk-metric-value").value;
+    if(!name && value === "") continue;
+    if(!name || value === ""){
+      showMessage("metricMessage",`Completa nome e valore della riga ${i+1}.` ,"error");
+      return;
+    }
+    const numeric=Number(value);
+    if(!Number.isFinite(numeric)){
+      showMessage("metricMessage",`Il valore della riga ${i+1} non è numerico.` ,"error");
+      return;
+    }
+    payloads.push({
+      patient_id:currentPatient.id,
+      recorded_at:row.querySelector(".bulk-metric-date").value || todayISO(),
+      category:row.querySelector(".bulk-metric-category").value,
+      metric_name:name,
+      value:numeric,
+      unit:row.querySelector(".bulk-metric-unit").value.trim() || null,
+      note:row.querySelector(".bulk-metric-note").value.trim() || null,
+      is_shared:row.querySelector(".bulk-metric-shared").checked
+    });
+  }
+  if(!payloads.length){
+    showMessage("metricMessage","Inserisci almeno un parametro da salvare.","error");
+    return;
+  }
+  const result=await db.from("patient_metrics").insert(payloads);
   if(result.error){showMessage("metricMessage",result.error.message,"error");return;}
-  showMessage("metricMessage","Dato registrato.","success");
-  ["metricName","metricValue","metricUnit","metricNote"].forEach(id=>document.getElementById(id).value="");
+  showMessage("metricMessage",`${payloads.length} ${payloads.length===1?"dato salvato":"dati salvati"} correttamente.`,"success");
+  resetMetricRows();
   await loadMetrics();
 }
 
@@ -8161,10 +8230,12 @@ document.getElementById("savePatientDiaryButton")?.addEventListener("click",asyn
 
 if(document.getElementById("assessmentDate")) document.getElementById("assessmentDate").value=todayISO();
 if(document.getElementById("metricDate")) document.getElementById("metricDate").value=todayISO();
+if(document.getElementById("metricsBulkRows") && !document.querySelector("#metricsBulkRows .metric-bulk-row")) addMetricRow();
 if(document.getElementById("documentDate")) document.getElementById("documentDate").value=todayISO();
 if(document.getElementById("reportDate")) document.getElementById("reportDate").value=todayISO();
 document.getElementById("saveAssessmentButton")?.addEventListener("click", saveAssessment);
-document.getElementById("saveMetricButton")?.addEventListener("click", saveMetric);
+document.getElementById("addMetricRowButton")?.addEventListener("click", ()=>addMetricRow());
+document.getElementById("saveMetricsButton")?.addEventListener("click", saveMetricsBulk);
 document.getElementById("refreshProgressButton")?.addEventListener("click", loadMetrics);
 document.getElementById("showMetricTrendButton")?.addEventListener("click", renderMetricTrend);
 document.getElementById("metricFilter")?.addEventListener("change", renderMetricTrend);

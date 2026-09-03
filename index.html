@@ -1523,13 +1523,6 @@ html, body { max-width:100%; overflow-x:hidden; }
 .patient-search { margin: 0 0 16px; }
 .dashboard-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 .activity-item { display:flex; width:100%; gap:14px; align-items:flex-start; padding:14px 16px; margin:0 0 8px; border:1px solid var(--border-color); border-radius:12px; background:#fff; text-align:left; box-sizing:border-box; }
-.activity-item { justify-content:flex-start !important; }
-.activity-item > .activity-dot { flex:0 0 10px !important; }
-.activity-item > div { flex:1 1 0 !important; width:auto !important; max-width:none !important; min-width:0 !important; text-align:left !important; }
-.activity-item strong,
-.activity-item small,
-.activity-item > div > div { text-align:left !important; }
-
 .activity-item > div { min-width:0; flex:1 1 auto; }
 .activity-item strong,
 .activity-item small { display:block; overflow-wrap:anywhere; word-break:normal; }
@@ -1646,184 +1639,6 @@ html, body { max-width:100%; overflow-x:hidden; }
 
   #printSheet img {
     max-width:100% !important;
-  }
-}
-
-
-/* NOCETO LAB v29 — scheda esercizi più compatta in stampa */
-@media print {
-  #printSheet .exercise-sheet-header {
-    padding: 7px 9px !important;
-    margin-bottom: 7px !important;
-    border-radius: 6px !important;
-  }
-  #printSheet .exercise-sheet-header h3 {
-    font-size: 12px !important;
-    margin-bottom: 2px !important;
-  }
-  #printSheet .exercise-sheet-header div {
-    font-size: 9px !important;
-  }
-  #printSheet .exercise {
-    padding: 8px 10px !important;
-    margin-bottom: 6px !important;
-    border-radius: 7px !important;
-    font-size: 10px !important;
-    line-height: 1.25 !important;
-  }
-  #printSheet .exercise h3 {
-    font-size: 12px !important;
-    margin: 0 0 4px !important;
-  }
-  #printSheet .exercise p {
-    font-size: 10px !important;
-    line-height: 1.25 !important;
-    margin: 3px 0 !important;
-  }
-  #printSheet .exercise-instructions {
-    padding: 5px 7px !important;
-    margin-top: 5px !important;
-    font-size: 9px !important;
-    line-height: 1.2 !important;
-  }
-  #printSheet .exercise-instructions strong {
-    font-size: 9px !important;
-  }
-  #printSheet .exercise-library-meta,
-  #printSheet .document-meta {
-    gap: 3px !important;
-    margin: 4px 0 !important;
-  }
-  #printSheet .exercise-chip {
-    padding: 2px 5px !important;
-    font-size: 8px !important;
-  }
-  #printSheet .phase-chip {
-    padding: 2px 5px !important;
-    font-size: 8px !important;
-    margin: 3px 0 !important;
-  }
-  #printSheet .exercise-media {
-    margin-top: 5px !important;
-    gap: 5px !important;
-  }
-  #printSheet .exercise-media img {
-    max-height: 95px !important;
-  }
-}
-
-
-/* NOCETO LAB v29 — corsa mobile leggibile senza scroll orizzontale */
-@media (max-width:700px) {
-  .running-planner {
-    width:100% !important;
-    max-width:100% !important;
-    overflow-x:hidden !important;
-    overflow-y:visible !important;
-  }
-
-  .running-table {
-    display:block !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    table-layout:auto !important;
-    border:0 !important;
-    border-radius:0 !important;
-    margin-top:10px !important;
-  }
-
-  .running-table thead {
-    display:none !important;
-  }
-
-  .running-table tbody,
-  .running-table tr {
-    display:block !important;
-    width:100% !important;
-  }
-
-  .running-table tr {
-    margin:0 0 12px !important;
-    border:1px solid var(--border-color) !important;
-    border-radius:10px !important;
-    overflow:hidden !important;
-    background:#fff !important;
-  }
-
-  .running-table td {
-    display:block !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    border:0 !important;
-    border-bottom:1px solid var(--border-color) !important;
-    padding:10px !important;
-    white-space:normal !important;
-    overflow-wrap:anywhere !important;
-    word-break:break-word !important;
-  }
-
-  .running-table td:last-child {
-    border-bottom:0 !important;
-  }
-
-  .running-table td:first-child {
-    width:100% !important;
-    min-width:0 !important;
-    background:#f8fafc !important;
-    font-size:13px !important;
-    padding:10px 12px !important;
-  }
-
-  .running-table td:not(:first-child)::before {
-    content:attr(data-session-label);
-    display:block;
-    margin:0 0 7px;
-    font-size:11px;
-    font-weight:800;
-    text-transform:uppercase;
-    letter-spacing:.35px;
-    color:var(--accent);
-  }
-
-  .running-table .session-box {
-    width:100% !important;
-    max-width:100% !important;
-    box-sizing:border-box !important;
-    padding:9px !important;
-    margin-bottom:6px !important;
-    font-size:13px !important;
-    line-height:1.35 !important;
-    overflow-wrap:anywhere !important;
-  }
-
-  .running-table .session-box input,
-  .running-table .session-box select,
-  .running-table .session-box textarea {
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    font-size:14px !important;
-    box-sizing:border-box !important;
-  }
-
-  .running-table .interval-box {
-    width:100% !important;
-    box-sizing:border-box !important;
-  }
-
-  /* Anche la tabella già renderizzata nel portale paziente segue lo stesso layout. */
-  #patientPortalRunning .running-table {
-    display:block !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-  }
-
-  #patientPortalRunning .running-table td {
-    width:100% !important;
-    min-width:0 !important;
   }
 }
 
@@ -2188,6 +2003,13 @@ html, body { max-width:100%; overflow-x:hidden; }
 
     <button
       class="section-tab"
+      data-target="therapistTabProgramAssign"
+    >
+      ➕ Assegna
+    </button>
+
+    <button
+      class="section-tab"
       data-target="therapistTabDocuments"
     >
       📄 Documenti
@@ -2272,9 +2094,16 @@ html, body { max-width:100%; overflow-x:hidden; }
       Caricamento...
     </div>
 
-    <hr>
+  </div>
 
-    <div id="patientExerciseAssignment">
+
+  <!-- ASSEGNA ESERCIZIO -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabProgramAssign"
+  >
+
     <h2>
       ＋ Assegna Esercizio
     </h2>
@@ -2410,8 +2239,6 @@ html, body { max-width:100%; overflow-x:hidden; }
       id="assignMessage"
       class="message hidden"
     ></div>
-
-    </div>
 
   </div>
 
@@ -4183,8 +4010,6 @@ document
         null;
 
 
-      stopPatientAutoRefresh();
-
       currentPatient =
         null;
 
@@ -4289,7 +4114,6 @@ async function startPatient() {
 
 
   await loadPatientPortal();
-  startPatientAutoRefresh();
 
 }
 
@@ -4493,143 +4317,6 @@ async function loadPatients() {
 }
 
 
-
-/* =========================================================
-   NOCETO LAB v29 — AGGIORNAMENTO AUTOMATICO UI
-========================================================= */
-
-let patientAutoRefreshTimer = null;
-let patientRealtimeChannel = null;
-
-async function refreshCurrentPatientData(options = {}) {
-  if(!currentPatient) return;
-
-  const {
-    exercises = true,
-    running = true,
-    timeline = true,
-    dashboard = true,
-    portal = false
-  } = options;
-
-  try {
-    if(portal) {
-      await loadPatientPortal();
-      return;
-    }
-
-    if(exercises) {
-      if(options.refreshExerciseLibrary) {
-        await loadExercises();
-      }
-      await loadPatientExercises();
-    }
-
-    if(running) {
-      await loadRunningPlans();
-    }
-
-    if(timeline) {
-      await loadPatientTimeline();
-    }
-
-    if(dashboard) {
-      await loadDashboardActivity();
-    }
-  } catch(error) {
-    console.error("Aggiornamento automatico Noceto Lab:", error);
-  }
-}
-
-function stopPatientAutoRefresh() {
-  if(patientAutoRefreshTimer) {
-    clearInterval(patientAutoRefreshTimer);
-    patientAutoRefreshTimer = null;
-  }
-
-  if(patientRealtimeChannel) {
-    try { db.removeChannel(patientRealtimeChannel); } catch(e) {}
-    patientRealtimeChannel = null;
-  }
-}
-
-function startPatientAutoRefresh() {
-  stopPatientAutoRefresh();
-
-  if(!currentPatient) return;
-
-  /* Aggiornamento locale periodico: non richiede ricaricare la pagina. */
-  let autoRefreshRunning = false;
-
-  patientAutoRefreshTimer = setInterval(async () => {
-    if(!currentPatient || autoRefreshRunning) return;
-    autoRefreshRunning = true;
-    const patientPageVisible = !document.getElementById("patientPage")?.classList.contains("hidden");
-    const portalVisible = !document.getElementById("patientPortalPage")?.classList.contains("hidden");
-
-    try {
-      if(patientPageVisible) {
-        await refreshCurrentPatientData({
-          exercises:true,
-          running: editingRunningPlanId == null,
-          timeline:true,
-          dashboard:false,
-          portal:false
-        });
-      } else if(portalVisible) {
-        await refreshCurrentPatientData({portal:true});
-      }
-    } finally {
-      autoRefreshRunning = false;
-    }
-  }, 5000);
-
-  /* Se Realtime è attivo sul progetto Supabase, gli aggiornamenti arrivano subito. */
-  try {
-    patientRealtimeChannel = db
-      .channel("noceto-patient-live-" + String(currentPatient.id))
-      .on("postgres_changes", {
-        event:"*",
-        schema:"public",
-        table:"patient_exercises",
-        filter:"patient_id=eq." + String(currentPatient.id)
-      }, async () => {
-        if(document.getElementById("patientPage")?.classList.contains("hidden")) {
-          if(!document.getElementById("patientPortalPage")?.classList.contains("hidden")) {
-            await loadPatientPortal();
-          }
-          return;
-        }
-        await refreshCurrentPatientData({exercises:true,running:false,timeline:true,dashboard:true});
-      })
-      .on("postgres_changes", {
-        event:"*",
-        schema:"public",
-        table:"running_plans",
-        filter:"patient_id=eq." + String(currentPatient.id)
-      }, async () => {
-        if(document.getElementById("patientPage")?.classList.contains("hidden")) {
-          if(!document.getElementById("patientPortalPage")?.classList.contains("hidden")) {
-            await loadPatientPortal();
-          }
-          return;
-        }
-        await refreshCurrentPatientData({
-          exercises:false,
-          running: editingRunningPlanId == null,
-          timeline:true,
-          dashboard:true
-        });
-      })
-      .subscribe((status) => {
-        console.log("Noceto Lab Realtime:", status);
-      });
-  } catch(error) {
-    console.warn("Realtime non disponibile, resta attivo l'aggiornamento automatico.", error);
-  }
-}
-
-
 /* =========================================================
    APRI PAZIENTE
 ========================================================= */
@@ -4689,8 +4376,6 @@ async function openPatient(
   await loadRunningSessions();
   await loadClinicalTests();
 
-  startPatientAutoRefresh();
-
 }
 
 
@@ -4705,8 +4390,6 @@ document
   .addEventListener(
     "click",
     async () => {
-
-      stopPatientAutoRefresh();
 
       currentPatient =
         null;
@@ -5401,15 +5084,6 @@ async function updateExercise(id) {
     showMessage("exerciseMessage", "Esercizio aggiornato.", "success");
     await loadExerciseLibrary();
     await loadExercises();
-    if(currentPatient) {
-      await refreshCurrentPatientData({
-        exercises:true,
-        refreshExerciseLibrary:false,
-        running:false,
-        timeline:true,
-        dashboard:true
-      });
-    }
     await loadDashboardStats();
   } catch(error) {
     alert("Errore: " + (error.message || error));
@@ -5453,17 +5127,6 @@ async function deleteExercise(id) {
 
 
   await loadExercises();
-
-
-  if(currentPatient) {
-    await refreshCurrentPatientData({
-      exercises:true,
-      refreshExerciseLibrary:false,
-      running:false,
-      timeline:true,
-      dashboard:true
-    });
-  }
 
 
   await loadDashboardStats();
@@ -5587,15 +5250,6 @@ document
 
       await loadExerciseLibrary();
       await loadExercises();
-      if(currentPatient) {
-        await refreshCurrentPatientData({
-          exercises:true,
-          refreshExerciseLibrary:true,
-          running:false,
-          timeline:true,
-          dashboard:true
-        });
-      }
       await loadDashboardStats();
     } catch(error) {
       showMessage("exerciseMessage", error.message || String(error), "error");
@@ -5744,12 +5398,7 @@ async function updateAssignedExercise(id) {
     return;
   }
 
-  await refreshCurrentPatientData({
-    exercises:true,
-    running:false,
-    timeline:true,
-    dashboard:true
-  });
+  await loadPatientExercises();
 }
 
 
@@ -5960,12 +5609,10 @@ document
         "success"
       );
 
-      await refreshCurrentPatientData({
-        exercises:true,
-        running:false,
-        timeline:true,
-        dashboard:true
-      });
+      await loadExercises();
+      await loadPatientExercises();
+      await loadPatientTimeline();
+      await loadDashboardActivity();
 
     }
   );
@@ -6003,12 +5650,7 @@ async function removeAssignedExercise(id) {
   }
 
 
-  await refreshCurrentPatientData({
-    exercises:true,
-    running:false,
-    timeline:true,
-    dashboard:true
-  });
+  await loadPatientExercises();
 
 }
 
@@ -6885,7 +6527,7 @@ function generateRunningPlanner(
 
       html += `
 
-        <td data-session-label="Sessione ${s}">
+        <td>
 
           <div class="session-box">
 
@@ -7382,12 +7024,7 @@ async function saveRunningProgram() {
     .getElementById("saveRunningProgramButton")
     .innerText = "💾 Salva Scheda Corsa";
 
-  await refreshCurrentPatientData({
-    exercises:false,
-    running:true,
-    timeline:true,
-    dashboard:true
-  });
+  await loadRunningPlans();
   await loadDashboardStats();
 }
 
@@ -7766,7 +7403,7 @@ async function loadRunningPlans() {
 
 
                 tableHtml +=
-                  `<td data-session-label="Sessione ${idx + 1}">
+                  `<td>
                     ${content}
                   </td>`;
 
@@ -7987,12 +7624,7 @@ async function duplicateRunningPlan(
   );
 
 
-  await refreshCurrentPatientData({
-    exercises:false,
-    running:true,
-    timeline:true,
-    dashboard:true
-  });
+  await loadRunningPlans();
 
 
   await loadDashboardStats();
@@ -8037,12 +7669,7 @@ async function deleteRunningPlan(
   }
 
 
-  await refreshCurrentPatientData({
-    exercises:false,
-    running:true,
-    timeline:true,
-    dashboard:true
-  });
+  await loadRunningPlans();
 
 
   await loadDashboardStats();
@@ -8484,7 +8111,7 @@ async function loadPatientPortal() {
 
 
                 html +=
-                  `<td data-session-label="Sessione ${index + 1}">
+                  `<td>
                     ${content}
                   </td>`;
 

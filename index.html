@@ -622,34 +622,6 @@ button:disabled {
 
 
 /* =========================================================
-   NAVIGAZIONE PAGINE
-========================================================= */
-
-function showPage(pageId) {
-  const pageIds = [
-    "loginPage",
-    "setPasswordPage",
-    "therapistPage",
-    "patientPage",
-    "newPatientPage",
-    "newExercisePage"
-  ];
-
-  pageIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add("hidden");
-  });
-
-  const target = document.getElementById(pageId);
-  if (!target) {
-    console.error("showPage: pagina non trovata:", pageId);
-    return;
-  }
-
-  target.classList.remove("hidden");
-}
-
-/* =========================================================
    UTILITY
 ========================================================= */
 
@@ -3177,6 +3149,35 @@ let currentUser = null;
 let currentPatient = null;
 
 let editingRunningPlanId = null;
+
+/* =========================================================
+   NAVIGAZIONE PAGINE
+========================================================= */
+
+function showPage(pageId) {
+  const pageIds = [
+    "loginPage",
+    "setPasswordPage",
+    "therapistPage",
+    "patientPage",
+    "newPatientPage",
+    "newExercisePage"
+  ];
+
+  pageIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+
+  const target = document.getElementById(pageId);
+  if (!target) {
+    console.error("showPage: pagina non trovata:", pageId);
+    return;
+  }
+
+  target.classList.remove("hidden");
+}
+
 
 
 /* =========================================================
@@ -5728,7 +5729,7 @@ function addMetricRow(values={}) {
       </div>
       <div>
         <label>Valore</label>
-        <input class="bulk-metric-value" type="number" step="any" placeholder="Es. 26" value="${escapeAttribute(values.value ?? "")} ">
+        <input class="bulk-metric-value" type="number" step="any" placeholder="Es. 26" value="${escapeAttribute(values.value ?? "")}">
       </div>
       <div>
         <label>Unità</label>

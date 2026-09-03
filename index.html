@@ -675,6 +675,15 @@ small {
 
 }
 
+/* FASE 1-3: stabilità, UX, responsive */
+.btn-loading { pointer-events:none !important; opacity:.65 !important; }
+.timeline-toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+@media (max-width:700px) {
+  .card { padding:18px; }
+  .actions button { flex:1 1 auto; min-width:120px; }
+  .running-table { min-width:720px; }
+}
+
 
 /* =========================================================
    PAZIENTE
@@ -1382,22 +1391,21 @@ hr {
       block !important;
 
     position:
-      absolute;
-
-    left:
-      0;
-
-    top:
-      0;
+      static !important;
 
     width:
-      100%;
+      auto !important;
 
-    max-width: 100%;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
     box-sizing: border-box;
     margin: 0 !important;
-    break-after: avoid-page;
-    page-break-after: avoid;
+    padding: 0 !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
 
     background:
       white;
@@ -3739,6 +3747,7 @@ async function saveNewPassword() {
 ========================================================= */
 
 let dashboardActivityExpanded = false;
+let patientTimelineExpanded = false;
 
 async function loadDashboardActivity(){
   const box=document.getElementById("dashboardActivity");
@@ -3753,11 +3762,14 @@ async function loadDashboardActivity(){
     ["running_plans","🏃","Programma corsa"]
   ];
   const all=[];
-  for(const [table,icon,label] of tasks){
-    const r=await db.from(table).select("id,patient_id,created_at").order("created_at",{ascending:false}).limit(30);
-    if(r.error) continue;
-    (r.data||[]).forEach(x=>all.push({...x,icon,label}));
-  }
+  const results=await Promise.all(tasks.map(([table,icon,label])=>
+    db.from(table).select("id,patient_id,created_at").order("created_at",{ascending:false}).limit(30)
+      .then(r=>({...r,icon,label}))
+  ));
+  results.forEach(r=>{
+    if(r.error) return;
+    (r.data||[]).forEach(x=>all.push({...x,icon:r.icon,label:r.label}));
+  });
   const patientIds=[...new Set(all.map(x=>x.patient_id).filter(Boolean))];
   let names={};
   if(patientIds.length){ const r=await db.from("patients").select("id,name").in("id",patientIds); (r.data||[]).forEach(p=>names[p.id]=p.name); }
@@ -3807,8 +3819,11 @@ async function loadPatientTimeline(){
   push(rs.data,"running-session","🏃",x=>x.session_type||"Seduta di corsa",x=>[x.duration_min?x.duration_min+" min":null,x.distance_km?x.distance_km+" km":null,x.rpe!=null?"RPE "+x.rpe:null,x.pain_score!=null?"Dolore "+x.pain_score+"/10":null].filter(Boolean).join(" · "),"session_date");
   push(ct.data,"test","🧪",x=>x.test_name||"Test",x=>`${x.test_value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
   events.sort((x,y)=>String(y.date||"").localeCompare(String(x.date||"")));
-  events = events.slice(0,3);
-  box.innerHTML=events.length?`<div class="timeline">${events.map(x=>`<div class="timeline-item"><div class="timeline-date">${escapeHtml(formatDateTimeIT(x.date))} · ${escapeHtml(x.type)}</div><div class="timeline-title">${x.icon} ${escapeHtml(x.title)}</div><div class="timeline-body">${escapeHtml(x.body||"")}</div></div>`).join("")}</div>`:`<div class="exercise-sheet-empty">Nessun evento clinico registrato.</div>`;
+  const totalEvents=events.length;
+  const rows=patientTimelineExpanded?events:events.slice(0,3);
+  const toolbar=totalEvents>3?`<div class="timeline-toolbar"><small>${patientTimelineExpanded?`Mostrati ${totalEvents} eventi`:`Mostrati gli ultimi 3 eventi`}</small><button type="button" class="secondary no-print" id="togglePatientTimelineButton">${patientTimelineExpanded?"Mostra ultimi 3":"Mostra tutti"}</button></div>`:"";
+  box.innerHTML=rows.length?`${toolbar}<div class="timeline">${rows.map(x=>`<div class="timeline-item"><div class="timeline-date">${escapeHtml(formatDateTimeIT(x.date))} · ${escapeHtml(x.type)}</div><div class="timeline-title">${x.icon} ${escapeHtml(x.title)}</div><div class="timeline-body">${escapeHtml(x.body||"")}</div></div>`).join("")}</div>`:`<div class="exercise-sheet-empty">Nessun evento clinico registrato.</div>`;
+  document.getElementById("togglePatientTimelineButton")?.addEventListener("click",()=>{patientTimelineExpanded=!patientTimelineExpanded;loadPatientTimeline();});
 }
 
 async function loadPatientTodo(){
@@ -8332,6 +8347,11 @@ async function triggerPrint(
 
 }
 
+window.addEventListener("afterprint",()=>{
+  const printSheet=document.getElementById("printSheet");
+  if(printSheet) printSheet.innerHTML="";
+});
+
 
 document
   .getElementById(
@@ -8553,8 +8573,10 @@ async function loadPatientDiary(){
     if(result.error) throw result.error;
     const therapistUnread=(result.data||[]).filter(x=>x.author_id!==currentPatient.user_id && !x.read_at);
     if(therapistUnread.length){
-      const mark=await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).in("id",therapistUnread.map(x=>x.id));
-      if(mark.error) console.warn("Impossibile segnare come letto:",mark.error.message);
+      for(const entry of therapistUnread){
+        const mark=await db.rpc("mark_patient_diary_read",{p_entry_id:entry.id});
+        if(mark.error) console.warn("Impossibile segnare come letto:",mark.error.message);
+      }
     }
     if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto. Puoi scrivere la prima annotazione qui sopra.</div>'; return; }
     box.innerHTML=result.data.map(x=>`<div class="note-card">
@@ -8628,6 +8650,11 @@ document.getElementById("saveTherapistRunningSessionButton")?.addEventListener("
 if(document.getElementById("therapistRunningSessionDate")) document.getElementById("therapistRunningSessionDate").value=todayISO();
 document.getElementById("saveClinicalTestButton")?.addEventListener("click",saveClinicalTest);
 if(document.getElementById("runningSessionDate")) document.getElementById("runningSessionDate").value=todayISO();
+
+/* =========================================================
+   NOCETO LAB v18 — FASI 1 + 2 + 3
+   Stabilità / UX / Responsive / Print / Performance
+========================================================= */
 
 /* =========================================================
    INIZIALIZZAZIONE

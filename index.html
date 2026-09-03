@@ -1409,14 +1409,33 @@ hr {
     padding:10px 13px !important;
     font-size:13px !important;
   }
-  .running-planner { width:100% !important; overflow-x:visible !important; }
-  .running-table {
+  .running-planner {
     width:100% !important;
-    min-width:0 !important;
-    font-size:14px !important;
-    table-layout:auto !important;
+    max-width:100% !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    display:block !important;
+    border-radius:10px;
   }
-  .running-table th, .running-table td { padding:8px !important; }
+  .running-table {
+    width:max-content !important;
+    min-width:760px !important;
+    max-width:none !important;
+    font-size:13px !important;
+    table-layout:fixed !important;
+  }
+  .running-table th,
+  .running-table td {
+    padding:9px !important;
+    white-space:normal !important;
+  }
+  .running-table th:first-child,
+  .running-table td:first-child {
+    width:95px !important;
+    min-width:95px !important;
+  }
 }
 
 /* =========================================================
@@ -1503,7 +1522,10 @@ html, body { max-width:100%; overflow-x:hidden; }
 ========================================================= */
 .patient-search { margin: 0 0 16px; }
 .dashboard-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-.activity-item { display:flex; width:100%; gap:14px; align-items:flex-start; padding:14px 16px; margin:0 0 8px; border:1px solid var(--border-color); border-radius:12px; background:#fff; text-align:left; }
+.activity-item { display:flex; width:100%; gap:14px; align-items:flex-start; padding:14px 16px; margin:0 0 8px; border:1px solid var(--border-color); border-radius:12px; background:#fff; text-align:left; box-sizing:border-box; }
+.activity-item > div { min-width:0; flex:1 1 auto; }
+.activity-item strong,
+.activity-item small { display:block; overflow-wrap:anywhere; word-break:normal; }
 .activity-item:last-child { margin-bottom:0; }
 .activity-item:hover { border-color:var(--accent); box-shadow:var(--shadow-hover); }
 .activity-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); margin-top:6px; flex:0 0 auto; }
@@ -1543,10 +1565,82 @@ html, body { max-width:100%; overflow-x:hidden; }
   .running-diary-form-grid input, .running-diary-form-grid select { width:100% !important; min-width:0 !important; }
   #runningSessionDate { width:100% !important; max-width:100% !important; min-width:0 !important; }
   #runningSessionNotes { min-height:120px; font-size:15px; }
-  .running-planner { overflow-x:auto !important; }
-  .running-table { min-width:760px !important; font-size:14px !important; }
+  .running-planner {
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .running-table {
+    min-width:760px !important;
+    width:max-content !important;
+    max-width:none !important;
+    font-size:13px !important;
+  }
 }
 @media(max-width:380px){ .section-tabs{grid-template-columns:1fr 1fr;} .section-tab{font-size:12px !important;padding:9px 6px !important;} }
+
+
+/* =========================================================
+   STAMPA / PDF — stampa esclusivamente il contenuto preparato
+========================================================= */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html, body {
+    width:100% !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    background:#fff !important;
+  }
+
+  body > * {
+    display:none !important;
+  }
+
+  body > #printSheet {
+    display:block !important;
+    position:static !important;
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:#fff !important;
+    color:#000 !important;
+    box-shadow:none !important;
+    border:0 !important;
+  }
+
+  #printSheet * {
+    visibility:visible !important;
+  }
+
+  #printSheet .no-print {
+    display:none !important;
+  }
+
+  #printSheet table {
+    width:100% !important;
+    max-width:100% !important;
+    border-collapse:collapse !important;
+  }
+
+  #printSheet tr,
+  #printSheet .exercise,
+  #printSheet .exercise-sheet-header {
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
+  }
+
+  #printSheet img {
+    max-width:100% !important;
+  }
+}
 
 </style>
 
@@ -1905,6 +1999,13 @@ html, body { max-width:100%; overflow-x:hidden; }
       data-target="therapistTabProgram"
     >
       📋 Esercizi
+    </button>
+
+    <button
+      class="section-tab"
+      data-target="therapistTabProgramAssign"
+    >
+      ➕ Assegna
     </button>
 
     <button
@@ -5318,8 +5419,12 @@ document
         showMessage("assignMessage", "Selettore esercizi non disponibile.", "error");
         return;
       }
-      const exerciseId = exerciseSelect.value;
+      const exerciseId = String(exerciseSelect.value || "").trim();
 
+      if(!exerciseId || !/^\d+$/.test(exerciseId)) {
+        showMessage("assignMessage", "Seleziona un esercizio valido dalla lista.", "error");
+        return;
+      }
 
       const sets =
         document
@@ -5504,6 +5609,7 @@ document
         "success"
       );
 
+      await loadExercises();
       await loadPatientExercises();
       await loadPatientTimeline();
       await loadDashboardActivity();
@@ -8063,6 +8169,8 @@ async function triggerPrint(
   if(!container)
     return;
 
+  // Evita che un contenuto di stampa precedente possa restare visibile.
+  printSheet.innerHTML = "";
 
   const logoDataUrl =
     await getLogoDataUrl();

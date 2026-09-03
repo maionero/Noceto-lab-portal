@@ -2342,6 +2342,21 @@ hr {
     <h3>📔 Diario scritto dal paziente</h3>
     <p style="color:var(--text-muted);font-size:13px;">Le annotazioni sono visibili a te e al fisioterapista. Il fisioterapista può segnarle come lette.</p>
     <div id="therapistDiaryList">Caricamento...</div>
+
+    <hr>
+    <h3 style="margin-top:18px;">🏃 Diario corsa del paziente</h3>
+    <p style="color:var(--text-muted);font-size:13px;">Puoi aggiungere anche tu una seduta o un’annotazione di corsa.</p>
+    <div class="grid">
+      <div><label>Data</label><input id="therapistRunningSessionDate" type="date"></div>
+      <div><label>Durata (min)</label><input id="therapistRunningSessionDuration" type="number" min="0" step="1"></div>
+      <div><label>Distanza (km)</label><input id="therapistRunningSessionDistance" type="number" min="0" step="0.01"></div>
+      <div><label>Fatica percepita RPE 0–10</label><input id="therapistRunningSessionRpe" type="number" min="0" max="10" step="1"></div>
+      <div><label>Dolore 0–10</label><input id="therapistRunningSessionPain" type="number" min="0" max="10" step="0.5"></div>
+    </div>
+    <label>Tipo / struttura seduta</label><input id="therapistRunningSessionType" placeholder="Es. lento, ripetute, progressivo...">
+    <label>Sensazioni / note</label><textarea id="therapistRunningSessionNotes" placeholder="Annotazioni del terapista..."></textarea>
+    <button id="saveTherapistRunningSessionButton" class="secondary">＋ Aggiungi al diario corsa</button>
+    <div id="therapistRunningSessionMessage" class="message hidden"></div>
     <hr>
     <h3>✍️ Scrivi nel diario del paziente</h3>
     <label>Oggetto</label>
@@ -7692,7 +7707,7 @@ async function loadPatientRunningSessions(){
   const box=document.getElementById("runningSessionsList"); if(!box||!currentPatient)return;
   const r=await db.from("patient_running_diary").select("*").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false});
   if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
-  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;">${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(s.notes)}</div>`:""}</div>`).join(""):"Nessuna seduta registrata.";
+  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;">${s.created_by && currentPatient.user_id && String(s.created_by)===String(currentPatient.user_id)?"👤 Paziente":"👨‍⚕️ Terapista"} · ${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(s.notes)}</div>`:""}</div>`).join(""):"Nessuna seduta registrata.";
 }
 
 async function loadPatientPortal() {
@@ -8479,24 +8494,44 @@ async function loadTherapistDiary(){
     const entries=result.data||[];
     if(!entries.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto.</div>'; return; }
     box.innerHTML=entries.map(x=>{
-      const isPatient=x.author_id===currentPatient.user_id;
+      const isPatient=String(x.author_id||"")===String(currentPatient.user_id||"");
       return `<div class="note-card public-note">
-      <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
-      <small>${isPatient ? "👤 Paziente" : "👨‍⚕️ Terapista"} · ${escapeHtml(formatDateTimeIT(x.created_at))}${x.read_at ? " · ✓ Letto" : " · 🆕 Nuovo"}</small>
-      <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
-      ${isPatient && !x.read_at ? `<button class="secondary no-print" onclick="markDiaryRead('${x.id}')">✓ Segna come letto</button>` : ""}
-    </div>`;
+        <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
+        <small>${isPatient ? "👤 Paziente" : "👨‍⚕️ Terapista"} · ${escapeHtml(formatDateTimeIT(x.created_at))}${isPatient && !x.read_at ? " · 🆕 Nuovo" : x.read_at ? " · ✓ Letto" : ""}</small>
+        <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
+        ${isPatient && !x.read_at ? `<button class="secondary no-print" onclick="markDiaryRead('${x.id}')">✓ Segna come letto</button>` : ""}
+      </div>`;
     }).join("");
   }catch(err){
     console.error("Errore diario paziente:",err);
     box.innerHTML=`<div class="message error">Impossibile caricare il diario: ${escapeHtml(err.message || "errore")}</div>`;
   }
 }
-
 async function markDiaryRead(id){
   const result=await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).eq("id",id);
   if(result.error){ alert(result.error.message); return; }
   await loadTherapistDiary();
+}
+
+async function saveTherapistRunningSession(){
+  if(!currentPatient || !currentUser) return;
+  const payload={
+    patient_id:currentPatient.id,
+    session_date:document.getElementById("therapistRunningSessionDate")?.value||todayISO(),
+    duration_min:document.getElementById("therapistRunningSessionDuration")?.value===""?null:Number(document.getElementById("therapistRunningSessionDuration").value),
+    distance_km:document.getElementById("therapistRunningSessionDistance")?.value===""?null:Number(document.getElementById("therapistRunningSessionDistance").value),
+    rpe:document.getElementById("therapistRunningSessionRpe")?.value===""?null:Number(document.getElementById("therapistRunningSessionRpe").value),
+    pain_score:document.getElementById("therapistRunningSessionPain")?.value===""?null:Number(document.getElementById("therapistRunningSessionPain").value),
+    session_type:document.getElementById("therapistRunningSessionType")?.value.trim()||null,
+    notes:document.getElementById("therapistRunningSessionNotes")?.value.trim()||null,
+    created_by:currentUser.id
+  };
+  const result=await db.from("patient_running_diary").insert([payload]);
+  if(result.error){showMessage("therapistRunningSessionMessage",result.error.message,"error");return;}
+  ["therapistRunningSessionDuration","therapistRunningSessionDistance","therapistRunningSessionRpe","therapistRunningSessionPain","therapistRunningSessionType","therapistRunningSessionNotes"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  showMessage("therapistRunningSessionMessage","Seduta aggiunta al diario corsa.","success");
+  await loadRunningSessions();
+  await loadPatientTimeline();
 }
 
 async function loadPatientDiary(){
@@ -8580,6 +8615,8 @@ document.getElementById("patientSearchInput")?.addEventListener("input",filterPa
 document.getElementById("refreshDashboardActivityButton")?.addEventListener("click",loadDashboardActivity);
 document.getElementById("refreshTimelineButton")?.addEventListener("click",loadPatientTimeline);
 document.getElementById("saveRunningSessionButton")?.addEventListener("click",saveRunningSession);
+document.getElementById("saveTherapistRunningSessionButton")?.addEventListener("click",saveTherapistRunningSession);
+if(document.getElementById("therapistRunningSessionDate")) document.getElementById("therapistRunningSessionDate").value=todayISO();
 document.getElementById("saveClinicalTestButton")?.addEventListener("click",saveClinicalTest);
 if(document.getElementById("runningSessionDate")) document.getElementById("runningSessionDate").value=todayISO();
 

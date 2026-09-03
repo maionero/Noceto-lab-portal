@@ -776,6 +776,8 @@ small {
 .exercise-sheet-header h3 { margin:0 0 5px; }
 .exercise-sheet-empty { padding:20px; text-align:center; color:var(--text-muted); }
 @media print {
+  html, body { height:auto !important; min-height:0 !important; overflow:visible !important; }
+  body { margin:0 !important; padding:0 !important; }
   .exercise { break-inside: avoid; page-break-inside: avoid; }
   .exercise-sheet-header { break-inside: avoid; }
 }
@@ -3758,7 +3760,7 @@ async function loadPatientTimeline(){
   if(!box||!currentPatient) return;
   box.innerHTML="Caricamento timeline...";
   const p=currentPatient.id;
-  const events=[];
+  let events=[];
   const push=(rows,type,icon,title,body,dateField="created_at")=>(rows||[]).forEach(r=>events.push({date:r[dateField]||r.created_at||r.assessment_date||r.recorded_at, type,icon,title:typeof title==="function"?title(r):title,body:typeof body==="function"?body(r):body}));
   const [a,m,d,e,rp,di,rs,ct]=await Promise.all([
     db.from("patient_assessments").select("*").eq("patient_id",p),
@@ -3770,6 +3772,11 @@ async function loadPatientTimeline(){
     db.from("patient_running_diary").select("*").eq("patient_id",p),
     db.from("patient_test_results").select("*").eq("patient_id",p)
   ]);
+  const queryErrors=[a,m,d,e,rp,di,rs,ct].filter(x=>x.error);
+  if(queryErrors.length){
+    box.innerHTML=`<div class="message error">Impossibile caricare la timeline: ${escapeHtml(queryErrors.map(x=>x.error.message).join(" · "))}</div>`;
+    return;
+  }
   push(a.data,"assessment","🩺",x=>x.assessment_type||"Valutazione",x=>x.subjective||x.interpretation||x.plan||"", "assessment_date");
   push(m.data,"metric","📈",x=>x.metric_name||"Misurazione",x=>`${x.value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
   push(d.data,"document","📄",x=>x.file_name||"Documento",x=>`${x.category||"Altro"}${x.description?" · "+x.description:""}`,"document_date");
@@ -5726,8 +5733,32 @@ function addMetricRow(values={}) {
         </select>
       </div>
       <div>
+        <label>Parametro predefinito</label>
+        <select class="bulk-metric-preset">
+          <option value="">Seleziona un parametro...</option>
+          <optgroup label="ROM · Ginocchio">
+            ${["Flessione ginocchio","Estensione ginocchio"].map(x=>`<option value="${escapeAttribute(x)}">${escapeHtml(x)}</option>`).join("")}
+          </optgroup>
+          <optgroup label="ROM · Anca">
+            ${["Flessione anca","Estensione anca","Abduzione anca","Adduzione anca","Rotazione interna anca","Rotazione esterna anca"].map(x=>`<option value="${escapeAttribute(x)}">${escapeHtml(x)}</option>`).join("")}
+          </optgroup>
+          <optgroup label="ROM · Spalla">
+            ${["Flessione spalla","Abduzione spalla","Rotazione interna spalla","Rotazione esterna spalla"].map(x=>`<option value="${escapeAttribute(x)}">${escapeHtml(x)}</option>`).join("")}
+          </optgroup>
+          <optgroup label="ROM · Caviglia">
+            ${["Dorsiflessione caviglia","Flessione plantare caviglia"].map(x=>`<option value="${escapeAttribute(x)}">${escapeHtml(x)}</option>`).join("")}
+          </optgroup>
+          <optgroup label="Forza">
+            ${["Forza quadricipite","Forza ischiocrurali","Forza glutei","Forza polpacci","Forza tibiale anteriore","Forza abduttori anca","Forza adduttori anca","Forza cuffia rotatori"].map(x=>`<option value="${escapeAttribute(x)}">${escapeHtml(x)}</option>`).join("")}
+          </optgroup>
+          <optgroup label="Test funzionali">
+            ${["Sit to Stand","Single Leg Squat","Y-Balance","6 Minute Walk Test","Timed Up and Go"].map(x=>`<option value="${escapeAttribute(x)}">${escapeHtml(x)}</option>`).join("")}
+          </optgroup>
+        </select>
+      </div>
+      <div>
         <label>Nome parametro</label>
-        <input class="bulk-metric-name" placeholder="Es. forza quadricipite, squat, ROM..." value="${escapeAttribute(values.name||"")}">
+        <input class="bulk-metric-name" placeholder="Oppure inserisci un parametro personalizzato" value="${escapeAttribute(values.name||"")}">
       </div>
       <div>
         <label>Valore</label>
@@ -5749,6 +5780,19 @@ function addMetricRow(values={}) {
       <button type="button" class="secondary remove-metric-row">🗑️ Rimuovi riga</button>
     </div>`;
   container.appendChild(row);
+  const preset=row.querySelector(".bulk-metric-preset");
+  const nameInput=row.querySelector(".bulk-metric-name");
+  const unitInput=row.querySelector(".bulk-metric-unit");
+  preset.value=values.name||"";
+  if(preset.value && !nameInput.value) nameInput.value=preset.value;
+  preset.addEventListener("change",()=>{
+    if(!preset.value) return;
+    nameInput.value=preset.value;
+    const rom=preset.value.toLowerCase().includes("flessione") || preset.value.toLowerCase().includes("estensione") || preset.value.toLowerCase().includes("abduzione") || preset.value.toLowerCase().includes("adduzione") || preset.value.toLowerCase().includes("rotazione") || preset.value.toLowerCase().includes("dorsiflessione") || preset.value.toLowerCase().includes("plantare");
+    const force=preset.value.toLowerCase().includes("forza");
+    if(rom && !unitInput.value) unitInput.value="°";
+    if(force && !unitInput.value) unitInput.value="kg";
+  });
   row.querySelector(".remove-metric-row").addEventListener("click",()=>{
     row.remove();
     if(!container.children.length) addMetricRow();
@@ -8432,14 +8476,17 @@ async function loadTherapistDiary(){
       .eq("patient_id",currentPatient.id)
       .order("created_at",{ascending:false});
     if(result.error) throw result.error;
-    const patientEntries=(result.data||[]).filter(x=>x.author_id===currentPatient.user_id);
-    if(!patientEntries.length){ box.innerHTML='<div class="exercise-sheet-empty">Nessuna annotazione del paziente.</div>'; return; }
-    box.innerHTML=patientEntries.map(x=>`<div class="note-card public-note">
+    const entries=result.data||[];
+    if(!entries.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto.</div>'; return; }
+    box.innerHTML=entries.map(x=>{
+      const isPatient=x.author_id===currentPatient.user_id;
+      return `<div class="note-card public-note">
       <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
-      <small>${escapeHtml(formatDateTimeIT(x.created_at))}${x.read_at ? " · ✓ Letto" : " · 🆕 Nuovo"}</small>
+      <small>${isPatient ? "👤 Paziente" : "👨‍⚕️ Terapista"} · ${escapeHtml(formatDateTimeIT(x.created_at))}${x.read_at ? " · ✓ Letto" : " · 🆕 Nuovo"}</small>
       <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
-      ${!x.read_at ? `<button class="secondary no-print" onclick="markDiaryRead('${x.id}')">✓ Segna come letto</button>` : ""}
-    </div>`).join("");
+      ${isPatient && !x.read_at ? `<button class="secondary no-print" onclick="markDiaryRead('${x.id}')">✓ Segna come letto</button>` : ""}
+    </div>`;
+    }).join("");
   }catch(err){
     console.error("Errore diario paziente:",err);
     box.innerHTML=`<div class="message error">Impossibile caricare il diario: ${escapeHtml(err.message || "errore")}</div>`;
@@ -8464,7 +8511,8 @@ async function loadPatientDiary(){
     if(result.error) throw result.error;
     const therapistUnread=(result.data||[]).filter(x=>x.author_id!==currentPatient.user_id && !x.read_at);
     if(therapistUnread.length){
-      await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).in("id",therapistUnread.map(x=>x.id));
+      const mark=await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).in("id",therapistUnread.map(x=>x.id));
+      if(mark.error) console.warn("Impossibile segnare come letto:",mark.error.message);
     }
     if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto. Puoi scrivere la prima annotazione qui sopra.</div>'; return; }
     box.innerHTML=result.data.map(x=>`<div class="note-card">

@@ -1903,7 +1903,7 @@ hr {
   </div>
 
   <div class="card">
-    <div class="section-title"><h2>⚡ Attività recenti</h2><button id="refreshDashboardActivityButton" class="secondary">↻ Aggiorna</button></div>
+    <div class="section-title"><h2>⚡ Attività recenti</h2><div class="actions"><button id="refreshDashboardActivityButton" class="secondary">↻ Aggiorna</button><button id="toggleDashboardActivityButton" class="secondary">Mostra tutte</button></div></div>
     <div id="dashboardActivity">Caricamento...</div>
   </div>
 
@@ -2344,20 +2344,6 @@ hr {
     <div id="therapistDiaryList">Caricamento...</div>
 
     <hr>
-    <h3 style="margin-top:18px;">🏃 Diario corsa del paziente</h3>
-    <p style="color:var(--text-muted);font-size:13px;">Puoi aggiungere anche tu una seduta o un’annotazione di corsa.</p>
-    <div class="grid">
-      <div><label>Data</label><input id="therapistRunningSessionDate" type="date"></div>
-      <div><label>Durata (min)</label><input id="therapistRunningSessionDuration" type="number" min="0" step="1"></div>
-      <div><label>Distanza (km)</label><input id="therapistRunningSessionDistance" type="number" min="0" step="0.01"></div>
-      <div><label>Fatica percepita RPE 0–10</label><input id="therapistRunningSessionRpe" type="number" min="0" max="10" step="1"></div>
-      <div><label>Dolore 0–10</label><input id="therapistRunningSessionPain" type="number" min="0" max="10" step="0.5"></div>
-    </div>
-    <label>Tipo / struttura seduta</label><input id="therapistRunningSessionType" placeholder="Es. lento, ripetute, progressivo...">
-    <label>Sensazioni / note</label><textarea id="therapistRunningSessionNotes" placeholder="Annotazioni del terapista..."></textarea>
-    <button id="saveTherapistRunningSessionButton" class="secondary">＋ Aggiungi al diario corsa</button>
-    <div id="therapistRunningSessionMessage" class="message hidden"></div>
-    <hr>
     <h3>✍️ Scrivi nel diario del paziente</h3>
     <label>Oggetto</label>
     <input id="therapistDiaryTitle" placeholder="Es. Indicazione per il prossimo allenamento...">
@@ -2524,6 +2510,19 @@ hr {
     </div>
     <hr>
     <h2>🏃 Diario delle corse del paziente</h2>
+    <p style="color:var(--text-muted);font-size:13px;">Diario dedicato esclusivamente alle sedute di corsa. Qui puoi aggiungere anche le tue annotazioni.</p>
+    <div class="grid">
+      <div><label>Data</label><input id="therapistRunningSessionDate" type="date"></div>
+      <div><label>Durata (min)</label><input id="therapistRunningSessionDuration" type="number" min="0" step="1"></div>
+      <div><label>Distanza (km)</label><input id="therapistRunningSessionDistance" type="number" min="0" step="0.01"></div>
+      <div><label>Fatica percepita RPE 0–10</label><input id="therapistRunningSessionRpe" type="number" min="0" max="10" step="1"></div>
+      <div><label>Dolore 0–10</label><input id="therapistRunningSessionPain" type="number" min="0" max="10" step="0.5"></div>
+    </div>
+    <label>Tipo / struttura seduta</label><input id="therapistRunningSessionType" placeholder="Es. lento, ripetute, progressivo...">
+    <label>Sensazioni / note</label><textarea id="therapistRunningSessionNotes" placeholder="Annotazioni del terapista..." ></textarea>
+    <button id="saveTherapistRunningSessionButton" class="secondary">＋ Aggiungi al diario corsa</button>
+    <div id="therapistRunningSessionMessage" class="message hidden"></div>
+    <hr>
     <div id="therapistRunningSessions">Caricamento...</div>
 
   </div>
@@ -3739,6 +3738,8 @@ async function saveNewPassword() {
    FASE A/B/C — FUNZIONI EVOLUTE
 ========================================================= */
 
+let dashboardActivityExpanded = false;
+
 async function loadDashboardActivity(){
   const box=document.getElementById("dashboardActivity");
   if(!box) return;
@@ -3753,7 +3754,7 @@ async function loadDashboardActivity(){
   ];
   const all=[];
   for(const [table,icon,label] of tasks){
-    const r=await db.from(table).select("id,patient_id,created_at").order("created_at",{ascending:false}).limit(8);
+    const r=await db.from(table).select("id,patient_id,created_at").order("created_at",{ascending:false}).limit(30);
     if(r.error) continue;
     (r.data||[]).forEach(x=>all.push({...x,icon,label}));
   }
@@ -3761,7 +3762,12 @@ async function loadDashboardActivity(){
   let names={};
   if(patientIds.length){ const r=await db.from("patients").select("id,name").in("id",patientIds); (r.data||[]).forEach(p=>names[p.id]=p.name); }
   all.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
-  const rows=all.slice(0,12);
+  const rows=dashboardActivityExpanded ? all : all.slice(0,3);
+  const toggle=document.getElementById("toggleDashboardActivityButton");
+  if(toggle){
+    toggle.textContent = dashboardActivityExpanded ? "Mostra ultime 3" : "Mostra tutte";
+    toggle.classList.toggle("hidden", all.length<=3);
+  }
   box.innerHTML=rows.length?rows.map(x=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${x.icon} ${escapeHtml(x.label)}</strong><div style="font-size:13px;">${escapeHtml(names[x.patient_id]||"Paziente")}</div><small>${escapeHtml(formatDateTimeIT(x.created_at))}</small></div></div>`).join(""):"Nessuna attività recente.";
 }
 
@@ -4318,6 +4324,7 @@ async function openPatient(
 
 
   await loadPatientNotes();
+  await loadTherapistDiary();
 
 
   await loadAssessments();
@@ -8571,6 +8578,7 @@ document.getElementById("saveTherapistDiaryButton")?.addEventListener("click",as
   document.getElementById("therapistDiaryTitle").value="";
   document.getElementById("therapistDiaryContent").value="";
   showMessage("therapistDiaryMessage","Messaggio inviato nel diario del paziente.","success");
+  await loadTherapistDiary();
 });
 
 document.getElementById("savePatientDiaryButton")?.addEventListener("click",async()=>{
@@ -8613,6 +8621,7 @@ document.getElementById("printAssessmentButton")?.addEventListener("click", ()=>
 ========================================================= */
 document.getElementById("patientSearchInput")?.addEventListener("input",filterPatients);
 document.getElementById("refreshDashboardActivityButton")?.addEventListener("click",loadDashboardActivity);
+document.getElementById("toggleDashboardActivityButton")?.addEventListener("click",()=>{ dashboardActivityExpanded=!dashboardActivityExpanded; loadDashboardActivity(); });
 document.getElementById("refreshTimelineButton")?.addEventListener("click",loadPatientTimeline);
 document.getElementById("saveRunningSessionButton")?.addEventListener("click",saveRunningSession);
 document.getElementById("saveTherapistRunningSessionButton")?.addEventListener("click",saveTherapistRunningSession);

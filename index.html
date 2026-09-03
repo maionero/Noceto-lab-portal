@@ -1053,13 +1053,7 @@ hr {
     16px;
 
   position:
-    sticky;
-
-  top:
-    72px;
-
-  z-index:
-    10;
+    static;
 
   background:
     var(--bg-color);
@@ -1550,6 +1544,40 @@ hr {
   .running-table th, .running-table td { display:table-cell !important; width:auto !important; padding:7px 6px !important; }
   .running-table th:first-child, .running-table td:first-child { width:76px !important; }
   .running-table td:first-child { background:#fff !important; color:var(--text-main) !important; border-radius:0 !important; margin:0 !important; }
+}
+
+/* NOCETO LAB v21 — NAVIGAZIONE SEZIONI */
+.section-tabs {
+  position:static !important;
+  z-index:auto !important;
+}
+.section-tab {
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+@media (max-width:700px) {
+  .section-tabs {
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:8px 2px;
+    margin-bottom:12px;
+  }
+  .section-tabs::-webkit-scrollbar { display:none; }
+  .section-tab {
+    flex:0 0 auto;
+    white-space:nowrap;
+    min-height:44px;
+    padding:10px 14px;
+  }
+  .dashboard-activity-link {
+    min-height:58px;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
 }
 
 /* =========================================================
@@ -2971,44 +2999,6 @@ hr {
 
 
   <div
-    class="card patient-portal-welcome"
-    style="
-      background:
-      linear-gradient(
-        135deg,
-        var(--primary) 0%,
-        #1e3a8a 100%
-      );
-      color:white;
-    "
-  >
-
-    <h2
-      id="patientWelcome"
-      style="
-        color:white;
-        font-size:22px;
-      "
-    >
-      Ciao 👋
-    </h2>
-
-    <p
-      style="
-        margin:0;
-        opacity:.85;
-      "
-    >
-      Benvenuto nella tua area riservata
-      di Noceto Lab.
-    </p>
-
-  </div>
-
-
-  </div>
-
-  <div
     class="section-tabs"
     id="patientPortalTabs"
   >
@@ -3058,6 +3048,42 @@ hr {
     </button>
 
     <button class="section-tab" data-target="portalRunningDiary">📓 Diario corsa</button>
+
+  </div>
+
+
+  <div
+    class="card patient-portal-welcome"
+    style="
+      background:
+      linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        #1e3a8a 100%
+      );
+      color:white;
+    "
+  >
+
+    <h2
+      id="patientWelcome"
+      style="
+        color:white;
+        font-size:22px;
+      "
+    >
+      Ciao 👋
+    </h2>
+
+    <p
+      style="
+        margin:0;
+        opacity:.85;
+      "
+    >
+      Benvenuto nella tua area riservata
+      di Noceto Lab.
+    </p>
 
   </div>
 

@@ -3799,12 +3799,25 @@ async function startApp() {
       .single();
 
 
-  if(profileResult.error) {
+  if(profileResult.error || !profileResult.data) {
 
-    console.error(
+    console.error("Errore caricamento profilo:", profileResult.error);
+
+    showMessage(
+      "loginMessage",
       profileResult.error
+        ? "Accesso riuscito, ma non riesco a leggere il profilo utente. Controlla le policy RLS della tabella profiles."
+        : "Profilo utente non trovato nella tabella profiles.",
+      "error"
     );
 
+    document
+      .getElementById("logoutButton")
+      ?.classList.add("hidden");
+
+    await db.auth.signOut();
+    currentUser = null;
+    showPage("loginPage");
     return;
 
   }

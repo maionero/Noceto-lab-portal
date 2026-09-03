@@ -1353,80 +1353,129 @@ hr {
 }
 
 
+
+/* NOCETO LAB v19 — TABELLA CORSA COMPATTA */
+.running-table {
+  table-layout: fixed;
+  width: 100%;
+  max-width: 100%;
+}
+.running-table th,
+.running-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+}
+.running-table th:first-child,
+.running-table td:first-child {
+  width: 82px;
+}
+
+@media print {
+  /* La stampa deve contenere SOLO printSheet: gli elementi hidden
+     con visibility:hidden occupano comunque spazio e possono creare
+     una pagina bianca aggiuntiva. */
+  body > *:not(#printSheet) {
+    display: none !important;
+  }
+  #printSheet {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  #printSheet .running-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 8px !important;
+    border-collapse: collapse !important;
+    margin-top: 6px !important;
+  }
+  #printSheet .running-table th,
+  #printSheet .running-table td {
+    padding: 4px 3px !important;
+    line-height: 1.2 !important;
+    vertical-align: top !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+  #printSheet .running-table th:first-child,
+  #printSheet .running-table td:first-child {
+    width: 58px !important;
+  }
+  #printSheet .card {
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+  #printSheet .exercise {
+    padding: 8px !important;
+    margin-bottom: 7px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #printSheet img[alt*="Logo"],
+  #printSheet img[alt*="logo"] {
+    display: none !important;
+  }
+}
+
 /* =========================================================
    PRINT
 ========================================================= */
 
 .print-sheet {
-
-  display:
-    none;
-
+  display: none;
 }
 
 @page { size: A4; margin: 10mm; }
 
 @media print {
-
-  html, body { margin:0 !important; padding:0 !important; height:auto !important; min-height:0 !important; overflow:visible !important; }
-
-  body * {
-
-    visibility:
-      hidden;
-
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
   }
-
-  #printSheet,
-  #printSheet * {
-
-    visibility:
-      visible;
-
-  }
-
+  body > *:not(#printSheet) { display: none !important; }
   #printSheet {
-
-    display:
-      block !important;
-
-    position:
-      static !important;
-
-    width:
-      auto !important;
-
-    max-width: none !important;
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
-    box-sizing: border-box;
     margin: 0 !important;
     padding: 0 !important;
+    box-sizing: border-box !important;
+    background: #fff !important;
+    color: #000 !important;
     break-after: auto !important;
     page-break-after: auto !important;
-
-    background:
-      white;
-
-    color:
-      black;
-
-    padding:
-      10px;
-
   }
-
-  .no-print {
-
-    display:
-      none !important;
-
+  #printSheet > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
   }
-
+  #printSheet img[alt*="Logo"],
+  #printSheet img[alt*="logo"] { display: none !important; }
+  #printSheet > div > div:first-child img { display: block !important; }
+  .no-print { display: none !important; }
 }
-
 
 /* =========================================================
    MOBILE
@@ -3780,7 +3829,31 @@ async function loadDashboardActivity(){
     toggle.textContent = dashboardActivityExpanded ? "Mostra ultime 3" : "Mostra tutte";
     toggle.classList.toggle("hidden", all.length<=3);
   }
-  box.innerHTML=rows.length?rows.map(x=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${x.icon} ${escapeHtml(x.label)}</strong><div style="font-size:13px;">${escapeHtml(names[x.patient_id]||"Paziente")}</div><small>${escapeHtml(formatDateTimeIT(x.created_at))}</small></div></div>`).join(""):"Nessuna attività recente.";
+  box.innerHTML=rows.length?rows.map((x,i)=>`<div class="activity-item dashboard-activity-link" data-activity-index="${i}" style="cursor:pointer;" title="Apri la sezione dedicata"><span class="activity-dot"></span><div><strong>${x.icon} ${escapeHtml(x.label)}</strong><div style="font-size:13px;">${escapeHtml(names[x.patient_id]||"Paziente")}</div><small>${escapeHtml(formatDateTimeIT(x.created_at))}</small></div></div>`).join(""):"Nessuna attività recente.";
+
+  box.querySelectorAll(".dashboard-activity-link").forEach(el=>{
+    el.addEventListener("click",async()=>{
+      const item=rows[Number(el.dataset.activityIndex)];
+      if(!item?.patient_id) return;
+      const r=await db.from("patients").select("*").eq("id",item.patient_id).single();
+      if(r.error || !r.data){ alert("Impossibile aprire il paziente."); return; }
+      await openPatient(r.data);
+      const targetMap={
+        "Valutazione":"therapistTabAssessment",
+        "Misurazione":"therapistTabProgress",
+        "Documento":"therapistTabDocuments",
+        "Diario paziente":"therapistTabNotes",
+        "Esercizio assegnato":"therapistTabProgram",
+        "Programma corsa":"therapistTabRunning"
+      };
+      const target=targetMap[item.label];
+      if(target){
+        const btn=document.querySelector(`#therapistPatientTabs .section-tab[data-target="${target}"]`);
+        btn?.click();
+        document.getElementById(target)?.scrollIntoView({behavior:"smooth",block:"start"});
+      }
+    });
+  });
 }
 
 function filterPatients(){
@@ -8232,6 +8305,17 @@ async function triggerPrint(
         el.remove()
     );
 
+  // Il logo viene aggiunto una sola volta nell'intestazione della stampa.
+  // Se un contenuto clonato contiene per errore un'altra immagine-logo,
+  // la rimuoviamo per evitare un secondo logo dentro tabelle/esercizi.
+  clone
+    .querySelectorAll("img")
+    .forEach(img => {
+      const alt = String(img.getAttribute("alt") || "").toLowerCase();
+      const src = String(img.getAttribute("src") || "").toLowerCase();
+      if(alt.includes("logo") || src.includes("logo-noceto-lab")) img.remove();
+    });
+
 
   printSheet.innerHTML = `
 
@@ -8652,7 +8736,7 @@ document.getElementById("saveClinicalTestButton")?.addEventListener("click",save
 if(document.getElementById("runningSessionDate")) document.getElementById("runningSessionDate").value=todayISO();
 
 /* =========================================================
-   NOCETO LAB v18 — FASI 1 + 2 + 3
+   NOCETO LAB v19 — FASI 1 + 2 + 3
    Stabilità / UX / Responsive / Print / Performance
 ========================================================= */
 

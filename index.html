@@ -1353,7 +1353,11 @@ hr {
 
 }
 
+@page { size: A4; margin: 10mm; }
+
 @media print {
+
+  html, body { margin:0 !important; padding:0 !important; height:auto !important; min-height:0 !important; overflow:visible !important; }
 
   body * {
 
@@ -1386,6 +1390,12 @@ hr {
 
     width:
       100%;
+
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0 !important;
+    break-after: avoid-page;
+    page-break-after: avoid;
 
     background:
       white;
@@ -2330,6 +2340,14 @@ hr {
     <h3>📔 Diario scritto dal paziente</h3>
     <p style="color:var(--text-muted);font-size:13px;">Le annotazioni sono visibili a te e al fisioterapista. Il fisioterapista può segnarle come lette.</p>
     <div id="therapistDiaryList">Caricamento...</div>
+    <hr>
+    <h3>✍️ Scrivi nel diario del paziente</h3>
+    <label>Oggetto</label>
+    <input id="therapistDiaryTitle" placeholder="Es. Indicazione per il prossimo allenamento...">
+    <label>Messaggio</label>
+    <textarea id="therapistDiaryContent" placeholder="Scrivi qui la risposta o l'indicazione per il paziente..."></textarea>
+    <button id="saveTherapistDiaryButton" class="primary">＋ Invia nel diario</button>
+    <div id="therapistDiaryMessage" class="message hidden"></div>
 
   </div>
 
@@ -2896,8 +2914,10 @@ hr {
     id="patientPortalTabs"
   >
 
+    <button class="section-tab active" data-target="portalDashboard">🏠 Dashboard</button>
+
     <button
-      class="section-tab active"
+      class="section-tab"
       data-target="portalExercises"
     >
       🏋️ Esercizi
@@ -2943,6 +2963,7 @@ hr {
   </div>
 
 
+  <div class="tab-panel active-panel" id="portalDashboard">
   <div class="card">
     <div class="section-title"><h2>✅ Da fare</h2></div>
     <div id="patientTodo" class="todo-grid"><div class="todo-card">Caricamento...</div></div>
@@ -2983,6 +3004,8 @@ hr {
 
   </div>
 
+
+  </div>
 
   <!-- ESERCIZI PAZIENTE -->
 
@@ -3078,7 +3101,7 @@ hr {
   </div>
 
   <!-- DIARIO CORSA PAZIENTE -->
-  <div class="card tab-panel" id="portalRunningDiary" style="display:none !important;">
+  <div class="card tab-panel" id="portalRunningDiary">
     <h2>🏃 Diario delle corse</h2>
     <p style="color:var(--text-muted);font-size:13px;">Registra una seduta di corsa per aiutare il fisioterapista a monitorare carico e risposta.</p>
     <div class="grid">
@@ -3756,6 +3779,7 @@ async function loadPatientTimeline(){
   push(rs.data,"running-session","🏃",x=>x.session_type||"Seduta di corsa",x=>[x.duration_min?x.duration_min+" min":null,x.distance_km?x.distance_km+" km":null,x.rpe!=null?"RPE "+x.rpe:null,x.pain_score!=null?"Dolore "+x.pain_score+"/10":null].filter(Boolean).join(" · "),"session_date");
   push(ct.data,"test","🧪",x=>x.test_name||"Test",x=>`${x.test_value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
   events.sort((x,y)=>String(y.date||"").localeCompare(String(x.date||"")));
+  events = events.slice(0,3);
   box.innerHTML=events.length?`<div class="timeline">${events.map(x=>`<div class="timeline-item"><div class="timeline-date">${escapeHtml(formatDateTimeIT(x.date))} · ${escapeHtml(x.type)}</div><div class="timeline-title">${x.icon} ${escapeHtml(x.title)}</div><div class="timeline-body">${escapeHtml(x.body||"")}</div></div>`).join("")}</div>`:`<div class="exercise-sheet-empty">Nessun evento clinico registrato.</div>`;
 }
 
@@ -3767,7 +3791,7 @@ async function loadPatientTodo(){
     db.from("running_plans").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
     db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id)
   ]);
-  const unread=await db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).is("read_at",null);
+  const unread=await db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).is("read_at",null).neq("author_id",currentPatient.user_id || "00000000-0000-0000-0000-000000000000");
   const badge=document.getElementById("patientDiaryUnreadBadge");
   if(badge){ badge.textContent=String(unread.count||0); badge.classList.toggle("hidden",!(unread.count||0)); }
   box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unread.count||0} ${unread.count===1?"voce da leggere":"voci da leggere"}</div></div>`;
@@ -3865,6 +3889,8 @@ async function startApp() {
 
   const role =
     profileResult.data.role;
+
+  currentUser.role = role;
 
 
   if(
@@ -6466,6 +6492,17 @@ function generateRunningPlanner(
               placeholder="Es. 30"
             >
 
+            <label>Fatica percepita (RPE 0–10)</label>
+            <input
+              type="number"
+              id="run_effort_${w}_${s}"
+              min="0"
+              max="10"
+              step="1"
+              value="${escapeAttribute(existingSession?.effort ?? "")}"
+              placeholder="Es. 6"
+            >
+
             <div
               id="interval_box_${w}_${s}"
               class="
@@ -6660,6 +6697,9 @@ function collectRunningPlanData() {
           )
           .value;
 
+      const effortEl = document.getElementById(`run_effort_${w}_${s}`);
+      const effort = effortEl?.value === "" ? "" : Number(effortEl.value);
+
       const fast =
         document
           .getElementById(
@@ -6692,6 +6732,8 @@ function collectRunningPlanData() {
         type,
 
         duration,
+
+        effort,
 
 
         fast:
@@ -7262,6 +7304,10 @@ async function loadRunningPlans() {
                         sess.duration
                       )} min
                     </strong><br>`;
+
+                if(sess.effort !== undefined && sess.effort !== "")
+                  content +=
+                    `💪 Fatica percepita: <strong>${escapeHtml(String(sess.effort))}/10</strong><br>`;
 
 
                 if(
@@ -8382,12 +8428,13 @@ async function loadTherapistDiary(){
   box.innerHTML="Caricamento...";
   try{
     const result=await db.from("patient_diary_entries")
-      .select("id, title, content, created_at, read_at")
+      .select("id, title, content, created_at, read_at, author_id")
       .eq("patient_id",currentPatient.id)
       .order("created_at",{ascending:false});
     if(result.error) throw result.error;
-    if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Nessuna annotazione del paziente.</div>'; return; }
-    box.innerHTML=result.data.map(x=>`<div class="note-card public-note">
+    const patientEntries=(result.data||[]).filter(x=>x.author_id===currentPatient.user_id);
+    if(!patientEntries.length){ box.innerHTML='<div class="exercise-sheet-empty">Nessuna annotazione del paziente.</div>'; return; }
+    box.innerHTML=patientEntries.map(x=>`<div class="note-card public-note">
       <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
       <small>${escapeHtml(formatDateTimeIT(x.created_at))}${x.read_at ? " · ✓ Letto" : " · 🆕 Nuovo"}</small>
       <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
@@ -8411,14 +8458,18 @@ async function loadPatientDiary(){
   box.innerHTML="Caricamento...";
   try{
     const result=await db.from("patient_diary_entries")
-      .select("id, title, content, created_at")
+      .select("id, title, content, created_at, read_at, author_id")
       .eq("patient_id",currentPatient.id)
       .order("created_at",{ascending:false});
     if(result.error) throw result.error;
+    const therapistUnread=(result.data||[]).filter(x=>x.author_id!==currentPatient.user_id && !x.read_at);
+    if(therapistUnread.length){
+      await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).in("id",therapistUnread.map(x=>x.id));
+    }
     if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto. Puoi scrivere la prima annotazione qui sopra.</div>'; return; }
     box.innerHTML=result.data.map(x=>`<div class="note-card">
       <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
-      <small>${escapeHtml(formatDateTimeIT(x.created_at))}</small>
+      <small>${x.author_id===currentPatient.user_id ? "Tu" : "Fisioterapista"} · ${escapeHtml(formatDateTimeIT(x.created_at))}</small>
       <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
     </div>`).join("");
   }catch(err){
@@ -8426,6 +8477,18 @@ async function loadPatientDiary(){
     box.innerHTML=`<div class="message error">Impossibile caricare il diario: ${escapeHtml(err.message || "errore")}</div>`;
   }
 }
+
+document.getElementById("saveTherapistDiaryButton")?.addEventListener("click",async()=>{
+  if(!currentPatient || !currentUser) return;
+  const title=document.getElementById("therapistDiaryTitle").value.trim() || "Indicazione";
+  const content=document.getElementById("therapistDiaryContent").value.trim();
+  if(!content){ showMessage("therapistDiaryMessage","Scrivi prima il messaggio.","error"); return; }
+  const result=await db.from("patient_diary_entries").insert([{patient_id:currentPatient.id,author_id:currentUser.id,title,content,read_at:null}]);
+  if(result.error){ showMessage("therapistDiaryMessage",result.error.message,"error"); return; }
+  document.getElementById("therapistDiaryTitle").value="";
+  document.getElementById("therapistDiaryContent").value="";
+  showMessage("therapistDiaryMessage","Messaggio inviato nel diario del paziente.","success");
+});
 
 document.getElementById("savePatientDiaryButton")?.addEventListener("click",async()=>{
   if(!currentPatient || !currentUser) return;

@@ -622,6 +622,34 @@ button:disabled {
 
 
 /* =========================================================
+   NAVIGAZIONE PAGINE
+========================================================= */
+
+function showPage(pageId) {
+  const pageIds = [
+    "loginPage",
+    "setPasswordPage",
+    "therapistPage",
+    "patientPage",
+    "newPatientPage",
+    "newExercisePage"
+  ];
+
+  pageIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
+
+  const target = document.getElementById(pageId);
+  if (!target) {
+    console.error("showPage: pagina non trovata:", pageId);
+    return;
+  }
+
+  target.classList.remove("hidden");
+}
+
+/* =========================================================
    UTILITY
 ========================================================= */
 
@@ -5655,11 +5683,14 @@ function addMetricRow(values={}) {
   const row=document.createElement("div");
   row.className="metric-bulk-row card";
   row.style="margin-bottom:10px;padding:12px;";
+  const rawDate = values?.date == null ? "" : String(values.date).trim();
+  const metricDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : todayISO();
+
   row.innerHTML=`
     <div class="grid">
       <div>
         <label>Data</label>
-        <input class="bulk-metric-date" type="date" value="${escapeAttribute(values.date || todayISO())}">
+        <input class="bulk-metric-date" type="date" value="${escapeAttribute(metricDate)}">
       </div>
       <div>
         <label>Categoria</label>

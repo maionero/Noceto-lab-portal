@@ -1521,6 +1521,33 @@ html, body { max-width:100%; overflow-x:hidden; }
 .running-session-card { border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:10px; background:#fff; }
 @media(max-width:700px){ .patient-search{position:sticky;top:64px;z-index:20;background:var(--bg-color);padding-top:6px;} .timeline{padding-left:10px;} .timeline-item{padding-left:15px;} }
 
+
+/* NOCETO LAB v24 — correzioni definitive mobile / corsa / assegnazione */
+.section-tab { cursor:pointer !important; -webkit-user-select:none; user-select:none; }
+.section-tabs { width:100%; box-sizing:border-box; }
+.activity-item { width:100% !important; box-sizing:border-box; min-height:64px; }
+.running-planner { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.running-table { min-width:760px; font-size:15px !important; }
+.running-table th { font-size:14px !important; padding:16px !important; }
+.running-table td { padding:16px !important; }
+.running-table .session-box { padding:14px !important; font-size:15px !important; line-height:1.45; }
+.running-table .session-box label { font-size:12px !important; margin-top:10px; }
+.running-table .session-box input, .running-table .session-box select, .running-table .session-box textarea { font-size:15px !important; min-height:42px; }
+.running-diary-form-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.running-diary-form-grid input, .running-diary-form-grid select, #runningSessionNotes { width:100%; box-sizing:border-box; }
+#runningSessionDate { max-width:100%; min-width:0; }
+@media(max-width:700px){
+  .section-tabs { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px !important; }
+  .section-tab { width:100% !important; min-width:0 !important; white-space:normal !important; min-height:46px !important; padding:10px 8px !important; font-size:13px !important; }
+  .running-diary-form-grid { grid-template-columns:1fr 1fr; gap:10px; }
+  .running-diary-form-grid input, .running-diary-form-grid select { width:100% !important; min-width:0 !important; }
+  #runningSessionDate { width:100% !important; max-width:100% !important; min-width:0 !important; }
+  #runningSessionNotes { min-height:120px; font-size:15px; }
+  .running-planner { overflow-x:auto !important; }
+  .running-table { min-width:760px !important; font-size:14px !important; }
+}
+@media(max-width:380px){ .section-tabs{grid-template-columns:1fr 1fr;} .section-tab{font-size:12px !important;padding:9px 6px !important;} }
+
 </style>
 
 </head>
@@ -3021,8 +3048,15 @@ html, body { max-width:100%; overflow-x:hidden; }
   <div class="card tab-panel" id="portalRunningDiary">
     <h2>🏃 Diario della corsa</h2>
     <p style="color:var(--text-muted);font-size:13px;">Scrivi solo le sensazioni o le note che vuoi far leggere al fisioterapista. Non è necessario inserire chilometri o minuti.</p>
-    <label>Data</label><input id="runningSessionDate" type="date">
-    <label>Nota della corsa</label><textarea id="runningSessionNotes" placeholder="Come è andata? Sintomi, sensazioni, fatica, risposta il giorno dopo..."></textarea>
+    <div class="running-diary-form-grid">
+      <div><label>Data</label><input id="runningSessionDate" type="date"></div>
+      <div><label>Tipo di seduta</label><select id="runningSessionType"><option value="Corsa continua">Corsa continua</option><option value="Ripetute">Ripetute</option><option value="Fartlek">Fartlek</option><option value="Corsa + camminata">Corsa + camminata</option><option value="Camminata">Camminata</option><option value="Altro">Altro</option></select></div>
+      <div><label>Durata (min)</label><input id="runningSessionDuration" type="number" min="0" step="1" placeholder="45"></div>
+      <div><label>Distanza (km)</label><input id="runningSessionDistance" type="number" min="0" step="0.1" placeholder="7.5"></div>
+      <div><label>RPE / fatica (0–10)</label><input id="runningSessionRpe" type="number" min="0" max="10" step="1" placeholder="6"></div>
+      <div><label>Dolore (0–10)</label><input id="runningSessionPain" type="number" min="0" max="10" step="1" placeholder="0"></div>
+    </div>
+    <label>Note della corsa</label><textarea id="runningSessionNotes" placeholder="Come è andata? Sintomi, sensazioni, fatica, risposta il giorno dopo..."></textarea>
     <button id="saveRunningSessionButton" class="primary">＋ Salva nota</button>
     <div id="runningSessionMessage" class="message hidden"></div>
     <hr><div id="runningSessionsList">Caricamento...</div>
@@ -3225,131 +3259,39 @@ async function loadLogo() {
    TABS
 ========================================================= */
 
-function setupSectionTabs(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  const buttons = Array.from(container.querySelectorAll(".section-tab"));
-  const root = container.closest("section");
-  if (!root) return;
-
-  const panels = Array.from(root.children).filter(el => el.classList?.contains("tab-panel"));
-
-  function activate(targetId) {
-    buttons.forEach(b => b.classList.toggle("active", b.dataset.target === targetId));
-    panels.forEach(panel => panel.classList.remove("active-panel"));
-
-    const target = document.getElementById(targetId);
-    if (target && root.contains(target)) target.classList.add("active-panel");
-
-    if (containerId === "therapistPatientTabs") {
-      const assignPanel = document.getElementById("therapistTabProgramAssign");
-      if (assignPanel && root.contains(assignPanel)) {
-        assignPanel.classList.toggle("active-panel", targetId === "therapistTabProgram");
-      }
-    }
-  }
-
-  buttons.forEach(button => {
-    button.addEventListener("click", () => activate(button.dataset.target));
-  });
-
-  if (buttons[0]) activate(buttons[0].dataset.target);
-}
-
-
-setupSectionTabs(
-  "therapistPatientTabs"
-);
-
-
-setupSectionTabs(
-  "patientPortalTabs"
-);
-
-// Fallback di navigazione: usa un listener delegato così il tap resta affidabile
-// anche su Safari/iPhone e dopo eventuali aggiornamenti dinamici del DOM.
-document.addEventListener("click", (event) => {
-  const button = event.target.closest?.(".section-tab");
+function activateSectionTab(button){
   if(!button) return;
-  const container = button.closest(".section-tabs");
+  const container=button.closest('.section-tabs');
+  const root=container?.closest('section');
+  const targetId=button.dataset.target;
+  if(!container || !root || !targetId) return;
+  container.querySelectorAll('.section-tab').forEach(b=>b.classList.toggle('active',b===button));
+  root.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.remove('active-panel'));
+  const target=document.getElementById(targetId);
+  if(target && root.contains(target)) target.classList.add('active-panel');
+}
+
+function setupSectionTabs(containerId){
+  const container=document.getElementById(containerId);
   if(!container) return;
-  const targetId = button.dataset.target;
-  if(!targetId) return;
-  const root = container.closest("section");
-  if(!root) return;
-  container.querySelectorAll(".section-tab").forEach(b => b.classList.toggle("active", b === button));
-  Array.from(root.children).filter(el => el.classList?.contains("tab-panel")).forEach(panel => panel.classList.remove("active-panel"));
-  const target = document.getElementById(targetId);
-  if(target && root.contains(target)) target.classList.add("active-panel");
-}, {passive:true});
-
-
-/* =========================================================
-   UI
-========================================================= */
-
-function showPage(
-  pageId
-) {
-
-  pages.forEach(
-    id => {
-
-      const element =
-        document.getElementById(
-          id
-        );
-
-
-      if(element)
-        element.classList.add(
-          "hidden"
-        );
-
-    }
-  );
-
-
-  const page =
-    document.getElementById(
-      pageId
-    );
-
-
-  if(page)
-    page.classList.remove(
-      "hidden"
-    );
-
+  container.querySelectorAll('.section-tab').forEach(button=>{
+    button.type='button';
+    button.onclick=(event)=>{ event.preventDefault(); event.stopPropagation(); activateSectionTab(button); };
+  });
+  const first=container.querySelector('.section-tab');
+  if(first) activateSectionTab(first);
 }
 
+setupSectionTabs('therapistPatientTabs');
+setupSectionTabs('patientPortalTabs');
 
-function showMessage(
-  id,
-  text,
-  type
-) {
-
-  const element =
-    document.getElementById(
-      id
-    );
-
-
-  if(!element)
-    return;
-
-
-  element.innerText =
-    text;
-
-
-  element.className =
-    "message " +
-    type;
-
-}
+// Fallback globale: il tap funziona anche se il DOM viene aggiornato dinamicamente.
+document.addEventListener('click',(event)=>{
+  const button=event.target.closest?.('.section-tab');
+  if(!button) return;
+  event.preventDefault();
+  activateSectionTab(button);
+},true);
 
 
 /* =========================================================
@@ -3774,11 +3716,22 @@ async function loadRunningSessions(){
 }
 
 async function saveRunningSession(){
-  const payload={patient_id:currentPatient.id,session_date:document.getElementById("runningSessionDate")?.value||todayISO(),notes:document.getElementById("runningSessionNotes")?.value.trim()||null,created_by:(await db.auth.getUser()).data.user?.id||null};
+  const userResult=await db.auth.getUser();
+  const payload={
+    patient_id:currentPatient.id,
+    session_date:document.getElementById("runningSessionDate")?.value||todayISO(),
+    session_type:document.getElementById("runningSessionType")?.value||null,
+    duration_min:document.getElementById("runningSessionDuration")?.value ? Number(document.getElementById("runningSessionDuration").value) : null,
+    distance_km:document.getElementById("runningSessionDistance")?.value ? Number(document.getElementById("runningSessionDistance").value) : null,
+    rpe:document.getElementById("runningSessionRpe")?.value ? Number(document.getElementById("runningSessionRpe").value) : null,
+    pain_score:document.getElementById("runningSessionPain")?.value ? Number(document.getElementById("runningSessionPain").value) : null,
+    notes:document.getElementById("runningSessionNotes")?.value.trim()||null,
+    created_by:userResult.data.user?.id||null
+  };
   if(!payload.notes){ showMessage("runningSessionMessage","Scrivi prima la nota della corsa.","error"); return; }
   const r=await db.from("patient_running_diary").insert(payload);
   if(r.error){showMessage("runningSessionMessage",r.error.message,"error");return;}
-  ["runningSessionNotes"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+  ["runningSessionNotes","runningSessionDuration","runningSessionDistance","runningSessionRpe","runningSessionPain"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
   showMessage("runningSessionMessage","Seduta registrata.","success"); await loadRunningSessions(); await loadPatientTimeline();
 }
 
@@ -5389,7 +5342,7 @@ document
               currentPatient.id,
 
             exercise_id:
-              exerciseId,
+              Number(exerciseId),
 
             sets:
               sets
@@ -6841,75 +6794,61 @@ async function saveRunningProgram() {
   if(editingRunningPlanId !== null && editingRunningPlanId !== undefined) {
 
     const planId = Number(editingRunningPlanId);
-
     if(!Number.isFinite(planId)) {
-      showMessage(
-        "runningMessage",
-        "ID della scheda corsa non valido.",
-        "error"
-      );
+      showMessage("runningMessage","ID della scheda corsa non valido.","error");
       return;
     }
 
-    console.log("Salvataggio modifica scheda corsa", {
-      planId,
-      patientId: currentPatient.id,
-      weeks: data.weeks,
-      sessions: data.sessions,
-      planData: data.planData
-    });
-
-    // UPDATE senza SELECT: in questo modo il salvataggio non dipende
-    // dalla risposta REST della riga aggiornata.
-    result = await db
-      .from("running_plans")
+    result = await db.from("running_plans")
       .update({
-        weeks_count: Number(data.weeks),
-        sessions_per_week: Number(data.sessions),
-        plan_data: data.planData
+        weeks_count:Number(data.weeks),
+        sessions_per_week:Number(data.sessions),
+        plan_data:data.planData
       })
-      .eq("id", planId);
+      .eq("id",planId)
+      .eq("patient_id",currentPatient.id);
 
     if(result.error) {
-      console.error("Errore UPDATE running_plans:", result.error);
-      showMessage(
-        "runningMessage",
-        "Errore nel salvataggio: " + result.error.message,
-        "error"
-      );
+      console.error("Errore UPDATE running_plans:",result.error);
+      showMessage("runningMessage","Errore nel salvataggio: "+result.error.message,"error");
       return;
     }
-
-    // Salvataggio riuscito: ricarichiamo la scheda senza un confronto
-    // del JSON restituito da PostgREST, che può differire solo nella rappresentazione.
 
   }
   else {
 
-    console.log("Creazione nuova scheda corsa", {
-      patientId: currentPatient.id,
-      weeks: data.weeks,
-      sessions: data.sessions
-    });
-
-    result = await db
-      .from("running_plans")
-      .insert([{
-        patient_id: currentPatient.id,
-        weeks_count: Number(data.weeks),
-        sessions_per_week: Number(data.sessions),
-        plan_data: data.planData
-      }])
+    // Se non siamo in modifica ma esiste già una scheda, aggiorniamo quella più recente.
+    // Questo impedisce la creazione accidentale di una seconda scheda.
+    const latest = await db.from("running_plans")
       .select("id")
-      .single();
+      .eq("patient_id",currentPatient.id)
+      .order("created_at",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+
+    if(latest.error) {
+      showMessage("runningMessage","Errore nel controllo della scheda esistente: "+latest.error.message,"error");
+      return;
+    }
+
+    if(latest.data?.id) {
+      result = await db.from("running_plans")
+        .update({weeks_count:Number(data.weeks),sessions_per_week:Number(data.sessions),plan_data:data.planData})
+        .eq("id",latest.data.id)
+        .eq("patient_id",currentPatient.id);
+      editingRunningPlanId = Number(latest.data.id);
+    } else {
+      result = await db.from("running_plans").insert([{
+        patient_id:currentPatient.id,
+        weeks_count:Number(data.weeks),
+        sessions_per_week:Number(data.sessions),
+        plan_data:data.planData
+      }]);
+    }
 
     if(result.error) {
-      console.error("Errore INSERT running_plans:", result.error);
-      showMessage(
-        "runningMessage",
-        "Errore nel salvataggio: " + result.error.message,
-        "error"
-      );
+      console.error("Errore salvataggio running_plans:",result.error);
+      showMessage("runningMessage","Errore nel salvataggio: "+result.error.message,"error");
       return;
     }
   }
@@ -6976,8 +6915,7 @@ async function editRunningPlan(
     result.data;
 
 
-  editingRunningPlanId =
-    id;
+  editingRunningPlanId = Number(id);
 
 
   document
@@ -7163,8 +7101,10 @@ async function loadRunningPlans() {
   container.innerHTML =
     "";
 
+  // Un solo programma attivo visibile: evita doppioni dopo i vecchi salvataggi.
+  const plansToShow = result.data.slice(0,1);
 
-  result.data.forEach(
+  plansToShow.forEach(
     plan => {
 
       const div =

@@ -1354,7 +1354,7 @@ hr {
 
 
 
-/* NOCETO LAB v19 — TABELLA CORSA COMPATTA */
+/* NOCETO LAB v20 — TABELLA CORSA COMPATTA */
 .running-table {
   table-layout: fixed;
   width: 100%;
@@ -1477,96 +1477,84 @@ hr {
   .no-print { display: none !important; }
 }
 
+/* NOCETO LAB v20 — CORSA RESPONSIVE
+   Le tabelle restano leggibili senza comprimere il resto della pagina. */
+.running-planner {
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.running-table {
+  width:100%;
+  max-width:100%;
+  table-layout:fixed;
+  font-size:12px;
+}
+.running-table th,
+.running-table td {
+  padding:8px 7px;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+.running-table th:first-child,
+.running-table td:first-child { width:78px; }
+.running-table .session-box {
+  padding:8px;
+  margin-bottom:6px;
+  font-size:11px;
+}
+.running-table .interval-box { padding:6px; margin-top:5px; }
+
+.dashboard-activity-link {
+  appearance:none;
+  border:0;
+  width:100%;
+  font:inherit;
+  color:inherit;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+  transition:background .15s, transform .15s;
+  border-radius:8px;
+  padding:12px 10px;
+}
+.dashboard-activity-link:hover {
+  background:var(--accent-light);
+  transform:translateX(2px);
+}
+
+.patient-portal-welcome {
+  margin-bottom:18px;
+}
+
+@media screen and (max-width:768px) {
+  /* Su mobile niente trasformazione della tabella in blocchi giganti.
+     La tabella scorre orizzontalmente nel suo contenitore. */
+  .running-planner {
+    width:100%;
+    overflow-x:auto;
+  }
+  .running-table {
+    display:table !important;
+    width:720px !important;
+    min-width:720px !important;
+    max-width:none !important;
+    table-layout:fixed !important;
+    font-size:11px !important;
+  }
+  .running-table thead { display:table-header-group !important; }
+  .running-table tbody { display:table-row-group !important; }
+  .running-table tr { display:table-row !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; }
+  .running-table th, .running-table td { display:table-cell !important; width:auto !important; padding:7px 6px !important; }
+  .running-table th:first-child, .running-table td:first-child { width:76px !important; }
+  .running-table td:first-child { background:#fff !important; color:var(--text-main) !important; border-radius:0 !important; margin:0 !important; }
+}
+
 /* =========================================================
    MOBILE
 ========================================================= */
-
-@media screen and (max-width:768px) {
-
-  .running-table,
-  .running-table tbody,
-  .running-table tr,
-  .running-table td {
-
-    display:
-      block;
-
-    width:
-      100%;
-
-  }
-
-  .running-table thead {
-
-    display:
-      none;
-
-  }
-
-  .running-table tr {
-
-    margin-bottom:
-      20px;
-
-    border:
-      2px solid
-      var(--accent);
-
-    border-radius:
-      var(--radius);
-
-    background:
-      #fff;
-
-    padding:
-      14px;
-
-  }
-
-  .running-table td {
-
-    border:
-      none;
-
-    padding:
-      8px 0;
-
-    border-bottom:
-      1px dashed
-      var(--border-color);
-
-  }
-
-  .running-table td:first-child {
-
-    font-size:
-      1.1em;
-
-    background:
-      var(--primary);
-
-    color:
-      #fff;
-
-    padding:
-      10px 14px;
-
-    border-radius:
-      8px;
-
-    margin-bottom:
-      12px;
-
-  }
-
-  .running-table td:last-child {
-
-    border-bottom:
-      none;
-
-  }
-
-}
 
 @media(max-width:600px) {
 
@@ -2983,6 +2971,44 @@ hr {
 
 
   <div
+    class="card patient-portal-welcome"
+    style="
+      background:
+      linear-gradient(
+        135deg,
+        var(--primary) 0%,
+        #1e3a8a 100%
+      );
+      color:white;
+    "
+  >
+
+    <h2
+      id="patientWelcome"
+      style="
+        color:white;
+        font-size:22px;
+      "
+    >
+      Ciao 👋
+    </h2>
+
+    <p
+      style="
+        margin:0;
+        opacity:.85;
+      "
+    >
+      Benvenuto nella tua area riservata
+      di Noceto Lab.
+    </p>
+
+  </div>
+
+
+  </div>
+
+  <div
     class="section-tabs"
     id="patientPortalTabs"
   >
@@ -3042,43 +3068,7 @@ hr {
     <div id="patientTodo" class="todo-grid"><div class="todo-card">Caricamento...</div></div>
   </div>
 
-  <div
-    class="card"
-    style="
-      background:
-      linear-gradient(
-        135deg,
-        var(--primary) 0%,
-        #1e3a8a 100%
-      );
-      color:white;
-    "
-  >
 
-    <h2
-      id="patientWelcome"
-      style="
-        color:white;
-        font-size:22px;
-      "
-    >
-      Ciao 👋
-    </h2>
-
-    <p
-      style="
-        margin:0;
-        opacity:.85;
-      "
-    >
-      Benvenuto nella tua area riservata
-      di Noceto Lab.
-    </p>
-
-  </div>
-
-
-  </div>
 
   <!-- ESERCIZI PAZIENTE -->
 
@@ -3829,7 +3819,7 @@ async function loadDashboardActivity(){
     toggle.textContent = dashboardActivityExpanded ? "Mostra ultime 3" : "Mostra tutte";
     toggle.classList.toggle("hidden", all.length<=3);
   }
-  box.innerHTML=rows.length?rows.map((x,i)=>`<div class="activity-item dashboard-activity-link" data-activity-index="${i}" style="cursor:pointer;" title="Apri la sezione dedicata"><span class="activity-dot"></span><div><strong>${x.icon} ${escapeHtml(x.label)}</strong><div style="font-size:13px;">${escapeHtml(names[x.patient_id]||"Paziente")}</div><small>${escapeHtml(formatDateTimeIT(x.created_at))}</small></div></div>`).join(""):"Nessuna attività recente.";
+  box.innerHTML=rows.length?rows.map((x,i)=>`<button type="button" class="activity-item dashboard-activity-link" data-activity-index="${i}" title="Apri ${escapeAttribute(names[x.patient_id]||"paziente")} nella sezione dedicata"><span class="activity-dot"></span><div style="text-align:left;flex:1;"><strong>${x.icon} ${escapeHtml(x.label)}</strong><div style="font-size:13px;">${escapeHtml(names[x.patient_id]||"Paziente")}</div><small>${escapeHtml(formatDateTimeIT(x.created_at))}</small></div></button>`).join(""):"Nessuna attività recente.";
 
   box.querySelectorAll(".dashboard-activity-link").forEach(el=>{
     el.addEventListener("click",async()=>{
@@ -3849,8 +3839,8 @@ async function loadDashboardActivity(){
       const target=targetMap[item.label];
       if(target){
         const btn=document.querySelector(`#therapistPatientTabs .section-tab[data-target="${target}"]`);
-        btn?.click();
-        document.getElementById(target)?.scrollIntoView({behavior:"smooth",block:"start"});
+        if(btn){ btn.click(); }
+        setTimeout(()=>document.getElementById(target)?.scrollIntoView({behavior:"smooth",block:"start"}),50);
       }
     });
   });

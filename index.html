@@ -1348,236 +1348,74 @@ hr {
 
 
 
-/* NOCETO LAB v20 — TABELLA CORSA COMPATTA */
+/* NOCETO LAB v22 — TABELLA CORSA LEGGIBILE */
 .running-table {
-  table-layout: fixed;
-  width: 100%;
-  max-width: 100%;
+  table-layout:auto !important;
+  width:100% !important;
+  max-width:100% !important;
+  font-size:13px !important;
 }
 .running-table th,
 .running-table td {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  min-width: 0;
+  padding:10px !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+  min-width:0;
 }
 .running-table th:first-child,
-.running-table td:first-child {
-  width: 82px;
-}
-
-@media print {
-  /* La stampa deve contenere SOLO printSheet: gli elementi hidden
-     con visibility:hidden occupano comunque spazio e possono creare
-     una pagina bianca aggiuntiva. */
-  body > *:not(#printSheet) {
-    display: none !important;
-  }
-  #printSheet {
-    display: block !important;
-    position: relative !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    break-after: auto !important;
-    page-break-after: auto !important;
-  }
-  #printSheet .running-table {
-    width: 100% !important;
-    table-layout: fixed !important;
-    font-size: 8px !important;
-    border-collapse: collapse !important;
-    margin-top: 6px !important;
-  }
-  #printSheet .running-table th,
-  #printSheet .running-table td {
-    padding: 4px 3px !important;
-    line-height: 1.2 !important;
-    vertical-align: top !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-  }
-  #printSheet .running-table th:first-child,
-  #printSheet .running-table td:first-child {
-    width: 58px !important;
-  }
-  #printSheet .card {
-    margin: 0 0 10px !important;
-    padding: 0 !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    break-inside: auto !important;
-    page-break-inside: auto !important;
-  }
-  #printSheet .exercise {
-    padding: 8px !important;
-    margin-bottom: 7px !important;
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
-  }
-  #printSheet img[alt*="Logo"],
-  #printSheet img[alt*="logo"] {
-    display: none !important;
-  }
-}
-
-/* =========================================================
-   PRINT
-========================================================= */
-
-.print-sheet {
-  display: none;
-}
-
-@page { size: A4; margin: 10mm; }
-
-@media print {
-  html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  body > *:not(#printSheet) { display: none !important; }
-  #printSheet {
-    display: block !important;
-    position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-    background: #fff !important;
-    color: #000 !important;
-    break-after: auto !important;
-    page-break-after: auto !important;
-  }
-  #printSheet > div {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-  }
-  #printSheet img[alt*="Logo"],
-  #printSheet img[alt*="logo"] { display: none !important; }
-  #printSheet > div > div:first-child img { display: block !important; }
-  .no-print { display: none !important; }
-}
-
-/* NOCETO LAB v20 — CORSA RESPONSIVE
-   Le tabelle restano leggibili senza comprimere il resto della pagina. */
-.running-planner {
-  width:100%;
-  max-width:100%;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
-.running-table {
-  width:100%;
-  max-width:100%;
-  table-layout:fixed;
-  font-size:12px;
-}
-.running-table th,
-.running-table td {
-  padding:8px 7px;
-  line-height:1.35;
-  overflow-wrap:anywhere;
-  word-break:normal;
-}
-.running-table th:first-child,
-.running-table td:first-child { width:78px; }
+.running-table td:first-child { width:105px !important; }
 .running-table .session-box {
-  padding:8px;
-  margin-bottom:6px;
-  font-size:11px;
+  padding:10px !important;
+  margin-bottom:7px !important;
+  font-size:12px !important;
 }
-.running-table .interval-box { padding:6px; margin-top:5px; }
+.running-table .interval-box { padding:8px !important; margin-top:6px !important; }
 
-.dashboard-activity-link {
-  appearance:none;
-  border:0;
-  width:100%;
-  font:inherit;
-  color:inherit;
-  background:transparent;
-  text-align:left;
-  cursor:pointer;
-  transition:background .15s, transform .15s;
-  border-radius:8px;
-  padding:12px 10px;
-}
-.dashboard-activity-link:hover {
-  background:var(--accent-light);
-  transform:translateX(2px);
-}
-
-.patient-portal-welcome {
-  margin-bottom:18px;
-}
-
-@media screen and (max-width:768px) {
-  /* Su mobile niente trasformazione della tabella in blocchi giganti.
-     La tabella scorre orizzontalmente nel suo contenitore. */
-  .running-planner {
-    width:100%;
-    overflow-x:auto;
-  }
-  .running-table {
-    display:table !important;
-    width:720px !important;
-    min-width:720px !important;
-    max-width:none !important;
-    table-layout:fixed !important;
-    font-size:11px !important;
-  }
-  .running-table thead { display:table-header-group !important; }
-  .running-table tbody { display:table-row-group !important; }
-  .running-table tr { display:table-row !important; margin:0 !important; padding:0 !important; border:0 !important; background:transparent !important; }
-  .running-table th, .running-table td { display:table-cell !important; width:auto !important; padding:7px 6px !important; }
-  .running-table th:first-child, .running-table td:first-child { width:76px !important; }
-  .running-table td:first-child { background:#fff !important; color:var(--text-main) !important; border-radius:0 !important; margin:0 !important; }
-}
-
-/* NOCETO LAB v21 — NAVIGAZIONE SEZIONI */
+/* NAVIGAZIONE: tutte le sezioni visibili, anche su mobile */
 .section-tabs {
-  position:static !important;
-  z-index:auto !important;
+  position:relative !important;
+  z-index:50 !important;
+  display:flex !important;
+  flex-wrap:wrap !important;
+  overflow:visible !important;
+  gap:8px !important;
+  touch-action:auto !important;
 }
 .section-tab {
-  touch-action:manipulation;
+  position:relative !important;
+  z-index:51 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
   -webkit-tap-highlight-color:transparent;
+}
+.dashboard-activity-link {
+  position:relative;
+  z-index:2;
+  pointer-events:auto !important;
+  touch-action:manipulation;
 }
 @media (max-width:700px) {
   .section-tabs {
-    display:flex;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    padding:8px 2px;
-    margin-bottom:12px;
+    flex-wrap:wrap !important;
+    overflow:visible !important;
+    padding:8px 0 !important;
+    margin-bottom:12px !important;
   }
-  .section-tabs::-webkit-scrollbar { display:none; }
   .section-tab {
-    flex:0 0 auto;
-    white-space:nowrap;
-    min-height:44px;
-    padding:10px 14px;
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+    min-height:44px !important;
+    padding:10px 13px !important;
+    font-size:13px !important;
   }
-  .dashboard-activity-link {
-    min-height:58px;
-    touch-action:manipulation;
-    -webkit-tap-highlight-color:transparent;
+  .running-planner { width:100% !important; overflow-x:auto !important; }
+  .running-table {
+    width:100% !important;
+    min-width:0 !important;
+    font-size:12px !important;
+    table-layout:auto !important;
   }
+  .running-table th, .running-table td { padding:8px !important; }
 }
 
 /* =========================================================
@@ -2416,14 +2254,6 @@ hr {
     <p style="color:var(--text-muted);font-size:13px;">Le annotazioni sono visibili a te e al fisioterapista. Il fisioterapista può segnarle come lette.</p>
     <div id="therapistDiaryList">Caricamento...</div>
 
-    <hr>
-    <h3>✍️ Scrivi nel diario del paziente</h3>
-    <label>Oggetto</label>
-    <input id="therapistDiaryTitle" placeholder="Es. Indicazione per il prossimo allenamento...">
-    <label>Messaggio</label>
-    <textarea id="therapistDiaryContent" placeholder="Scrivi qui la risposta o l'indicazione per il paziente..."></textarea>
-    <button id="saveTherapistDiaryButton" class="primary">＋ Invia nel diario</button>
-    <div id="therapistDiaryMessage" class="message hidden"></div>
 
   </div>
 
@@ -2582,20 +2412,8 @@ hr {
       Caricamento...
     </div>
     <hr>
-    <h2>🏃 Diario delle corse del paziente</h2>
-    <p style="color:var(--text-muted);font-size:13px;">Diario dedicato esclusivamente alle sedute di corsa. Qui puoi aggiungere anche le tue annotazioni.</p>
-    <div class="grid">
-      <div><label>Data</label><input id="therapistRunningSessionDate" type="date"></div>
-      <div><label>Durata (min)</label><input id="therapistRunningSessionDuration" type="number" min="0" step="1"></div>
-      <div><label>Distanza (km)</label><input id="therapistRunningSessionDistance" type="number" min="0" step="0.01"></div>
-      <div><label>Fatica percepita RPE 0–10</label><input id="therapistRunningSessionRpe" type="number" min="0" max="10" step="1"></div>
-      <div><label>Dolore 0–10</label><input id="therapistRunningSessionPain" type="number" min="0" max="10" step="0.5"></div>
-    </div>
-    <label>Tipo / struttura seduta</label><input id="therapistRunningSessionType" placeholder="Es. lento, ripetute, progressivo...">
-    <label>Sensazioni / note</label><textarea id="therapistRunningSessionNotes" placeholder="Annotazioni del terapista..." ></textarea>
-    <button id="saveTherapistRunningSessionButton" class="secondary">＋ Aggiungi al diario corsa</button>
-    <div id="therapistRunningSessionMessage" class="message hidden"></div>
-    <hr>
+    <h2>🏃 Diario corsa del paziente</h2>
+    <p style="color:var(--text-muted);font-size:13px;">Qui visualizzi esclusivamente le note che il paziente ha scritto nel proprio diario della corsa.</p>
     <div id="therapistRunningSessions">Caricamento...</div>
 
   </div>
@@ -3191,18 +3009,11 @@ hr {
 
   <!-- DIARIO CORSA PAZIENTE -->
   <div class="card tab-panel" id="portalRunningDiary">
-    <h2>🏃 Diario delle corse</h2>
-    <p style="color:var(--text-muted);font-size:13px;">Registra una seduta di corsa per aiutare il fisioterapista a monitorare carico e risposta.</p>
-    <div class="grid">
-      <div><label>Data</label><input id="runningSessionDate" type="date"></div>
-      <div><label>Durata (min)</label><input id="runningSessionDuration" type="number" min="0" step="1"></div>
-      <div><label>Distanza (km)</label><input id="runningSessionDistance" type="number" min="0" step="0.01"></div>
-      <div><label>RPE 0–10</label><input id="runningSessionRpe" type="number" min="0" max="10" step="1"></div>
-      <div><label>Dolore 0–10</label><input id="runningSessionPain" type="number" min="0" max="10" step="0.5"></div>
-    </div>
-    <label>Tipo / struttura seduta</label><input id="runningSessionType" placeholder="Es. lento, ripetute, progressivo, partita...">
-    <label>Sensazioni / note</label><textarea id="runningSessionNotes" placeholder="Come è andata? Sintomi, fatica, risposta il giorno dopo..."></textarea>
-    <button id="saveRunningSessionButton" class="primary">＋ Registra corsa</button>
+    <h2>🏃 Diario della corsa</h2>
+    <p style="color:var(--text-muted);font-size:13px;">Scrivi solo le sensazioni o le note che vuoi far leggere al fisioterapista. Non è necessario inserire chilometri o minuti.</p>
+    <label>Data</label><input id="runningSessionDate" type="date">
+    <label>Nota della corsa</label><textarea id="runningSessionNotes" placeholder="Come è andata? Sintomi, sensazioni, fatica, risposta il giorno dopo..."></textarea>
+    <button id="saveRunningSessionButton" class="primary">＋ Salva nota</button>
     <div id="runningSessionMessage" class="message hidden"></div>
     <hr><div id="runningSessionsList">Caricamento...</div>
   </div>
@@ -3446,6 +3257,23 @@ setupSectionTabs(
 setupSectionTabs(
   "patientPortalTabs"
 );
+
+// Fallback di navigazione: usa un listener delegato così il tap resta affidabile
+// anche su Safari/iPhone e dopo eventuali aggiornamenti dinamici del DOM.
+document.addEventListener("click", (event) => {
+  const button = event.target.closest?.(".section-tab");
+  if(!button) return;
+  const container = button.closest(".section-tabs");
+  if(!container) return;
+  const targetId = button.dataset.target;
+  if(!targetId) return;
+  const root = container.closest("section");
+  if(!root) return;
+  container.querySelectorAll(".section-tab").forEach(b => b.classList.toggle("active", b === button));
+  root.querySelectorAll(":scope > .tab-panel").forEach(panel => panel.classList.remove("active-panel"));
+  const target = document.getElementById(targetId);
+  if(target && root.contains(target)) target.classList.add("active-panel");
+}, {passive:true});
 
 
 /* =========================================================
@@ -3933,14 +3761,15 @@ async function loadRunningSessions(){
   const box=document.getElementById("therapistRunningSessions"); if(!box||!currentPatient)return;
   const r=await db.from("patient_running_diary").select("*").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false});
   if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
-  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>🏃 ${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;font-size:13px;">${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:7px;white-space:pre-line;color:var(--text-muted);">${escapeHtml(s.notes)}</div>`:""}</div>`).join(""):"Nessuna seduta di corsa registrata.";
+  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>🏃 ${escapeHtml(formatDateIT(s.session_date))}</strong>${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);">${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}</div>`).join(""):"Nessuna nota di corsa registrata dal paziente.";
 }
 
 async function saveRunningSession(){
-  const payload={patient_id:currentPatient.id,session_date:document.getElementById("runningSessionDate")?.value||todayISO(),duration_min:Number(document.getElementById("runningSessionDuration")?.value)||null,distance_km:Number(document.getElementById("runningSessionDistance")?.value)||null,rpe:document.getElementById("runningSessionRpe")?.value===""?null:Number(document.getElementById("runningSessionRpe").value),pain_score:document.getElementById("runningSessionPain")?.value===""?null:Number(document.getElementById("runningSessionPain").value),session_type:document.getElementById("runningSessionType")?.value.trim()||null,notes:document.getElementById("runningSessionNotes")?.value.trim()||null,created_by:(await db.auth.getUser()).data.user?.id||null};
+  const payload={patient_id:currentPatient.id,session_date:document.getElementById("runningSessionDate")?.value||todayISO(),notes:document.getElementById("runningSessionNotes")?.value.trim()||null,created_by:(await db.auth.getUser()).data.user?.id||null};
+  if(!payload.notes){ showMessage("runningSessionMessage","Scrivi prima la nota della corsa.","error"); return; }
   const r=await db.from("patient_running_diary").insert(payload);
   if(r.error){showMessage("runningSessionMessage",r.error.message,"error");return;}
-  ["runningSessionDuration","runningSessionDistance","runningSessionRpe","runningSessionPain","runningSessionType","runningSessionNotes"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+  ["runningSessionNotes"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
   showMessage("runningSessionMessage","Seduta registrata.","success"); await loadRunningSessions(); await loadPatientTimeline();
 }
 
@@ -7074,6 +6903,12 @@ async function saveRunningProgram() {
           return obj;
         }, {});
       }
+      if (typeof value === "string") {
+        const trimmed=value.trim();
+        if (trimmed === "") return null;
+        if (/^-?\d+(?:\.\d+)?$/.test(trimmed)) return Number(trimmed);
+        return trimmed;
+      }
       return value;
     };
 
@@ -8690,19 +8525,6 @@ async function loadPatientDiary(){
   }
 }
 
-document.getElementById("saveTherapistDiaryButton")?.addEventListener("click",async()=>{
-  if(!currentPatient || !currentUser) return;
-  const title=document.getElementById("therapistDiaryTitle").value.trim() || "Indicazione";
-  const content=document.getElementById("therapistDiaryContent").value.trim();
-  if(!content){ showMessage("therapistDiaryMessage","Scrivi prima il messaggio.","error"); return; }
-  const result=await db.from("patient_diary_entries").insert([{patient_id:currentPatient.id,author_id:currentUser.id,title,content,read_at:null}]);
-  if(result.error){ showMessage("therapistDiaryMessage",result.error.message,"error"); return; }
-  document.getElementById("therapistDiaryTitle").value="";
-  document.getElementById("therapistDiaryContent").value="";
-  showMessage("therapistDiaryMessage","Messaggio inviato nel diario del paziente.","success");
-  await loadTherapistDiary();
-});
-
 document.getElementById("savePatientDiaryButton")?.addEventListener("click",async()=>{
   if(!currentPatient || !currentUser) return;
   const title=document.getElementById("patientDiaryTitle").value.trim() || "Annotazione";
@@ -8746,8 +8568,6 @@ document.getElementById("refreshDashboardActivityButton")?.addEventListener("cli
 document.getElementById("toggleDashboardActivityButton")?.addEventListener("click",()=>{ dashboardActivityExpanded=!dashboardActivityExpanded; loadDashboardActivity(); });
 document.getElementById("refreshTimelineButton")?.addEventListener("click",loadPatientTimeline);
 document.getElementById("saveRunningSessionButton")?.addEventListener("click",saveRunningSession);
-document.getElementById("saveTherapistRunningSessionButton")?.addEventListener("click",saveTherapistRunningSession);
-if(document.getElementById("therapistRunningSessionDate")) document.getElementById("therapistRunningSessionDate").value=todayISO();
 document.getElementById("saveClinicalTestButton")?.addEventListener("click",saveClinicalTest);
 if(document.getElementById("runningSessionDate")) document.getElementById("runningSessionDate").value=todayISO();
 

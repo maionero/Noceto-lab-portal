@@ -4216,8 +4216,22 @@ async function saveRunningSession(event){
   }
   ["runningSessionNotes","runningSessionDuration","runningSessionDistance","runningSessionRpe","runningSessionPain"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
   showMessage("runningSessionMessage","Seduta registrata.","success");
-  await loadPatientRunningSessions();
-  await loadRunningSessions();
+
+  // Aggiorna subito l'elenco locale senza aspettare realtime o refresh pagina.
+  const runBox=document.getElementById("runningSessionsList");
+  if(runBox){
+    const emptyText=runBox.querySelector(".exercise-sheet-empty");
+    if(emptyText) emptyText.remove();
+    const card=document.createElement("div");
+    card.className="running-session-card";
+    card.dataset.runningDiaryId=String(r.data?.id || "");
+    const createdId=r.data?.id || "";
+    card.innerHTML=`<strong>${escapeHtml(formatDateIT(payload.session_date))} · ${escapeHtml(payload.session_type||"Seduta")}</strong>
+      <div style="margin-top:6px;">👤 Paziente · ${payload.duration_min!=null?escapeHtml(String(payload.duration_min))+" min · ":""}${payload.distance_km!=null?escapeHtml(String(payload.distance_km))+" km · ":""}${payload.rpe!=null?"RPE "+escapeHtml(String(payload.rpe))+" · ":""}${payload.pain_score!=null?"Dolore "+escapeHtml(String(payload.pain_score))+"/10":""}</div>
+      ${payload.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(payload.notes)}</div>`:""}
+      ${createdId?`<div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${escapeHtml(createdId)}')">🗑️ Elimina</button></div>`:""}`;
+    runBox.prepend(card);
+  }
   await loadPatientTimeline();
   await loadDashboardActivity();
   await loadPatientTodo();
@@ -8740,7 +8754,7 @@ async function loadTherapistDiary(){
     if(!entries.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto.</div>'; return; }
     box.innerHTML=entries.map(x=>{
       const isPatient=String(x.author_id||"")===String(currentPatient.user_id||"");
-      return `<div class="note-card public-note">
+      return `<div class="note-card public-note" data-diary-entry-id="${escapeHtml(x.id)}">
         <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
         <small>${isPatient ? "👤 Paziente" : "👨‍⚕️ Terapista"} · ${escapeHtml(formatDateTimeIT(x.created_at))}${isPatient && !x.read_at ? " · 🆕 Nuovo" : x.read_at ? " · ✓ Letto" : ""}</small>
         <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
@@ -8835,8 +8849,22 @@ document.getElementById("savePatientDiaryButton")?.addEventListener("click",asyn
   document.getElementById("patientDiaryTitle").value="";
   document.getElementById("patientDiaryContent").value="";
   showMessage("patientDiaryMessage","Annotazione salvata nel diario.","success");
-  // Ricarica subito il solo elenco: la nuova nota compare senza refresh della pagina.
-  await loadPatientDiary();
+
+  // Mostra immediatamente la nuova voce senza dipendere da realtime o da un reload.
+  const box=document.getElementById("patientDiaryList");
+  if(box){
+    const empty=box.querySelector(".exercise-sheet-empty");
+    if(empty) empty.remove();
+    const created=result.data;
+    const card=document.createElement("div");
+    card.className="note-card";
+    card.dataset.diaryEntryId=String(created.id);
+    card.innerHTML=`<h3>📔 ${escapeHtml(created.title || "Annotazione")}</h3>
+      <small>Tu · ${escapeHtml(formatDateTimeIT(created.created_at))}</small>
+      <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(created.content)}</p>
+      <div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteDiaryEntry('${escapeHtml(created.id)}')">🗑️ Elimina</button></div>`;
+    box.prepend(card);
+  }
   await loadPatientTodo();
   await loadPatientTimeline();
   await loadDashboardActivity();
@@ -8852,8 +8880,16 @@ async function deleteDiaryEntry(id){
     return;
   }
   document.querySelectorAll(`[data-diary-entry-id="${CSS.escape(String(id))}"]`).forEach(el=>el.remove());
-  await loadPatientDiary();
-  if(typeof loadTherapistDiary === "function") await loadTherapistDiary();
+  const patientBox=document.getElementById("patientDiaryList");
+  if(patientBox && !patientBox.querySelector(".note-card")) patientBox.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto. Puoi scrivere la prima annotazione qui sopra.</div>';
+  const therapistBox=document.getElementById("therapistDiaryList");
+  if(therapistBox){
+    const therapistCard=therapistBox.querySelector(`[data-diary-entry-id="${CSS.escape(String(id))}"]`);
+    if(therapistCard) therapistCard.remove();
+  }
+  await loadPatientTodo();
+  await loadPatientTimeline();
+  await loadDashboardActivity();
   await loadPatientTodo();
   await loadPatientTimeline();
   await loadDashboardActivity();

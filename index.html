@@ -4186,7 +4186,7 @@ async function loadRunningSessions(){
   const box=document.getElementById("therapistRunningSessions"); if(!box||!currentPatient)return;
   const r=await db.from("patient_running_diary").select("*").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false});
   if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
-  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>🏃 ${escapeHtml(formatDateIT(s.session_date))}</strong>${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);">${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}<div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${s.id}')">🗑️ Elimina</button></div></div>`).join(""):"Nessuna nota di corsa registrata dal paziente.";
+  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card" data-running-diary-id="${escapeHtml(s.id)}"><strong>🏃 ${escapeHtml(formatDateIT(s.session_date))}</strong>${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);">${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}<div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${s.id}')">🗑️ Elimina</button></div></div>`).join(""):"Nessuna nota di corsa registrata dal paziente.";
 }
 
 async function saveRunningSession(event){
@@ -4206,10 +4206,12 @@ async function saveRunningSession(event){
     created_by:userResult.data.user.id
   };
   if(!payload.notes){ showMessage("runningSessionMessage","Scrivi prima la nota della corsa.","error"); return; }
-  const r=await db.from("patient_running_diary").insert([payload]).select("*").single();
+  // Non usiamo .select() dopo l'insert: richiederebbe anche il permesso SELECT
+  // sulla tabella e potrebbe far sembrare fallito un INSERT riuscito.
+  const r=await db.from("patient_running_diary").insert([payload]);
   if(r.error){
     console.error("Errore salvataggio diario corsa:",r.error);
-    showMessage("runningSessionMessage","Impossibile salvare la nota: " + r.error.message,"error");
+    showMessage("runningSessionMessage","Impossibile salvare la nota: " + (r.error.message || "errore Supabase"),"error");
     return;
   }
   ["runningSessionNotes","runningSessionDuration","runningSessionDistance","runningSessionRpe","runningSessionPain"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
@@ -4227,13 +4229,15 @@ async function deleteRunningDiaryEntry(id){
   const result=await db.from("patient_running_diary").delete().eq("id",id);
   if(result.error){
     console.error("Errore eliminazione diario corsa:",result.error);
-    alert("Impossibile eliminare la voce: " + result.error.message);
+    alert("Impossibile eliminare la voce: " + (result.error.message || "errore Supabase"));
     return;
   }
+  document.querySelectorAll(`[data-running-diary-id="${CSS.escape(String(id))}"]`).forEach(el=>el.remove());
   await loadPatientRunningSessions();
   await loadRunningSessions();
   await loadPatientTimeline();
   await loadDashboardActivity();
+  await loadPatientTodo();
 }
 
 async function saveClinicalTest(){
@@ -8798,7 +8802,7 @@ async function loadPatientDiary(){
     if(!result.data?.length){ box.innerHTML='<div class="exercise-sheet-empty">Il diario è vuoto. Puoi scrivere la prima annotazione qui sopra.</div>'; return; }
     box.innerHTML=result.data.map(x=>{
       const isMine=String(x.author_id||"")===String(currentUser?.id||currentPatient.user_id||"");
-      return `<div class="note-card">
+      return `<div class="note-card" data-diary-entry-id="${escapeHtml(x.id)}">
         <h3>📔 ${escapeHtml(x.title || "Annotazione")}</h3>
         <small>${isMine ? "Tu" : "Fisioterapista"} · ${escapeHtml(formatDateTimeIT(x.created_at))}</small>
         <p style="white-space:pre-line;margin-top:8px;">${escapeHtml(x.content)}</p>
@@ -8825,14 +8829,17 @@ document.getElementById("savePatientDiaryButton")?.addEventListener("click",asyn
   }]).select("id, title, content, created_at, read_at, author_id").single();
   if(result.error){
     console.error("Errore salvataggio diario:",result.error);
-    showMessage("patientDiaryMessage","Impossibile salvare la nota: " + result.error.message,"error");
+    showMessage("patientDiaryMessage","Impossibile salvare la nota: " + (result.error.message || "errore Supabase"),"error");
     return;
   }
   document.getElementById("patientDiaryTitle").value="";
   document.getElementById("patientDiaryContent").value="";
   showMessage("patientDiaryMessage","Annotazione salvata nel diario.","success");
+  // Ricarica subito il solo elenco: la nuova nota compare senza refresh della pagina.
   await loadPatientDiary();
   await loadPatientTodo();
+  await loadPatientTimeline();
+  await loadDashboardActivity();
 });
 
 async function deleteDiaryEntry(id){
@@ -8841,9 +8848,10 @@ async function deleteDiaryEntry(id){
   const result=await db.from("patient_diary_entries").delete().eq("id",id);
   if(result.error){
     console.error("Errore eliminazione diario:",result.error);
-    alert("Impossibile eliminare la voce: " + result.error.message);
+    alert("Impossibile eliminare la voce: " + (result.error.message || "errore Supabase"));
     return;
   }
+  document.querySelectorAll(`[data-diary-entry-id="${CSS.escape(String(id))}"]`).forEach(el=>el.remove());
   await loadPatientDiary();
   if(typeof loadTherapistDiary === "function") await loadTherapistDiary();
   await loadPatientTodo();

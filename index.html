@@ -7269,49 +7269,38 @@ async function saveRunningProgram() {
   }
 
   const data = collectRunningPlanData();
-
   if(!data.weeks || !data.sessions || !Array.isArray(data.planData)) {
     showMessage("runningMessage","La scheda corsa non contiene dati validi.","error");
     return;
   }
 
   const patientId = currentPatient.id;
-  let planId = editingRunningPlanId;
-  let wasEditing = planId !== null && planId !== undefined && String(planId).trim() !== "";
+  const rawPlanId = editingRunningPlanId;
+  const isEditing = rawPlanId !== null && rawPlanId !== undefined && String(rawPlanId).trim() !== "";
 
-  /*
-     SALVATAGGIO ROBUSTO:
-     1. Se siamo in modifica, recuperiamo prima la riga esatta.
-     2. Aggiorniamo SOLO per id: il paziente viene verificato prima.
-     3. Chiediamo a Supabase di restituire la riga aggiornata.
-     In questo modo un filtro aggiuntivo su patient_id non può impedire
-     l'UPDATE quando la policy RLS gestisce già il controllo del paziente.
-  */
-  if(wasEditing) {
+  console.log("RUNNING SAVE START", { rawPlanId, patientId, isEditing, data });
 
-    const check = await db.from("running_plans")
-      .select("id, patient_id")
-      .eq("id", planId)
+  if(isEditing) {
+    // Recuperiamo la riga esatta prima di aggiornare: così evitiamo qualsiasi
+    // problema dovuto a ID convertiti o a un paziente diverso.
+    const existing = await db
+      .from("running_plans")
+      .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
+      .eq("id", rawPlanId)
       .maybeSingle();
 
-    console.log("RUNNING EDIT CHECK", {
-      planId: planId,
-      currentPatientId: patientId,
-      check: check
-    });
+    console.log("RUNNING EXISTING ROW", existing);
 
-    if(check.error) {
-      showMessage("runningMessage","Impossibile verificare il programma: "+check.error.message,"error");
+    if(existing.error) {
+      showMessage("runningMessage", "Errore nel recupero del programma: " + existing.error.message, "error");
       return;
     }
-
-    if(!check.data) {
-      showMessage("runningMessage","Programma corsa non trovato nel database. ID: "+String(planId),"error");
+    if(!existing.data) {
+      showMessage("runningMessage", "Programma corsa non trovato. ID: " + String(rawPlanId), "error");
       return;
     }
-
-    if(String(check.data.patient_id) !== String(patientId)) {
-      showMessage("runningMessage","Il programma selezionato appartiene a un altro paziente. Modifica annullata.","error");
+    if(String(existing.data.patient_id) !== String(patientId)) {
+      showMessage("runningMessage", "Il programma selezionato appartiene a un altro paziente. Modifica annullata.", "error");
       return;
     }
 
@@ -7321,54 +7310,62 @@ async function saveRunningProgram() {
       plan_data: data.planData
     };
 
-    const result = await db.from("running_plans")
+    // UPDATE separato dal SELECT: prima chiediamo a Supabase di eseguire
+    // realmente la modifica, poi rileggiamo la riga dal database.
+    const updateResult = await db
+      .from("running_plans")
       .update(updatePayload)
-      .eq("id", planId)
-      .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
-      .maybeSingle();
+      .eq("id", existing.data.id);
 
     console.log("RUNNING UPDATE RESULT", {
-      planId: planId,
-      patientId: patientId,
+      id: existing.data.id,
+      patientId,
       payload: updatePayload,
-      result: result
+      result: updateResult
     });
 
-    if(result.error) {
-      console.error("Errore UPDATE running_plans:", result.error);
-      showMessage("runningMessage","ERRORE: la modifica non è stata salvata. "+result.error.message,"error");
+    if(updateResult.error) {
+      console.error("Errore UPDATE running_plans:", updateResult.error);
+      showMessage("runningMessage", "ERRORE SALVATAGGIO: " + updateResult.error.message, "error");
       return;
     }
 
-    if(!result.data) {
-      console.error("UPDATE senza riga restituita", {planId, patientId});
-      showMessage("runningMessage","La modifica NON è stata salvata. Supabase non ha restituito la riga aggiornata: controlla la policy UPDATE (RLS) di running_plans.","error");
-      return;
-    }
-
-    // Controllo finale indipendente: rileggiamo il dato appena salvato.
-    const verify = await db.from("running_plans")
+    // Verifica reale dopo UPDATE.
+    const verify = await db
+      .from("running_plans")
       .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
-      .eq("id", planId)
+      .eq("id", existing.data.id)
       .maybeSingle();
 
-    console.log("RUNNING FINAL VERIFY", verify);
+    console.log("RUNNING VERIFY AFTER UPDATE", verify);
 
     if(verify.error) {
-      showMessage("runningMessage","La modifica potrebbe essere stata salvata, ma la verifica è fallita: "+verify.error.message,"error");
+      showMessage("runningMessage", "UPDATE eseguito ma verifica fallita: " + verify.error.message, "error");
+      return;
+    }
+    if(!verify.data) {
+      showMessage("runningMessage", "Dopo il salvataggio il programma non è più leggibile dal database. Controlla RLS.", "error");
       return;
     }
 
-    if(!verify.data) {
-      showMessage("runningMessage","La modifica non è verificabile nel database. Controlla RLS su running_plans.","error");
+    // Confronto esplicito: se la durata/tipologia ecc. inviate non coincidono
+    // con ciò che abbiamo appena riletto, NON dichiariamo il salvataggio riuscito.
+    const savedJson = JSON.stringify(verify.data.plan_data);
+    const sentJson = JSON.stringify(data.planData);
+    if(savedJson !== sentJson || Number(verify.data.weeks_count) !== Number(data.weeks) || Number(verify.data.sessions_per_week) !== Number(data.sessions)) {
+      console.error("RUNNING DATA MISMATCH", {
+        sent: {weeks:data.weeks, sessions:data.sessions, planData:data.planData},
+        saved: verify.data
+      });
+      showMessage("runningMessage", "Il database ha risposto, ma i dati salvati non coincidono con quelli inseriti. Controlla la console.", "error");
       return;
     }
 
   } else {
 
-    // Nessuna modifica attiva: se esiste già un programma per il paziente,
-    // aggiorniamo quello più recente invece di crearne uno duplicato.
-    const latest = await db.from("running_plans")
+    // Nuova scheda: se esiste già una scheda per il paziente, la aggiorniamo.
+    const latest = await db
+      .from("running_plans")
       .select("id")
       .eq("patient_id", patientId)
       .order("created_at", {ascending:false})
@@ -7376,64 +7373,48 @@ async function saveRunningProgram() {
       .maybeSingle();
 
     if(latest.error) {
-      showMessage("runningMessage","Errore nel controllo della scheda esistente: "+latest.error.message,"error");
+      showMessage("runningMessage", "Errore nel controllo della scheda esistente: " + latest.error.message, "error");
       return;
     }
 
     if(latest.data?.id !== undefined && latest.data?.id !== null) {
-      planId = latest.data.id;
-      const result = await db.from("running_plans")
+      const updateResult = await db
+        .from("running_plans")
         .update({
           weeks_count:Number(data.weeks),
           sessions_per_week:Number(data.sessions),
           plan_data:data.planData
         })
-        .eq("id", planId)
-        .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
-        .maybeSingle();
+        .eq("id", latest.data.id);
 
-      if(result.error) {
-        console.error("Errore UPDATE running_plans:",result.error);
-        showMessage("runningMessage","Errore nel salvataggio: "+result.error.message,"error");
+      if(updateResult.error) {
+        console.error("Errore UPDATE running_plans:", updateResult.error);
+        showMessage("runningMessage", "Errore nel salvataggio: " + updateResult.error.message, "error");
         return;
       }
-
-      if(!result.data) {
-        showMessage("runningMessage","La modifica non è stata salvata. Controlla la policy UPDATE (RLS) di running_plans.","error");
-        return;
-      }
-
     } else {
-      const result = await db.from("running_plans").insert([{
-        patient_id:patientId,
-        weeks_count:Number(data.weeks),
-        sessions_per_week:Number(data.sessions),
-        plan_data:data.planData
-      }]).select("id, patient_id, weeks_count, sessions_per_week, plan_data").maybeSingle();
+      const insertResult = await db
+        .from("running_plans")
+        .insert([{
+          patient_id:patientId,
+          weeks_count:Number(data.weeks),
+          sessions_per_week:Number(data.sessions),
+          plan_data:data.planData
+        }]);
 
-      if(result.error) {
-        console.error("Errore INSERT running_plans:",result.error);
-        showMessage("runningMessage","Errore nel salvataggio: "+result.error.message,"error");
-        return;
-      }
-
-      if(!result.data) {
-        showMessage("runningMessage","Il programma non è stato creato nel database.","error");
+      if(insertResult.error) {
+        console.error("Errore INSERT running_plans:", insertResult.error);
+        showMessage("runningMessage", "Errore nel salvataggio: " + insertResult.error.message, "error");
         return;
       }
     }
   }
 
-  showMessage(
-    "runningMessage",
-    wasEditing ? "Programma modificato con successo!" : "Programma di corsa salvato con successo!",
-    "success"
-  );
-
   editingRunningPlanId = null;
-
   document.getElementById("cancelRunningEditButton").classList.add("hidden");
   document.getElementById("saveRunningProgramButton").innerText = "💾 Salva Scheda Corsa";
+
+  showMessage("runningMessage", isEditing ? "Programma modificato con successo!" : "Programma di corsa salvato con successo!", "success");
 
   await loadRunningPlans();
   await loadPatientTimeline();

@@ -7290,6 +7290,9 @@ async function saveRunningProgram() {
       return;
     }
 
+    // IMPORTANTE: chiediamo a Supabase di restituire la riga aggiornata.
+    // Un UPDATE senza SELECT può risultare "senza errori" anche quando RLS
+    // non permette di individuare la riga: in quel caso data resta vuoto.
     result = await db.from("running_plans")
       .update({
         weeks_count:Number(data.weeks),
@@ -7297,7 +7300,15 @@ async function saveRunningProgram() {
         plan_data:data.planData
       })
       .eq("id",planId)
-      .eq("patient_id",currentPatient.id);
+      .eq("patient_id",currentPatient.id)
+      .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
+      .maybeSingle();
+
+    console.log("UPDATE running_plans:", {
+      planId,
+      patientId:currentPatient.id,
+      result
+    });
 
     if(result.error) {
       console.error("Errore UPDATE running_plans:",result.error);
@@ -7305,15 +7316,9 @@ async function saveRunningProgram() {
       return;
     }
 
-    // Conferma che Supabase abbia effettivamente trovato la riga da modificare.
-    const verify = await db.from("running_plans")
-      .select("id, weeks_count, sessions_per_week, plan_data")
-      .eq("id",planId)
-      .eq("patient_id",currentPatient.id)
-      .maybeSingle();
-    if(verify.error || !verify.data) {
-      console.error("UPDATE eseguito ma scheda non verificabile:",verify.error);
-      showMessage("runningMessage","La modifica non è stata verificata. Controlla i permessi RLS della tabella running_plans.","error");
+    if(!result.data) {
+      console.error("Nessuna riga aggiornata. ID programma:",planId,"Paziente:",currentPatient.id);
+      showMessage("runningMessage","La modifica non è stata salvata: Supabase non ha trovato una riga modificabile. Probabile problema di permessi RLS sulla tabella running_plans.","error");
       return;
     }
 
@@ -7335,11 +7340,24 @@ async function saveRunningProgram() {
     }
 
     if(latest.data?.id) {
+      editingRunningPlanId = latest.data.id;
       result = await db.from("running_plans")
         .update({weeks_count:Number(data.weeks),sessions_per_week:Number(data.sessions),plan_data:data.planData})
         .eq("id",latest.data.id)
-        .eq("patient_id",currentPatient.id);
-      editingRunningPlanId = latest.data.id;
+        .eq("patient_id",currentPatient.id)
+        .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
+        .maybeSingle();
+
+      if(result.error) {
+        console.error("Errore UPDATE running_plans:",result.error);
+        showMessage("runningMessage","Errore nel salvataggio: "+result.error.message,"error");
+        return;
+      }
+      if(!result.data) {
+        console.error("Nessuna riga aggiornata nel salvataggio automatico. ID:",latest.data.id,"Paziente:",currentPatient.id);
+        showMessage("runningMessage","La modifica non è stata salvata: controlla i permessi RLS di running_plans.","error");
+        return;
+      }
     } else {
       result = await db.from("running_plans").insert([{
         patient_id:currentPatient.id,
@@ -7399,6 +7417,7 @@ async function editRunningPlan(
         "id",
         id
       )
+      .eq("patient_id", currentPatient.id)
       .single();
 
 

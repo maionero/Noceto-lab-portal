@@ -1789,6 +1789,69 @@ html, body { max-width:100%; overflow-x:hidden; }
   #printSheet img {
     max-width:100% !important;
   }
+
+  /* La stampa deve ignorare il layout mobile della tabella corsa.
+     Anche se window.print() viene chiamato da uno smartphone, qui
+     la tabella torna ad essere una vera tabella e non viene impilata. */
+  #printSheet .running-planner {
+    width:100% !important;
+    max-width:100% !important;
+    overflow:visible !important;
+    display:block !important;
+  }
+  #printSheet .running-table {
+    display:table !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    table-layout:fixed !important;
+    font-size:9px !important;
+    margin-top:8px !important;
+  }
+  #printSheet .running-table thead { display:table-header-group !important; }
+  #printSheet .running-table tbody { display:table-row-group !important; }
+  #printSheet .running-table tr {
+    display:table-row !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:visible !important;
+  }
+  #printSheet .running-table th,
+  #printSheet .running-table td {
+    display:table-cell !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    padding:5px !important;
+    vertical-align:top !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+    border:1px solid #cbd5e1 !important;
+  }
+  #printSheet .running-table th:first-child,
+  #printSheet .running-table td:first-child {
+    width:12% !important;
+    min-width:0 !important;
+  }
+  #printSheet .running-table td[data-label]::before {
+    content:none !important;
+    display:none !important;
+  }
+  #printSheet .running-table .session-box {
+    padding:5px !important;
+    margin:0 !important;
+    font-size:8.5px !important;
+    line-height:1.2 !important;
+    border:0 !important;
+    background:transparent !important;
+  }
+  #printSheet .running-table .session-box label,
+  #printSheet .running-table .session-box input,
+  #printSheet .running-table .session-box select,
+  #printSheet .running-table .session-box textarea {
+    font-size:8px !important;
+  }
 }
 
 </style>
@@ -3154,6 +3217,8 @@ html, body { max-width:100%; overflow-x:hidden; }
   </div>
 
 
+  <div class="tab-panel active-panel" id="portalDashboard">
+
   <div
     class="card patient-portal-welcome"
     style="
@@ -3188,9 +3253,6 @@ html, body { max-width:100%; overflow-x:hidden; }
     </p>
 
   </div>
-
-
-  <div class="tab-panel active-panel" id="portalDashboard">
   <div class="card">
     <div class="section-title"><h2>✅ Da fare</h2></div>
     <div id="patientTodo" class="todo-grid"><div class="todo-card">Caricamento...</div></div>
@@ -7222,8 +7284,8 @@ async function saveRunningProgram() {
 
   if(editingRunningPlanId !== null && editingRunningPlanId !== undefined) {
 
-    const planId = Number(editingRunningPlanId);
-    if(!Number.isFinite(planId)) {
+    const planId = editingRunningPlanId;
+    if(planId === null || planId === undefined || String(planId).trim() === "") {
       showMessage("runningMessage","ID della scheda corsa non valido.","error");
       return;
     }
@@ -7240,6 +7302,18 @@ async function saveRunningProgram() {
     if(result.error) {
       console.error("Errore UPDATE running_plans:",result.error);
       showMessage("runningMessage","Errore nel salvataggio: "+result.error.message,"error");
+      return;
+    }
+
+    // Conferma che Supabase abbia effettivamente trovato la riga da modificare.
+    const verify = await db.from("running_plans")
+      .select("id, weeks_count, sessions_per_week, plan_data")
+      .eq("id",planId)
+      .eq("patient_id",currentPatient.id)
+      .maybeSingle();
+    if(verify.error || !verify.data) {
+      console.error("UPDATE eseguito ma scheda non verificabile:",verify.error);
+      showMessage("runningMessage","La modifica non è stata verificata. Controlla i permessi RLS della tabella running_plans.","error");
       return;
     }
 
@@ -7265,7 +7339,7 @@ async function saveRunningProgram() {
         .update({weeks_count:Number(data.weeks),sessions_per_week:Number(data.sessions),plan_data:data.planData})
         .eq("id",latest.data.id)
         .eq("patient_id",currentPatient.id);
-      editingRunningPlanId = Number(latest.data.id);
+      editingRunningPlanId = latest.data.id;
     } else {
       result = await db.from("running_plans").insert([{
         patient_id:currentPatient.id,
@@ -7303,6 +7377,8 @@ async function saveRunningProgram() {
     .innerText = "💾 Salva Scheda Corsa";
 
   await loadRunningPlans();
+  await loadPatientTimeline();
+  await loadDashboardActivity();
   await loadDashboardStats();
 }
 
@@ -7344,7 +7420,7 @@ async function editRunningPlan(
     result.data;
 
 
-  editingRunningPlanId = Number(id);
+  editingRunningPlanId = id;
 
 
   document

@@ -1582,6 +1582,155 @@ html, body { max-width:100%; overflow-x:hidden; }
 @media(max-width:380px){ .section-tabs{grid-template-columns:1fr 1fr;} .section-tab{font-size:12px !important;padding:9px 6px !important;} }
 
 
+
+/* =========================================================
+   NOCETO LAB v29 — LAYOUT / PRINT / MOBILE
+========================================================= */
+.activity-item {
+  justify-content:flex-start !important;
+  align-items:stretch !important;
+  text-align:left !important;
+}
+.activity-item > div {
+  width:100% !important;
+  max-width:none !important;
+  flex:1 1 auto !important;
+  text-align:left !important;
+}
+
+.assignment-inline {
+  width:100%;
+  margin-top:22px;
+  padding:20px 0 0;
+  border:0;
+  border-top:1px solid var(--border-color);
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+}
+.assignment-inline h2 { margin-bottom:12px; }
+.assignment-inline-divider { display:none; }
+
+/* Stampa esercizi più compatta: il contenuto resta leggibile ma occupa molto meno spazio. */
+@media print {
+  #printSheet .exercise {
+    padding:9px 10px !important;
+    margin:0 0 7px !important;
+    border-radius:7px !important;
+    font-size:10.5px !important;
+    line-height:1.28 !important;
+  }
+  #printSheet .exercise h3 {
+    font-size:13px !important;
+    margin:0 0 4px !important;
+  }
+  #printSheet .exercise p {
+    font-size:10.5px !important;
+    line-height:1.28 !important;
+    margin:4px 0 !important;
+  }
+  #printSheet .exercise .exercise-library-meta {
+    margin:4px 0 !important;
+    gap:3px !important;
+  }
+  #printSheet .exercise .exercise-chip {
+    font-size:9px !important;
+    padding:2px 5px !important;
+  }
+  #printSheet .exercise .exercise-instructions {
+    padding:6px 8px !important;
+    margin-top:5px !important;
+    line-height:1.25 !important;
+  }
+  #printSheet .exercise .exercise-instructions > div {
+    margin-top:3px !important;
+  }
+  #printSheet .exercise-media {
+    margin-top:6px !important;
+    gap:5px !important;
+  }
+  #printSheet .exercise-media img {
+    max-height:155px !important;
+    max-width:330px !important;
+  }
+  #printSheet .phase-chip {
+    font-size:9px !important;
+    padding:2px 6px !important;
+    margin:3px 0 !important;
+  }
+}
+
+/* Corsa su mobile: niente tabella larga 760px. Ogni settimana diventa una colonna
+   leggibile con Sessione 1, Sessione 2, ecc. */
+@media(max-width:700px){
+  .running-planner {
+    overflow-x:hidden !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .running-table,
+  .running-table tbody,
+  .running-table tr,
+  .running-table td {
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+  .running-table {
+    table-layout:auto !important;
+    min-width:0 !important;
+    width:100% !important;
+    max-width:100% !important;
+    font-size:12px !important;
+  }
+  .running-table thead { display:none !important; }
+  .running-table tr {
+    margin-bottom:12px !important;
+    border:1px solid var(--border-color);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .running-table td {
+    padding:10px !important;
+    border-right:0 !important;
+    border-bottom:1px solid var(--border-color) !important;
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+    white-space:normal !important;
+  }
+  .running-table td:last-child { border-bottom:0 !important; }
+  .running-table td:first-child {
+    width:100% !important;
+    min-width:0 !important;
+    background:#f8fafc !important;
+    font-size:13px !important;
+  }
+  .running-table td[data-label]::before {
+    content:attr(data-label);
+    display:block;
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    margin-bottom:5px;
+  }
+  .running-table .session-box {
+    padding:8px !important;
+    margin:0 !important;
+    font-size:12px !important;
+    line-height:1.3 !important;
+  }
+  .running-table .session-box label { font-size:10px !important; margin-top:7px !important; }
+  .running-table .session-box input,
+  .running-table .session-box select,
+  .running-table .session-box textarea {
+    font-size:13px !important;
+    min-height:38px !important;
+    padding:9px 10px !important;
+  }
+}
+
 /* =========================================================
    STAMPA / PDF — stampa esclusivamente il contenuto preparato
 ========================================================= */
@@ -2001,12 +2150,6 @@ html, body { max-width:100%; overflow-x:hidden; }
       📋 Esercizi
     </button>
 
-    <button
-      class="section-tab"
-      data-target="therapistTabProgramAssign"
-    >
-      ➕ Assegna
-    </button>
 
     <button
       class="section-tab"
@@ -2094,13 +2237,15 @@ html, body { max-width:100%; overflow-x:hidden; }
       Caricamento...
     </div>
 
+    <div class="assignment-inline-divider"></div>
+
   </div>
 
 
   <!-- ASSEGNA ESERCIZIO -->
 
   <div
-    class="card tab-panel"
+    class="card assignment-inline"
     id="therapistTabProgramAssign"
   >
 
@@ -3252,6 +3397,123 @@ let currentPatient = null;
 let editingRunningPlanId = null;
 
 /* =========================================================
+   REALTIME SUPABASE — aggiornamento automatico senza reload
+========================================================= */
+let realtimeChannel = null;
+let realtimeRefreshTimer = null;
+let realtimeRefreshBusy = false;
+
+function stopRealtimeSubscriptions(){
+  if(realtimeChannel){
+    db.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+  if(realtimeRefreshTimer){
+    clearTimeout(realtimeRefreshTimer);
+    realtimeRefreshTimer = null;
+  }
+}
+
+function scheduleRealtimeRefresh(table){
+  clearTimeout(realtimeRefreshTimer);
+  realtimeRefreshTimer = setTimeout(async()=>{
+    if(realtimeRefreshBusy) return;
+    if(!currentUser || (!currentPatient && table !== "exercises")) return;
+    realtimeRefreshBusy = true;
+    try {
+      const isTherapist = currentUser.role === "therapist";
+      const isPatient = currentUser.role === "patient";
+      if(table === "patient_exercises" || table === "exercises"){
+        if(isTherapist){
+          await loadExercises();
+          await loadExerciseLibrary();
+          if(currentPatient){
+            await loadPatientExercises();
+            await loadPatientTimeline();
+          }
+          await loadDashboardActivity();
+        } else if(isPatient){
+          await refreshPatientPortalExercises();
+          await loadPatientTodo();
+        }
+      } else if(table === "running_plans"){
+        if(isTherapist){
+          await loadRunningPlans();
+          await loadPatientTimeline();
+          await loadDashboardActivity();
+        } else if(isPatient){
+          await refreshPatientPortalRunning();
+          await loadPatientTodo();
+        }
+      }
+    } catch(err){
+      console.warn("Aggiornamento realtime non riuscito:", err);
+    } finally {
+      realtimeRefreshBusy = false;
+    }
+  },180);
+}
+
+function startRealtimeSubscriptions(){
+  stopRealtimeSubscriptions();
+  if(!currentUser) return;
+
+  realtimeChannel = db.channel("noceto-lab-live-updates")
+    .on("postgres_changes", {event:"*", schema:"public", table:"patient_exercises"}, payload=>{
+      if(!currentPatient || !payload?.new?.patient_id && !payload?.old?.patient_id) return;
+      const pid = payload.new?.patient_id ?? payload.old?.patient_id;
+      if(String(pid) === String(currentPatient.id)) scheduleRealtimeRefresh("patient_exercises");
+    })
+    .on("postgres_changes", {event:"*", schema:"public", table:"running_plans"}, payload=>{
+      if(!currentPatient || !payload?.new?.patient_id && !payload?.old?.patient_id) return;
+      const pid = payload.new?.patient_id ?? payload.old?.patient_id;
+      if(String(pid) === String(currentPatient.id)) scheduleRealtimeRefresh("running_plans");
+    })
+    .on("postgres_changes", {event:"*", schema:"public", table:"exercises"}, ()=>{
+      scheduleRealtimeRefresh("exercises");
+    })
+    .subscribe((status, err)=>{
+      if(status === "CHANNEL_ERROR" || status === "TIMED_OUT") console.warn("Supabase Realtime:", status, err);
+    });
+}
+
+async function refreshPatientPortalExercises(){
+  const exContainer=document.getElementById("patientPortalExercises");
+  if(!exContainer || !currentPatient) return;
+  const r=await db.from("patient_exercises").select("*, exercises(*)").eq("patient_id",currentPatient.id);
+  if(r.error){ console.warn(r.error); return; }
+  exContainer.innerHTML="";
+  if(!r.data?.length){ exContainer.innerText="Nessun esercizio presente."; return; }
+  r.data.forEach(item=>{
+    const div=document.createElement("div");
+    div.className="exercise";
+    const ex=item.exercises||{};
+    div.innerHTML=`
+      <h3>${escapeHtml(ex.name||"Esercizio")}</h3>
+      ${exerciseMetaHtml(ex)}
+      ${ex.description ? `<p style="font-size:13px;color:var(--text-muted);">${escapeHtml(ex.description)}</p>` : ""}
+      ${ex.instructions ? `<div class="exercise-instructions"><strong>▶ Esecuzione</strong><div style="margin-top:5px;white-space:pre-line;">${escapeHtml(ex.instructions)}</div></div>` : ""}
+      <p style="font-size:14px;"><strong>Parametri:</strong> ${item.sets ? `${item.sets} serie` : ""}${item.reps ? ` | ${item.reps} rep` : ""}${item.duration ? ` | ${item.duration}s` : ""}${item.rest ? ` | rec ${item.rest}s` : ""}${item.frequency_per_week != null ? ` | ${item.frequency_per_week}×/sett` : ""}</p>
+      ${item.goal ? `<p style="font-size:13px;"><strong>🎯 Obiettivo:</strong> ${escapeHtml(item.goal)}</p>` : ""}
+      ${item.phase_name ? `<div class="phase-chip">${escapeHtml(item.phase_name)}</div>` : ""}
+      ${item.notes ? `<p style="font-size:13px;color:var(--text-muted);"><strong>Note:</strong> ${escapeHtml(item.notes)}</p>` : ""}
+      ${exerciseMediaHtml(ex)}
+      ${ex.video_url ? `<p class="video no-print"><a href="${escapeAttribute(ex.video_url)}" target="_blank" rel="noopener">🎥 Guarda Video Dimostrativo</a></p>` : ""}`;
+    exContainer.appendChild(div);
+  });
+}
+
+async function refreshPatientPortalRunning(){
+  const box=document.getElementById("patientPortalRunning");
+  if(!box || !currentPatient) return;
+  // La sezione corsa viene ricaricata solo se esiste nel DOM, senza cambiare pagina o scroll.
+  const result=await db.from("running_plans").select("*").eq("patient_id",currentPatient.id).order("created_at",{ascending:false});
+  if(result.error) return;
+  // Il renderer del portale usa già il contenuto aggiornato dopo una piccola ricarica mirata.
+  if(typeof loadPatientPortalRunningOnly === "function") await loadPatientPortalRunningOnly(result.data||[]);
+}
+
+/* =========================================================
    NAVIGAZIONE PAGINE
 ========================================================= */
 
@@ -3958,6 +4220,9 @@ async function startApp() {
 
   currentUser.role = role;
 
+  // Mantiene aggiornata anche la dashboard (es. nuova voce nella libreria esercizi).
+  startRealtimeSubscriptions();
+
 
   if(
     role === "patient" &&
@@ -4009,6 +4274,8 @@ document
       currentUser =
         null;
 
+
+      stopRealtimeSubscriptions();
 
       currentPatient =
         null;
@@ -4114,6 +4381,7 @@ async function startPatient() {
 
 
   await loadPatientPortal();
+  startRealtimeSubscriptions();
 
 }
 
@@ -4321,6 +4589,13 @@ async function loadPatients() {
    APRI PAZIENTE
 ========================================================= */
 
+function moveExerciseAssignmentIntoProgram() {
+  const program = document.getElementById("therapistTabProgram");
+  const assign = document.getElementById("therapistTabProgramAssign");
+  if(!program || !assign) return;
+  if(assign.parentElement !== program) program.appendChild(assign);
+}
+
 async function openPatient(
   patient
 ) {
@@ -4346,6 +4621,8 @@ async function openPatient(
     "patientPage"
   );
 
+
+  moveExerciseAssignmentIntoProgram();
 
   setupSectionTabs(
     "therapistPatientTabs"
@@ -4375,6 +4652,7 @@ async function openPatient(
   await loadPatientTimeline();
   await loadRunningSessions();
   await loadClinicalTests();
+  startRealtimeSubscriptions();
 
 }
 
@@ -6473,7 +6751,7 @@ function generateRunningPlanner(
     html +=
       `<tr>
 
-        <td>
+        <td data-label="Settimana">
 
           <strong>
             Settimana ${w}
@@ -6527,7 +6805,7 @@ function generateRunningPlanner(
 
       html += `
 
-        <td>
+        <td data-label="Sessione ${s}">
 
           <div class="session-box">
 
@@ -7312,7 +7590,7 @@ async function loadRunningPlans() {
             tableHtml +=
               `<tr>
 
-                <td>
+                <td data-label="Settimana">
 
                   <strong>
                     Settimana ${wData.week}
@@ -7403,7 +7681,7 @@ async function loadRunningPlans() {
 
 
                 tableHtml +=
-                  `<td>
+                  `<td data-label="Sessione ${idx + 1}">
                     ${content}
                   </td>`;
 
@@ -7689,6 +7967,34 @@ async function loadPatientRunningSessions(){
   box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card"><strong>${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;">${s.created_by && currentPatient.user_id && String(s.created_by)===String(currentPatient.user_id)?"👤 Paziente":"👨‍⚕️ Terapista"} · ${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(s.notes)}</div>`:""}</div>`).join(""):"Nessuna seduta registrata.";
 }
 
+async function loadPatientPortalRunningOnly(data){
+  const runContainer=document.getElementById("patientPortalRunning");
+  if(!runContainer || !currentPatient) return;
+  if(!data?.length){ runContainer.innerText="Nessun programma corsa assegnato."; return; }
+  runContainer.innerHTML="";
+  data.forEach(plan=>{
+    let html=`<div class="card" style="margin-bottom:20px;"><table class="running-table"><thead><tr><th>Settimana</th>`;
+    for(let s=1;s<=plan.sessions_per_week;s++) html+=`<th>Sessione ${s}</th>`;
+    html+=`</tr></thead><tbody>`;
+    (plan.plan_data||[]).forEach(week=>{
+      html+=`<tr><td data-label="Settimana"><strong>Settimana ${week.week}</strong></td>`;
+      (week.sessions||[]).forEach((sess,index)=>{
+        let content=`<strong>🏃 Sessione ${index+1}: ${escapeHtml(sess.type||"Corsa")}</strong><br>`;
+        if(sess.duration) content+=`⏱️ ${escapeHtml(sess.duration)} min<br>`;
+        if(sess.effort!==undefined && sess.effort!=="") content+=`💪 RPE ${escapeHtml(String(sess.effort))}/10<br>`;
+        if(sess.type==="Ripetute"){ if(sess.fast) content+=`⚡ ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🐢 ${escapeHtml(sess.slow)}<br>`; }
+        else if(sess.type==="Corsa + Camminata"){ if(sess.fast) content+=`🏃 ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🚶 ${escapeHtml(sess.slow)}<br>`; }
+        if(sess.notes) content+=`<small>📝 ${escapeHtml(sess.notes)}</small>`;
+        html+=`<td data-label="Sessione ${index+1}">${content}</td>`;
+      });
+      html+=`</tr>`;
+    });
+    html+=`</tbody></table></div>`;
+    runContainer.insertAdjacentHTML("beforeend",html);
+  });
+}
+
+
 async function loadPatientPortal() {
   await loadPatientSharedProgress();
   await loadPatientDiary();
@@ -7924,221 +8230,15 @@ async function loadPatientPortal() {
   /* =======================================================
      CORSA
   ====================================================== */
-
-  const runContainer =
-    document.getElementById(
-      "patientPortalRunning"
-    );
-
-
-  runContainer.innerHTML =
-    "Caricamento...";
-
-
-  const runResult =
-    await db
-      .from("running_plans")
-      .select("*")
-      .eq(
-        "patient_id",
-        currentPatient.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:
-            false
-        }
-      );
-
-
-  if(
-    runResult.error
-  ) {
-
-    runContainer.innerText =
-      "Errore nel caricamento del programma.";
-
-  }
-  else if(
-    !runResult.data ||
-    runResult.data.length === 0
-  ) {
-
-    runContainer.innerText =
-      "Nessun programma corsa assegnato.";
-
-  }
-  else {
-
-    runContainer.innerHTML =
-      "";
-
-
-    runResult.data.forEach(
-      plan => {
-
-        let html =
-          `<div
-            class="card"
-            style="
-              margin-bottom:20px;
-            "
-          >
-
-          <table class="running-table">
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Settimana
-                </th>`;
-
-
-        for(
-          let s = 1;
-          s <= plan.sessions_per_week;
-          s++
-        ) {
-
-          html +=
-            `<th>
-              Sessione ${s}
-            </th>`;
-
-        }
-
-
-        html +=
-          `</tr>
-          </thead>
-          <tbody>`;
-
-
-        plan.plan_data.forEach(
-          week => {
-
-            html +=
-              `<tr>
-
-                <td>
-
-                  <strong>
-                    Settimana ${week.week}
-                  </strong>
-
-                </td>`;
-
-
-            week.sessions.forEach(
-              (
-                sess,
-                index
-              ) => {
-
-                let content =
-                  `<strong>
-                    🏃 Sessione ${index + 1}:
-                    ${escapeHtml(
-                      sess.type ||
-                      "Corsa"
-                    )}
-                  </strong><br>`;
-
-
-                if(sess.duration)
-                  content +=
-                    `⏱️
-                    ${escapeHtml(
-                      sess.duration
-                    )} min<br>`;
-
-
-                if(
-                  sess.type ===
-                  "Ripetute"
-                ) {
-
-                  if(sess.fast)
-                    content +=
-                      `⚡
-                      ${escapeHtml(
-                        sess.fast
-                      )}<br>`;
-
-
-                  if(sess.slow)
-                    content +=
-                      `🐢
-                      ${escapeHtml(
-                        sess.slow
-                      )}<br>`;
-
-                }
-                else if(
-                  sess.type ===
-                  "Corsa + Camminata"
-                ) {
-
-                  if(sess.fast)
-                    content +=
-                      `🏃
-                      ${escapeHtml(
-                        sess.fast
-                      )}<br>`;
-
-
-                  if(sess.slow)
-                    content +=
-                      `🚶
-                      ${escapeHtml(
-                        sess.slow
-                      )}<br>`;
-
-                }
-
-
-                if(sess.notes)
-                  content +=
-                    `<small>
-                      📝
-                      ${escapeHtml(
-                        sess.notes
-                      )}
-                    </small>`;
-
-
-                html +=
-                  `<td>
-                    ${content}
-                  </td>`;
-
-              }
-            );
-
-
-            html +=
-              `</tr>`;
-
-          }
-        );
-
-
-        html +=
-          `</tbody>
-          </table>
-
-          </div>`;
-
-
-        runContainer.innerHTML +=
-          html;
-
-      }
-    );
-
+  const runResult = await db.from("running_plans")
+    .select("*")
+    .eq("patient_id", currentPatient.id)
+    .order("created_at", {ascending:false});
+  if(runResult.error) {
+    const runContainer=document.getElementById("patientPortalRunning");
+    if(runContainer) runContainer.innerText="Errore nel caricamento del programma.";
+  } else {
+    await loadPatientPortalRunningOnly(runResult.data||[]);
   }
 
 }

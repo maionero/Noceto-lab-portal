@@ -4136,7 +4136,11 @@ async function loadPatientTimeline(){
   push(m.data,"metric","📈",x=>x.metric_name||"Misurazione",x=>`${x.value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
   push(d.data,"document","📄",x=>x.file_name||"Documento",x=>`${x.category||"Altro"}${x.description?" · "+x.description:""}`,"document_date");
   push(e.data,"exercise","🏋️",x=>x.exercises?.name||"Esercizio assegnato",x=>[x.phase_name,x.goal].filter(Boolean).join(" · "));
-  push(rp.data,"running","🏃",x=>x.title||"Programma corsa",x=>x.workout||x.notes||"", "date");
+  push(rp.data,"running","🏃",x=>x.title||"Programma corsa",x=>{
+    const weeks=Number(x.weeks_count)||0;
+    const sessions=Number(x.sessions_per_week)||0;
+    return weeks && sessions ? `${weeks} settimane · ${sessions} sessioni/settimana` : "Nuova scheda di programmazione corsa";
+  }, "created_at");
   push(di.data,"diary","📔",x=>x.title||"Diario",x=>x.content||"");
   push(rs.data,"running-session","🏃",x=>x.session_type||"Seduta di corsa",x=>[x.duration_min?x.duration_min+" min":null,x.distance_km?x.distance_km+" km":null,x.rpe!=null?"RPE "+x.rpe:null,x.pain_score!=null?"Dolore "+x.pain_score+"/10":null].filter(Boolean).join(" · "),"session_date");
   push(ct.data,"test","🧪",x=>x.test_name||"Test",x=>`${x.test_value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
@@ -7363,50 +7367,27 @@ async function saveRunningProgram() {
 
   } else {
 
-    // Nuova scheda: se esiste già una scheda per il paziente, la aggiorniamo.
-    const latest = await db
+    // NUOVA SCHEDA: non sovrascriviamo quella precedente.
+    // Ogni nuovo salvataggio crea una nuova riga: in questo modo
+    // resta la cronologia e il nuovo programma compare anche nelle
+    // Attività recenti e nella timeline grazie al nuovo created_at.
+    const insertResult = await db
       .from("running_plans")
-      .select("id")
-      .eq("patient_id", patientId)
-      .order("created_at", {ascending:false})
-      .limit(1)
-      .maybeSingle();
+      .insert([{
+        patient_id:patientId,
+        weeks_count:Number(data.weeks),
+        sessions_per_week:Number(data.sessions),
+        plan_data:data.planData
+      }])
+      .select("id, patient_id, weeks_count, sessions_per_week, plan_data, created_at")
+      .single();
 
-    if(latest.error) {
-      showMessage("runningMessage", "Errore nel controllo della scheda esistente: " + latest.error.message, "error");
+    console.log("RUNNING INSERT RESULT", insertResult);
+
+    if(insertResult.error) {
+      console.error("Errore INSERT running_plans:", insertResult.error);
+      showMessage("runningMessage", "Errore nel salvataggio: " + insertResult.error.message, "error");
       return;
-    }
-
-    if(latest.data?.id !== undefined && latest.data?.id !== null) {
-      const updateResult = await db
-        .from("running_plans")
-        .update({
-          weeks_count:Number(data.weeks),
-          sessions_per_week:Number(data.sessions),
-          plan_data:data.planData
-        })
-        .eq("id", latest.data.id);
-
-      if(updateResult.error) {
-        console.error("Errore UPDATE running_plans:", updateResult.error);
-        showMessage("runningMessage", "Errore nel salvataggio: " + updateResult.error.message, "error");
-        return;
-      }
-    } else {
-      const insertResult = await db
-        .from("running_plans")
-        .insert([{
-          patient_id:patientId,
-          weeks_count:Number(data.weeks),
-          sessions_per_week:Number(data.sessions),
-          plan_data:data.planData
-        }]);
-
-      if(insertResult.error) {
-        console.error("Errore INSERT running_plans:", insertResult.error);
-        showMessage("runningMessage", "Errore nel salvataggio: " + insertResult.error.message, "error");
-        return;
-      }
     }
   }
 
@@ -7646,8 +7627,9 @@ async function loadRunningPlans() {
   container.innerHTML =
     "";
 
-  // Un solo programma attivo visibile: evita doppioni dopo i vecchi salvataggi.
-  const plansToShow = result.data.slice(0,1);
+  // Mostriamo tutti i programmi salvati, dal più recente al più vecchio.
+  // In questo modo una nuova scheda non cancella/nasconde la cronologia.
+  const plansToShow = result.data;
 
   plansToShow.forEach(
     plan => {

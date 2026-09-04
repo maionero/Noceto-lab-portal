@@ -3464,6 +3464,7 @@ let editingRunningPlanId = null;
 let realtimeChannel = null;
 let realtimeRefreshTimer = null;
 let realtimeRefreshBusy = false;
+let liveUiRefreshTimer = null;
 
 function stopRealtimeSubscriptions(){
   if(realtimeChannel){
@@ -3473,6 +3474,10 @@ function stopRealtimeSubscriptions(){
   if(realtimeRefreshTimer){
     clearTimeout(realtimeRefreshTimer);
     realtimeRefreshTimer = null;
+  }
+  if(liveUiRefreshTimer){
+    clearInterval(liveUiRefreshTimer);
+    liveUiRefreshTimer = null;
   }
 }
 
@@ -3525,9 +3530,32 @@ function scheduleRealtimeRefresh(table){
   },180);
 }
 
+function startLiveUiRefresh(){
+  if(liveUiRefreshTimer) clearInterval(liveUiRefreshTimer);
+  if(!currentUser) return;
+  liveUiRefreshTimer=setInterval(async()=>{
+    if(document.hidden || !currentUser) return;
+    try{
+      if(currentUser.role === "therapist"){
+        await loadPatients();
+        if(currentPatient){
+          await loadTherapistDiary();
+          await loadRunningSessions();
+        }
+      } else if(currentUser.role === "patient"){
+        await loadPatientTodo();
+        await refreshPatientPortalNotes();
+        if(document.getElementById("runningSessionsList")) await loadPatientRunningSessions();
+        if(document.getElementById("patientDiaryList")) await loadPatientDiary();
+      }
+    }catch(err){ console.warn("Aggiornamento automatico UI:",err); }
+  },2000);
+}
+
 function startRealtimeSubscriptions(){
   stopRealtimeSubscriptions();
   if(!currentUser) return;
+  startLiveUiRefresh();
 
   realtimeChannel = db.channel("noceto-lab-live-updates")
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_diary_entries"}, payload=>{
@@ -3571,9 +3599,16 @@ async function refreshPatientPortalNotes(){
   if(r.error){ container.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`; return; }
   if(!r.data?.length){ container.innerText="Nessuna nota comunicata."; return; }
   container.innerHTML=r.data.map(note=>`<div class="note-card public-note"><h3>📢 ${escapeHtml(note.title||"Nota")}</h3><small>${escapeHtml(formatDateIT(note.created_at))}</small><p style="white-space:pre-line;">${escapeHtml(note.content)}</p></div>`).join("");
-  const unread=r.data.filter(n=>!n.read_at);
-  for(const note of unread) await db.from("patient_notes").update({read_at:new Date().toISOString()}).eq("id",note.id);
 }
+
+async function markPatientPortalNotesRead(){
+  if(!currentPatient || currentUser?.role !== "patient") return;
+  const r=await db.from("patient_notes").update({read_at:new Date().toISOString()})
+    .eq("patient_id",currentPatient.id).eq("is_private",false).is("read_at",null);
+  if(r.error) console.warn("Impossibile segnare le comunicazioni come lette:",r.error.message);
+  await loadPatientTodo();
+}
+
 
 async function refreshPatientPortalExercises(){
   const exContainer=document.getElementById("patientPortalExercises");
@@ -3627,7 +3662,10 @@ function showPage(pageId) {
 
   pageIds.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.classList.add("hidden");
+    if (el) {
+      el.classList.add("hidden");
+      el.style.display = "none";
+    }
   });
 
   const target = document.getElementById(pageId);
@@ -3637,6 +3675,7 @@ function showPage(pageId) {
   }
 
   target.classList.remove("hidden");
+  target.style.display = "";
 }
 
 
@@ -4198,11 +4237,8 @@ async function loadPatientTodo(){
     db.from("running_plans").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
     db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id)
   ]);
-  const [unreadDiary, unreadNotes]=await Promise.all([
-    db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).is("read_at",null).neq("author_id",currentPatient.user_id || "00000000-0000-0000-0000-000000000000"),
-    db.from("patient_notes").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).eq("is_private",false).is("read_at",null)
-  ]);
-  const unreadCount=(unreadDiary.count||0)+(unreadNotes.count||0);
+  const unreadNotes=await db.from("patient_notes").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).eq("is_private",false).is("read_at",null);
+  const unreadCount=unreadNotes.count||0;
   const badge=document.getElementById("patientDiaryUnreadBadge");
   if(badge){ badge.textContent=String(unreadCount); badge.classList.toggle("hidden",!unreadCount); }
   box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unreadCount} ${unreadCount===1?"voce da leggere":"voci da leggere"}</div></div>`;
@@ -4231,10 +4267,8 @@ async function saveRunningSession(event){
     notes:document.getElementById("runningSessionNotes")?.value.trim()||null,
     created_by:userResult.data.user.id
   };
-  if(!payload.notes){ showMessage("runningSessionMessage","Scrivi prima la nota della corsa.","error"); return; }
-  // Non usiamo .select() dopo l'insert: richiederebbe anche il permesso SELECT
-  // sulla tabella e potrebbe far sembrare fallito un INSERT riuscito.
-  const r=await db.from("patient_running_diary").insert([payload]);
+  // La nota testuale è facoltativa: si può salvare anche solo data/durata/distanza/RPE/dolore.
+  const r=await db.from("patient_running_diary").insert([payload]).select("*").single();
   if(r.error){
     console.error("Errore salvataggio diario corsa:",r.error);
     showMessage("runningSessionMessage","Impossibile salvare la nota: " + (r.error.message || "errore Supabase"),"error");
@@ -4447,9 +4481,9 @@ document
         );
 
 
-      showPage(
-        "loginPage"
-      );
+      document.querySelectorAll("#therapistPage, #patientPage, #patientPortal, #newPatientPage, #newExercisePage, #setPasswordPage").forEach(el=>{ el.classList.add("hidden"); el.style.display="none"; });
+      const loginPage=document.getElementById("loginPage");
+      if(loginPage){ loginPage.classList.remove("hidden"); loginPage.style.display=""; }
 
     }
   );
@@ -4534,6 +4568,7 @@ async function startPatient() {
 
 
   await loadPatientPortal();
+  document.querySelectorAll('.section-tab[data-target="portalNotes"]').forEach(btn=>btn.addEventListener("click",async()=>{ await refreshPatientPortalNotes(); await markPatientPortalNotesRead(); }));
   startRealtimeSubscriptions();
 
 }
@@ -4649,12 +4684,11 @@ async function loadPatients() {
 
   const patients=result.data;
   const enriched=await Promise.all(patients.map(async patient=>{
-    const [diary,notes,running]=await Promise.all([
+    const [diary,running]=await Promise.all([
       db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).is("read_at",null).eq("author_id",patient.user_id),
-      db.from("patient_notes").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).eq("is_private",false).is("read_at",null),
-      db.from("patient_running_diary").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).is("read_at",null).neq("created_by",currentUser?.id || "00000000-0000-0000-0000-000000000000")
+      db.from("patient_running_diary").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).is("read_at",null).eq("created_by",patient.user_id)
     ]);
-    return {...patient, unreadDiary:diary.count||0, unreadNotes:notes.count||0, unreadRunning:running.count||0};
+    return {...patient, unreadDiary:diary.count||0, unreadNotes:0, unreadRunning:running.count||0};
   }));
 
   list.innerHTML="";
@@ -4735,7 +4769,10 @@ async function openPatient(
   await loadRunningPlans();
   await loadPatientTimeline();
   await loadRunningSessions();
+  await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).eq("patient_id",currentPatient.id).eq("author_id",patient.user_id).is("read_at",null);
+  await db.from("patient_running_diary").update({read_at:new Date().toISOString()}).eq("patient_id",currentPatient.id).eq("created_by",patient.user_id).is("read_at",null);
   await loadClinicalTests();
+  await loadPatients();
   startRealtimeSubscriptions();
 
 }

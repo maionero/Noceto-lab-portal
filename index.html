@@ -3531,47 +3531,30 @@ function scheduleRealtimeRefresh(table){
 }
 
 function startLiveUiRefresh(){
-  if(liveUiRefreshTimer) clearInterval(liveUiRefreshTimer);
-  if(!currentUser) return;
-  liveUiRefreshTimer=setInterval(async()=>{
-    if(document.hidden || !currentUser) return;
-    try{
-      if(currentUser.role === "therapist"){
-        await loadPatients();
-        if(currentPatient){
-          await loadTherapistDiary();
-          await loadRunningSessions();
-        }
-      } else if(currentUser.role === "patient"){
-        await loadPatientTodo();
-        await refreshPatientPortalNotes();
-        if(document.getElementById("runningSessionsList")) await loadPatientRunningSessions();
-        if(document.getElementById("patientDiaryList")) await loadPatientDiary();
-      }
-    }catch(err){ console.warn("Aggiornamento automatico UI:",err); }
-  },2000);
+  // Disattivato: nessun auto-refresh periodico per evitare scatti e ritorni in cima alla pagina.
 }
 
 function startRealtimeSubscriptions(){
   stopRealtimeSubscriptions();
   if(!currentUser) return;
-  startLiveUiRefresh();
-
   realtimeChannel = db.channel("noceto-lab-live-updates")
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_diary_entries"}, payload=>{
       const pid = payload.new?.patient_id ?? payload.old?.patient_id;
       if(!currentPatient || String(pid) !== String(currentPatient.id)) return;
-      scheduleRealtimeRefresh("patient_diary_entries");
+      // Le modifiche locali vengono già inserite/rimosse direttamente dal DOM.
+      // Evitiamo un reload completo che farebbe saltare la pagina.
+      if(currentUser?.role === "therapist") loadPatients();
     })
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_notes"}, payload=>{
       const pid = payload.new?.patient_id ?? payload.old?.patient_id;
-      if(currentPatient && String(pid) === String(currentPatient.id)) scheduleRealtimeRefresh("patient_notes");
-      else if(currentUser?.role === "therapist") scheduleRealtimeRefresh("patient_notes");
+      // Aggiorna solo il badge/lista pazienti; niente reload completo della pagina.
+      if(currentUser?.role === "therapist") loadPatients();
+      else if(currentUser?.role === "patient" && currentPatient && String(pid) === String(currentPatient.id)) loadPatientTodo();
     })
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_running_diary"}, payload=>{
       const pid = payload.new?.patient_id ?? payload.old?.patient_id;
       if(!currentPatient || String(pid) !== String(currentPatient.id)) return;
-      scheduleRealtimeRefresh("patient_running_diary");
+      if(currentUser?.role === "therapist") loadPatients();
     })
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_exercises"}, payload=>{
       if(!currentPatient || !payload?.new?.patient_id && !payload?.old?.patient_id) return;
@@ -4237,10 +4220,22 @@ async function loadPatientTodo(){
     db.from("running_plans").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
     db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id)
   ]);
-  const unreadNotes=await db.from("patient_notes").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).eq("is_private",false).is("read_at",null);
-  const unreadCount=unreadNotes.count||0;
+  // Nel portale paziente la notifica riguarda ESCLUSIVAMENTE le comunicazioni
+  // pubbliche scritte dal terapista. Le voci scritte dal paziente non contano.
+  let unreadCount=0;
+  if(currentUser?.role === "patient") {
+    const unreadNotes=await db.from("patient_notes")
+      .select("id",{count:"exact",head:true})
+      .eq("patient_id",currentPatient.id)
+      .eq("is_private",false)
+      .is("read_at",null);
+    unreadCount=unreadNotes.count||0;
+  }
   const badge=document.getElementById("patientDiaryUnreadBadge");
-  if(badge){ badge.textContent=String(unreadCount); badge.classList.toggle("hidden",!unreadCount); }
+  if(badge){
+    badge.textContent=String(unreadCount);
+    badge.classList.toggle("hidden",currentUser?.role !== "patient" || !unreadCount);
+  }
   box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unreadCount} ${unreadCount===1?"voce da leggere":"voci da leggere"}</div></div>`;
 }
 
@@ -4248,7 +4243,21 @@ async function loadRunningSessions(){
   const box=document.getElementById("therapistRunningSessions"); if(!box||!currentPatient)return;
   const r=await db.from("patient_running_diary").select("*").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false});
   if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
-  box.innerHTML=r.data?.length?r.data.map(s=>`<div class="running-session-card" data-running-diary-id="${escapeHtml(s.id)}"><strong>🏃 ${escapeHtml(formatDateIT(s.session_date))}</strong>${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);">${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}<div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${s.id}')">🗑️ Elimina</button></div></div>`).join(""):"Nessuna nota di corsa registrata dal paziente.";
+  box.innerHTML=r.data?.length?r.data.map(s=>{
+    const details=[
+      s.session_type ? `Tipo: ${escapeHtml(s.session_type)}` : null,
+      s.duration_min!=null ? `Durata: ${escapeHtml(String(s.duration_min))} min` : null,
+      s.distance_km!=null ? `Distanza: ${escapeHtml(String(s.distance_km))} km` : null,
+      s.rpe!=null ? `RPE: ${escapeHtml(String(s.rpe))}/10` : null,
+      s.pain_score!=null ? `Dolore: ${escapeHtml(String(s.pain_score))}/10` : null
+    ].filter(Boolean).join(" · ");
+    return `<div class="running-session-card" data-running-diary-id="${escapeHtml(s.id)}">
+      <strong>🏃 ${escapeHtml(formatDateIT(s.session_date))}</strong>
+      ${details?`<div style="margin-top:8px;line-height:1.55;">${details}</div>`:""}
+      ${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);"><strong>📝 Nota:</strong><br>${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}
+      <div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${escapeHtml(s.id)}')">🗑️ Elimina</button></div>
+    </div>`;
+  }).join(""):"Nessuna seduta di corsa registrata dal paziente.";
 }
 
 async function saveRunningSession(event){
@@ -8807,6 +8816,7 @@ async function saveTherapistRunningSession(){
   if(result.error){showMessage("therapistRunningSessionMessage",result.error.message,"error");return;}
   ["therapistRunningSessionDuration","therapistRunningSessionDistance","therapistRunningSessionRpe","therapistRunningSessionPain","therapistRunningSessionType","therapistRunningSessionNotes"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   showMessage("therapistRunningSessionMessage","Seduta aggiunta al diario corsa.","success");
+  // Aggiornamento immediato della lista del terapista senza refresh della pagina.
   await loadRunningSessions();
   await loadPatientTimeline();
 }

@@ -3549,7 +3549,7 @@ function startRealtimeSubscriptions(){
       const pid = payload.new?.patient_id ?? payload.old?.patient_id;
       // Aggiorna solo il badge/lista pazienti; niente reload completo della pagina.
       if(currentUser?.role === "therapist") loadPatients();
-      else if(currentUser?.role === "patient" && currentPatient && String(pid) === String(currentPatient.id)) loadPatientTodo();
+      else if(currentUser?.role === "patient" && currentPatient && String(pid) === String(currentPatient.id)) refreshPatientPortalNotes();
     })
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_running_diary"}, payload=>{
       const pid = payload.new?.patient_id ?? payload.old?.patient_id;
@@ -3820,123 +3820,42 @@ document
   );
 
 
-async function login() {
-
-  const email =
-    document
-      .getElementById(
-        "email"
-      )
-      .value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById(
-        "password"
-      )
-      .value;
-
-
-  if(
-    !email ||
-    !password
-  ) {
-
-    showMessage(
-      "loginMessage",
-      "Inserisci email e password.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  const result =
-    await db.auth.signInWithPassword({
-
-      email,
-
-      password
-
-    });
-
-
-  if(result.error) {
-
-    showMessage(
-      "loginMessage",
-      result.error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  currentUser =
-    result.data.user;
-
-
-  const profileResult =
-    await db
-      .from("profiles")
-      .select(
-        "role, must_change_password"
-      )
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .maybeSingle();
-
-
-  if(
-    profileResult.error ||
-    !profileResult.data
-  ) {
-
-    await db.auth.signOut();
-
-    currentUser =
-      null;
-
-
-    showMessage(
-      "loginMessage",
-      "Errore nel caricamento del profilo.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  if(
-    profileResult.data.role ===
-      "patient" &&
-    profileResult.data.must_change_password ===
-      true
-  ) {
-
-    showPage(
-      "setPasswordPage"
-    );
-
-    return;
-
-  }
-
-
-  await startApp();
-
+function setLoginLoading(isLoading){
+  const btn=document.getElementById("loginButton");
+  if(!btn) return;
+  btn.disabled=!!isLoading;
+  btn.classList.toggle("btn-loading",!!isLoading);
+  btn.textContent=isLoading ? "Accesso..." : "Accedi";
 }
 
+async function login() {
+  const email = document.getElementById("email")?.value.trim() || "";
+  const password = document.getElementById("password")?.value || "";
+
+  if(!email || !password){
+    showMessage("loginMessage","Inserisci email e password.","error");
+    return;
+  }
+
+  setLoginLoading(true);
+  const loginMessage=document.getElementById("loginMessage");
+  if(loginMessage) loginMessage.classList.add("hidden");
+
+  try {
+    // Una sola autenticazione. startApp legge poi la sessione già presente
+    // e carica il profilo senza ripetere la richiesta di login.
+    const result=await db.auth.signInWithPassword({email,password});
+    if(result.error) throw result.error;
+
+    currentUser=result.data.user;
+    await startApp();
+  } catch(error){
+    console.error("Errore login:",error);
+    currentUser=null;
+    showMessage("loginMessage",error?.message || "Impossibile effettuare l'accesso.","error");
+    setLoginLoading(false);
+  }
+}
 
 /* =========================================================
    RECOVERY
@@ -4233,10 +4152,13 @@ async function loadPatientTodo(){
   }
   const badge=document.getElementById("patientDiaryUnreadBadge");
   if(badge){
-    badge.textContent=String(unreadCount);
-    badge.classList.toggle("hidden",currentUser?.role !== "patient" || !unreadCount);
+    // Le notifiche numeriche appartengono ESCLUSIVAMENTE all'area terapista.
+    // Nel portale paziente il badge non deve mai essere visibile.
+    badge.textContent="";
+    badge.classList.add("hidden");
+    badge.style.display="none";
   }
-  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unreadCount} ${unreadCount===1?"voce da leggere":"voci da leggere"}</div></div>`;
+  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>Controlla le comunicazioni dello studio</div></div>`;
 }
 
 async function loadRunningSessions(){
@@ -4428,16 +4350,15 @@ async function startApp() {
     showPage(
       "setPasswordPage"
     );
+    setLoginLoading(false);
 
     return;
 
   }
 
 
-  // Il logo viene caricato solo dopo l'autenticazione,
-  // quando Supabase può generare correttamente l'URL firmato.
-  await loadLogo();
-
+  // Non bloccare l'apertura del portale sul caricamento del logo:
+  // soprattutto da mobile la pagina deve diventare interattiva subito.
   if(role === "therapist") {
 
     await startTherapist();
@@ -4448,6 +4369,10 @@ async function startApp() {
     await startPatient();
 
   }
+
+  // Caricamento non bloccante del logo: il portale è già utilizzabile.
+  loadLogo().catch(error=>console.warn("Caricamento logo non riuscito:", error));
+  setLoginLoading(false);
 
 }
 
@@ -4464,36 +4389,31 @@ document
     "click",
     async () => {
 
-      await db.auth.signOut();
-
-
-      currentUser =
-        null;
-
-
+      // Cambia immediatamente schermata: non aspettiamo la rete di Supabase.
+      // Questo evita che su mobile il vecchio portale resti visibile sotto al login.
       stopRealtimeSubscriptions();
-
-      currentPatient =
-        null;
-
-
-      editingRunningPlanId =
-        null;
-
+      currentUser = null;
+      currentPatient = null;
+      editingRunningPlanId = null;
 
       document
-        .getElementById(
-          "logoutButton"
-        )
-        .classList.add(
-          "hidden"
-        );
+        .getElementById("logoutButton")
+        ?.classList.add("hidden");
 
+      document.querySelectorAll("#therapistPage, #patientPage, #patientPortal, #newPatientPage, #newExercisePage, #setPasswordPage")
+        .forEach(el=>{ el.classList.add("hidden"); el.style.display="none"; });
 
-      document.querySelectorAll("#therapistPage, #patientPage, #patientPortal, #newPatientPage, #newExercisePage, #setPasswordPage").forEach(el=>{ el.classList.add("hidden"); el.style.display="none"; });
       const loginPage=document.getElementById("loginPage");
       if(loginPage){ loginPage.classList.remove("hidden"); loginPage.style.display=""; }
+      setLoginLoading(false);
+      const loginMessage=document.getElementById("loginMessage");
+      if(loginMessage) loginMessage.classList.add("hidden");
+      if(document.getElementById("password")) document.getElementById("password").value="";
+      document.getElementById("email")?.focus();
 
+      // Chiusura sessione in background.
+      try { await db.auth.signOut(); }
+      catch(error){ console.warn("Logout Supabase:", error); }
     }
   );
 

@@ -3499,8 +3499,11 @@ function scheduleRealtimeRefresh(table){
           await loadPatientTodo();
         }
       } else if(table === "patient_diary_entries"){
-        if(isTherapist){ await loadTherapistDiary(); await loadPatientTimeline(); await loadDashboardActivity(); }
+        if(isTherapist){ await loadTherapistDiary(); await loadPatientTimeline(); await loadDashboardActivity(); await loadPatients(); }
         else if(isPatient){ await loadPatientDiary(); await loadPatientTodo(); }
+      } else if(table === "patient_notes"){
+        if(isTherapist){ if(currentPatient) await loadPatientNotes(); await loadDashboardActivity(); await loadPatients(); }
+        else if(isPatient){ await refreshPatientPortalNotes(); await loadPatientTodo(); }
       } else if(table === "patient_running_diary"){
         if(isTherapist){ await loadRunningSessions(); await loadPatientTimeline(); await loadDashboardActivity(); }
         else if(isPatient){ await loadPatientRunningSessions(); await loadPatientTodo(); }
@@ -3532,6 +3535,11 @@ function startRealtimeSubscriptions(){
       if(!currentPatient || String(pid) !== String(currentPatient.id)) return;
       scheduleRealtimeRefresh("patient_diary_entries");
     })
+    .on("postgres_changes", {event:"*", schema:"public", table:"patient_notes"}, payload=>{
+      const pid = payload.new?.patient_id ?? payload.old?.patient_id;
+      if(currentPatient && String(pid) === String(currentPatient.id)) scheduleRealtimeRefresh("patient_notes");
+      else if(currentUser?.role === "therapist") scheduleRealtimeRefresh("patient_notes");
+    })
     .on("postgres_changes", {event:"*", schema:"public", table:"patient_running_diary"}, payload=>{
       const pid = payload.new?.patient_id ?? payload.old?.patient_id;
       if(!currentPatient || String(pid) !== String(currentPatient.id)) return;
@@ -3553,6 +3561,18 @@ function startRealtimeSubscriptions(){
     .subscribe((status, err)=>{
       if(status === "CHANNEL_ERROR" || status === "TIMED_OUT") console.warn("Supabase Realtime:", status, err);
     });
+}
+
+async function refreshPatientPortalNotes(){
+  if(!currentPatient) return;
+  const container=document.getElementById("patientPortalNotes");
+  if(!container) return;
+  const r=await db.from("patient_notes").select("*").eq("patient_id",currentPatient.id).eq("is_private",false).order("created_at",{ascending:false});
+  if(r.error){ container.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`; return; }
+  if(!r.data?.length){ container.innerText="Nessuna nota comunicata."; return; }
+  container.innerHTML=r.data.map(note=>`<div class="note-card public-note"><h3>📢 ${escapeHtml(note.title||"Nota")}</h3><small>${escapeHtml(formatDateIT(note.created_at))}</small><p style="white-space:pre-line;">${escapeHtml(note.content)}</p></div>`).join("");
+  const unread=r.data.filter(n=>!n.read_at);
+  for(const note of unread) await db.from("patient_notes").update({read_at:new Date().toISOString()}).eq("id",note.id);
 }
 
 async function refreshPatientPortalExercises(){
@@ -4071,6 +4091,7 @@ async function loadDashboardActivity(){
     ["patient_assessments","🩺","Valutazione"],
     ["patient_metrics","📈","Misurazione"],
     ["patient_documents","📄","Documento"],
+    ["patient_notes","📢","Comunicazione al paziente"],
     ["patient_diary_entries","📔","Diario paziente"],
     ["patient_exercises","🏋️","Esercizio assegnato"],
     ["running_plans","🏃","Programma corsa"]
@@ -4107,6 +4128,7 @@ async function loadDashboardActivity(){
         "Valutazione":"therapistTabAssessment",
         "Misurazione":"therapistTabProgress",
         "Documento":"therapistTabDocuments",
+        "Comunicazione al paziente":"therapistTabNotes",
         "Diario paziente":"therapistTabNotes",
         "Esercizio assegnato":"therapistTabProgram",
         "Programma corsa":"therapistTabRunning"
@@ -4176,10 +4198,14 @@ async function loadPatientTodo(){
     db.from("running_plans").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
     db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id)
   ]);
-  const unread=await db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).is("read_at",null).neq("author_id",currentPatient.user_id || "00000000-0000-0000-0000-000000000000");
+  const [unreadDiary, unreadNotes]=await Promise.all([
+    db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).is("read_at",null).neq("author_id",currentPatient.user_id || "00000000-0000-0000-0000-000000000000"),
+    db.from("patient_notes").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id).eq("is_private",false).is("read_at",null)
+  ]);
+  const unreadCount=(unreadDiary.count||0)+(unreadNotes.count||0);
   const badge=document.getElementById("patientDiaryUnreadBadge");
-  if(badge){ badge.textContent=String(unread.count||0); badge.classList.toggle("hidden",!(unread.count||0)); }
-  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unread.count||0} ${unread.count===1?"voce da leggere":"voci da leggere"}</div></div>`;
+  if(badge){ badge.textContent=String(unreadCount); badge.classList.toggle("hidden",!unreadCount); }
+  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${unreadCount} ${unreadCount===1?"voce da leggere":"voci da leggere"}</div></div>`;
 }
 
 async function loadRunningSessions(){
@@ -4614,101 +4640,32 @@ async function loadDashboardStats() {
 ========================================================= */
 
 async function loadPatients() {
+  const list=document.getElementById("patientsList");
+  if(!list) return;
+  list.innerHTML="Caricamento...";
+  const result=await db.from("patients").select("*").order("name",{ascending:true});
+  if(result.error || !result.data){ list.innerHTML="Errore o nessun paziente presente."; return; }
+  if(!result.data.length){ list.innerHTML="Nessun paziente presente."; return; }
 
-  const list =
-    document.getElementById(
-      "patientsList"
-    );
+  const patients=result.data;
+  const enriched=await Promise.all(patients.map(async patient=>{
+    const [diary,notes,running]=await Promise.all([
+      db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).is("read_at",null).eq("author_id",patient.user_id),
+      db.from("patient_notes").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).eq("is_private",false).is("read_at",null),
+      db.from("patient_running_diary").select("id",{count:"exact",head:true}).eq("patient_id",patient.id).is("read_at",null).neq("created_by",currentUser?.id || "00000000-0000-0000-0000-000000000000")
+    ]);
+    return {...patient, unreadDiary:diary.count||0, unreadNotes:notes.count||0, unreadRunning:running.count||0};
+  }));
 
-
-  list.innerHTML =
-    "Caricamento...";
-
-
-  const result =
-    await db
-      .from("patients")
-      .select("*")
-      .order(
-        "name",
-        {
-          ascending:
-            true
-        }
-      );
-
-
-  if(
-    result.error ||
-    !result.data
-  ) {
-
-    list.innerHTML =
-      "Errore o nessun paziente presente.";
-
-    return;
-
-  }
-
-
-  if(result.data.length === 0) {
-
-    list.innerHTML =
-      "Nessun paziente presente.";
-
-    return;
-
-  }
-
-
-  list.innerHTML =
-    "";
-
-
-  result.data.forEach(
-    patient => {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "patient";
-
-
-      div.innerHTML = `
-
-        <strong>
-          👤 ${escapeHtml(patient.name)}
-        </strong>
-
-        <br><br>
-
-        <small>
-          Apri Scheda Clinica →
-        </small>
-
-      `;
-
-
-      div.addEventListener(
-        "click",
-        () =>
-          openPatient(
-            patient
-          )
-      );
-
-
-      list.appendChild(
-        div
-      );
-
-    }
-  );
-
+  list.innerHTML="";
+  enriched.forEach(patient=>{
+    const total=patient.unreadDiary+patient.unreadNotes+patient.unreadRunning;
+    const div=document.createElement("div");
+    div.className="patient";
+    div.innerHTML=`<strong>👤 ${escapeHtml(patient.name)}</strong>${total?`<span class="unread-badge" style="margin-left:8px;display:inline-flex;vertical-align:middle;">${total}</span>`:""}<br><br><small>${total?`🔔 ${total} ${total===1?"novità da controllare":"novità da controllare"}`:"Apri Scheda Clinica →"}</small>`;
+    div.addEventListener("click",()=>openPatient(patient));
+    list.appendChild(div);
+  });
 }
 
 
@@ -6474,6 +6431,15 @@ async function loadPatientNotes() {
       return;
     }
 
+    // Se siamo nell'area paziente, le comunicazioni appena aperte vengono segnate come lette.
+    if(currentUser?.role === "patient") {
+      const unreadPublic=(result.data||[]).filter(n=>!n.is_private && !n.read_at);
+      for(const note of unreadPublic){
+        const mark=await db.from("patient_notes").update({read_at:new Date().toISOString()}).eq("id",note.id);
+        if(mark.error) console.warn("Impossibile segnare la comunicazione come letta:",mark.error.message);
+      }
+    }
+
     container.innerHTML = "";
     result.data.forEach(note => {
       const div = document.createElement("div");
@@ -6560,7 +6526,9 @@ document
             is_private:
               isPrivate
 
-          }]);
+          }])
+          .select("*")
+          .single();
 
 
       if(result.error) {
@@ -6611,10 +6579,20 @@ document
       );
 
 
-      await loadPatientNotes();
-
-
+      // Aggiorna subito la lista senza attendere realtime o reload della pagina.
+      const savedNote=result.data;
+      const container=document.getElementById("patientNotesList");
+      if(container && savedNote){
+        const empty=container.innerText.trim()==="Nessuna nota presente.";
+        if(empty) container.innerHTML="";
+        const div=document.createElement("div");
+        div.className="note-card " + (savedNote.is_private ? "private-note" : "public-note");
+        div.dataset.patientNoteId=String(savedNote.id);
+        div.innerHTML=`<h3>${savedNote.is_private ? "🔒" : "📢"} ${escapeHtml(savedNote.title || "Nota")} <small>(${escapeHtml(formatDateIT(savedNote.created_at))})</small></h3><p style="white-space:pre-line;">${escapeHtml(savedNote.content)}</p><p style="font-size:11px;font-weight:700;color:var(--text-muted);">${savedNote.is_private ? "🔒 VISIBILE SOLO AL TERAPISTA" : "📢 VISIBILE AL PAZIENTE"}</p><button class="danger no-print" onclick="deletePatientNote('${escapeHtml(savedNote.id)}')">🗑️ Elimina</button>`;
+        container.prepend(div);
+      }
       await loadDashboardStats();
+      await loadDashboardActivity();
 
     }
   );
@@ -6653,10 +6631,10 @@ async function deletePatientNote(
   }
 
 
+  document.querySelectorAll(`[data-patient-note-id="${CSS.escape(String(id))}"]`).forEach(el=>el.remove());
   await loadPatientNotes();
-
-
   await loadDashboardStats();
+  await loadDashboardActivity();
 
 }
 

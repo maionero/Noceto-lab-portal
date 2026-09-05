@@ -2919,6 +2919,16 @@ html, body { max-width:100%; overflow-x:hidden; }
 
     <hr>
 
+    <div class="actions no-print" style="margin-bottom:12px;">
+      <button
+        type="button"
+        id="resetPatientPasswordButton"
+        class="secondary"
+      >
+        🔑 Reimposta password
+      </button>
+    </div>
+
     <button
       id="deletePatientButton"
       class="danger"
@@ -4647,13 +4657,7 @@ async function loadPatients() {
     const div=document.createElement("div");
     div.className="patient";
     div.innerHTML=`<strong>👤 ${escapeHtml(patient.name)}</strong>${total?`<span class="unread-badge" style="margin-left:8px;display:inline-flex;vertical-align:middle;">${total}</span>`:""}<br><br><small>${total?`🔔 ${total} ${total===1?"novità da controllare":"novità da controllare"}`:"Apri Scheda Clinica →"}</small>
-      <div class="actions no-print" style="margin-top:12px;">
-        <button type="button" class="secondary reset-patient-password" style="font-size:12px;padding:7px 10px;">🔑 Reimposta password</button>
       </div>`;
-    div.querySelector(".reset-patient-password")?.addEventListener("click",async(event)=>{
-      event.stopPropagation();
-      await resetPatientPassword(patient);
-    });
     div.addEventListener("click",()=>openPatient(patient));
     list.appendChild(div);
   });
@@ -4693,6 +4697,16 @@ async function resetPatientPassword(patient){
     alert(error?.message || "Impossibile reimpostare la password.");
   }
 }
+
+
+/* =========================================================
+   RESET PASSWORD PAZIENTE
+========================================================= */
+
+document.getElementById("resetPatientPasswordButton")?.addEventListener("click", async () => {
+  if (!currentPatient) return;
+  await resetPatientPassword(currentPatient);
+});
 
 
 /* =========================================================

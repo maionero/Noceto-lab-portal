@@ -4220,7 +4220,14 @@ async function loadRunningSessions(){
       <strong>🏃 ${escapeHtml(formatDateIT(s.session_date))}</strong>
       ${details?`<div style="margin-top:8px;line-height:1.55;">${details}</div>`:""}
       ${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);"><strong>📝 Nota:</strong><br>${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}
-      <div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${escapeHtml(s.id)}')">🗑️ Elimina</button></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <label style="font-size:13px;font-weight:700;">💬 Commento del terapista</label>
+        <textarea id="runningComment_${escapeHtml(s.id)}" rows="2" placeholder="Es. Buona risposta al carico, prossima volta aumenta leggermente il ritmo...">${escapeHtml(s.therapist_comment||"")}</textarea>
+        <div class="actions no-print" style="margin-top:7px;">
+          <button type="button" class="secondary" onclick="saveRunningDiaryComment('${escapeHtml(s.id)}')">💾 Salva commento</button>
+          <button type="button" class="danger" onclick="deleteRunningDiaryEntry('${escapeHtml(s.id)}')">🗑️ Elimina</button>
+        </div>
+      </div>
     </div>`;
   }).join(""):"Nessuna seduta di corsa registrata dal paziente.";
 }
@@ -6404,11 +6411,14 @@ async function downloadDocument(path,fileName){
 }
 
 document.getElementById("uploadDocumentButton")?.addEventListener("click", async()=>{
+  const button=document.getElementById("uploadDocumentButton");
   const fileInput=document.getElementById("documentFile"), file=fileInput?.files?.[0];
   if(!file){showMessage("documentMessage","Seleziona un documento.","error");return;}
   const allowed=file.type==="application/pdf" || file.type.startsWith("image/");
   if(!allowed){showMessage("documentMessage","Sono ammessi PDF o immagini.","error");return;}
   if(file.size>25*1024*1024){showMessage("documentMessage","File troppo grande. Limite 25 MB.","error");return;}
+  if(button) { button.disabled=true; button.dataset.originalText=button.textContent; button.textContent="⏳ Caricamento..."; }
+  try {
   const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
   const filePath=`${currentPatient.id}/${Date.now()}_${safeName}`;
   const upload=await db.storage.from(DOCUMENT_BUCKET).upload(filePath,file,{upsert:false});
@@ -6423,6 +6433,9 @@ document.getElementById("uploadDocumentButton")?.addEventListener("click", async
   fileInput.value=""; document.getElementById("documentDescription").value="";
   showMessage("documentMessage","Documento caricato correttamente.","success");
   await loadPatientDocuments();
+  } finally {
+    if(button) { button.disabled=false; button.textContent=button.dataset.originalText || "📎 Carica documento"; }
+  }
 });
 
 async function deleteDocument(id,filePath){
@@ -8158,7 +8171,7 @@ async function loadPatientRunningSessions(){
   if(r.error){box.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`;return;}
   box.innerHTML=r.data?.length?r.data.map(s=>{
     const isMine=String(s.created_by||"")===String(currentUser?.id||currentPatient.user_id||"");
-    return `<div class="running-session-card"><strong>${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;">${isMine?"👤 Paziente":"👨‍⚕️ Terapista"} · ${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(s.notes)}</div>`:""}${isMine?`<div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${s.id}')">🗑️ Elimina</button></div>`:""}</div>`;
+    return `<div class="running-session-card"><strong>${escapeHtml(formatDateIT(s.session_date))} · ${escapeHtml(s.session_type||"Seduta")}</strong><div style="margin-top:6px;">${isMine?"👤 Paziente":"👨‍⚕️ Terapista"} · ${s.duration_min!=null?escapeHtml(String(s.duration_min))+" min · ":""}${s.distance_km!=null?escapeHtml(String(s.distance_km))+" km · ":""}${s.rpe!=null?"RPE "+escapeHtml(String(s.rpe))+" · ":""}${s.pain_score!=null?"Dolore "+escapeHtml(String(s.pain_score))+"/10":""}</div>${s.notes?`<div style="margin-top:6px;color:var(--text-muted);white-space:pre-line;">${escapeHtml(s.notes)}</div>`:""}${s.therapist_comment?`<div style="margin-top:10px;padding:10px;border-left:3px solid var(--primary);background:var(--surface-2);border-radius:8px;white-space:pre-line;"><strong>💬 Commento del terapista</strong><br>${escapeHtml(s.therapist_comment)}</div>`:""}${isMine?`<div class="actions no-print" style="margin-top:10px;"><button type="button" class="danger" onclick="deleteRunningDiaryEntry('${s.id}')">🗑️ Elimina</button></div>`:""}</div>`;
   }).join(""):"Nessuna seduta registrata.";
 }
 
@@ -8806,6 +8819,21 @@ async function markDiaryRead(id){
   const result=await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).eq("id",id);
   if(result.error){ alert(result.error.message); return; }
   await loadTherapistDiary();
+}
+
+async function saveRunningDiaryComment(id){
+  if(!id || !currentPatient || currentUser?.role !== "therapist") return;
+  const input=document.getElementById(`runningComment_${CSS.escape(String(id))}`);
+  if(!input) return;
+  const comment=input.value.trim() || null;
+  const result=await db.from("patient_running_diary").update({therapist_comment:comment}).eq("id",id).eq("patient_id",currentPatient.id);
+  if(result.error){
+    console.error("Errore salvataggio commento corsa:",result.error);
+    alert("Impossibile salvare il commento: " + (result.error.message || "errore Supabase"));
+    return;
+  }
+  await loadRunningSessions();
+  await loadPatientTimeline();
 }
 
 async function saveTherapistRunningSession(){

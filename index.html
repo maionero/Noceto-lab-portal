@@ -4189,7 +4189,13 @@ async function loadPatientTodo(){
     badge.classList.add("hidden");
     badge.style.display="none";
   }
-  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>Controlla le comunicazioni dello studio</div></div>`;
+  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${
+    unreadCount === 0
+      ? "Non c'è nulla da leggere"
+      : unreadCount === 1
+        ? "1 comunicazione da leggere"
+        : `${unreadCount} comunicazioni da leggere`
+  }</div></div>`;
 }
 
 async function loadRunningSessions(){

@@ -5841,6 +5841,8 @@ async function updateAssignedExercise(id) {
   }
 
   await loadPatientExercises();
+  await loadPatientTimeline();
+  await loadDashboardActivity();
 }
 
 
@@ -6096,6 +6098,8 @@ async function removeAssignedExercise(id) {
 
 
   await loadPatientExercises();
+  await loadPatientTimeline();
+  await loadDashboardActivity();
 
 }
 
@@ -6123,7 +6127,8 @@ function parseAssessmentMeasures(text) {
 
 function formatDateIT(value) {
   if(!value) return "";
-  const d = new Date(value + (String(value).length === 10 ? "T00:00:00" : ""));
+  const isPureDate = /^\d{4}-\d{2}-\d{2}$/.test(String(value));
+  const d = new Date(isPureDate ? value + "T00:00:00" : value);
   return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString("it-IT");
 }
 
@@ -6758,32 +6763,37 @@ document.getElementById("refreshStudioStatsButton")?.addEventListener("click",lo
    CORSA
 ========================================================= */
 
+function idFor(prefix, base, w, s) {
+  return prefix ? `${prefix}_${base}_${w}_${s}` : `${base}_${w}_${s}`;
+}
+
 function toggleIntervalInputs(
+  prefix,
   w,
   s
 ) {
 
   const typeElement =
     document.getElementById(
-      `run_type_${w}_${s}`
+      idFor(prefix, "run_type", w, s)
     );
 
 
   const intervalBox =
     document.getElementById(
-      `interval_box_${w}_${s}`
+      idFor(prefix, "interval_box", w, s)
     );
 
 
   const labelFast =
     document.getElementById(
-      `label_fast_${w}_${s}`
+      idFor(prefix, "label_fast", w, s)
     );
 
 
   const labelSlow =
     document.getElementById(
-      `label_slow_${w}_${s}`
+      idFor(prefix, "label_slow", w, s)
     );
 
 
@@ -6843,7 +6853,7 @@ function toggleIntervalInputs(
 
 
 /* =========================================================
-   GENERA GRIGLIA CORSA
+   GENERA GRIGLIA CORSA (form "nuovo programma")
 ========================================================= */
 
 document
@@ -6854,42 +6864,39 @@ document
     "click",
     () => {
 
-      generateRunningPlanner();
+      const weeksValue = document.getElementById("runningWeeks").value;
+      const sessionsValue = document.getElementById("runningSessionsPerWeek").value;
+      generateRunningPlanner("", "runningPlanner", weeksValue, sessionsValue, null);
+      document.getElementById("saveRunningProgramButton").classList.remove("hidden");
 
     }
   );
 
 
 function generateRunningPlanner(
+  prefix,
+  containerId,
+  weeksValue,
+  sessionsValue,
   existingData = null
 ) {
 
   const weeks =
-    parseInt(
-      document
-        .getElementById(
-          "runningWeeks"
-        )
-        .value
-    ) ||
+    parseInt(weeksValue) ||
     4;
 
 
   const sessions =
-    parseInt(
-      document
-        .getElementById(
-          "runningSessionsPerWeek"
-        )
-        .value
-    ) ||
+    parseInt(sessionsValue) ||
     3;
 
 
   const planner =
     document.getElementById(
-      "runningPlanner"
+      containerId
     );
+
+  if(!planner) return;
 
 
   let html =
@@ -6996,6 +7003,16 @@ function generateRunningPlanner(
         existingSession?.notes ||
         "";
 
+      const typeId = idFor(prefix, "run_type", w, s);
+      const durId = idFor(prefix, "run_dur", w, s);
+      const effortId = idFor(prefix, "run_effort", w, s);
+      const intervalBoxId = idFor(prefix, "interval_box", w, s);
+      const labelFastId = idFor(prefix, "label_fast", w, s);
+      const labelSlowId = idFor(prefix, "label_slow", w, s);
+      const fastId = idFor(prefix, "run_fast", w, s);
+      const slowId = idFor(prefix, "run_slow", w, s);
+      const notesId = idFor(prefix, "run_notes", w, s);
+
 
       html += `
 
@@ -7009,9 +7026,10 @@ function generateRunningPlanner(
 
 
             <select
-              id="run_type_${w}_${s}"
+              id="${typeId}"
               onchange="
                 toggleIntervalInputs(
+                  '${prefix}',
                   ${w},
                   ${s}
                 )
@@ -7075,7 +7093,7 @@ function generateRunningPlanner(
 
             <input
               type="number"
-              id="run_dur_${w}_${s}"
+              id="${durId}"
               min="1"
               value="${escapeAttribute(duration)}"
               placeholder="Es. 30"
@@ -7084,7 +7102,7 @@ function generateRunningPlanner(
             <label>Fatica percepita (RPE 0–10)</label>
             <input
               type="number"
-              id="run_effort_${w}_${s}"
+              id="${effortId}"
               min="0"
               max="10"
               step="1"
@@ -7093,7 +7111,7 @@ function generateRunningPlanner(
             >
 
             <div
-              id="interval_box_${w}_${s}"
+              id="${intervalBoxId}"
               class="
                 interval-box
                 ${
@@ -7110,7 +7128,7 @@ function generateRunningPlanner(
             >
 
               <label
-                id="label_fast_${w}_${s}"
+                id="${labelFastId}"
               >
                 ${
                   type === "Ripetute"
@@ -7124,14 +7142,14 @@ function generateRunningPlanner(
 
               <input
                 type="text"
-                id="run_fast_${w}_${s}"
+                id="${fastId}"
                 value="${escapeAttribute(fast)}"
                 placeholder="Es. 30 sec"
               >
 
 
               <label
-                id="label_slow_${w}_${s}"
+                id="${labelSlowId}"
               >
                 ${
                   type === "Ripetute"
@@ -7145,7 +7163,7 @@ function generateRunningPlanner(
 
               <input
                 type="text"
-                id="run_slow_${w}_${s}"
+                id="${slowId}"
                 value="${escapeAttribute(slow)}"
                 placeholder="Es. 30 sec"
               >
@@ -7159,7 +7177,7 @@ function generateRunningPlanner(
 
 
             <textarea
-              id="run_notes_${w}_${s}"
+              id="${notesId}"
               rows="2"
               placeholder="Indicazioni..."
             >${escapeHtml(notes)}</textarea>
@@ -7188,15 +7206,6 @@ function generateRunningPlanner(
     html;
 
 
-  document
-    .getElementById(
-      "saveRunningProgramButton"
-    )
-    .classList.remove(
-      "hidden"
-    );
-
-
   if(existingData) {
 
     for(
@@ -7212,6 +7221,7 @@ function generateRunningPlanner(
       ) {
 
         toggleIntervalInputs(
+          prefix,
           w,
           s
         );
@@ -7229,27 +7239,15 @@ function generateRunningPlanner(
    RACCOLTA DATI CORSA
 ========================================================= */
 
-function collectRunningPlanData() {
+function collectRunningPlanData(prefix, weeksValue, sessionsValue) {
 
   const weeks =
-    parseInt(
-      document
-        .getElementById(
-          "runningWeeks"
-        )
-        .value
-    ) ||
+    parseInt(weeksValue) ||
     4;
 
 
   const sessions =
-    parseInt(
-      document
-        .getElementById(
-          "runningSessionsPerWeek"
-        )
-        .value
-    ) ||
+    parseInt(sessionsValue) ||
     3;
 
 
@@ -7274,7 +7272,7 @@ function collectRunningPlanData() {
       const type =
         document
           .getElementById(
-            `run_type_${w}_${s}`
+            idFor(prefix, "run_type", w, s)
           )
           .value;
 
@@ -7282,17 +7280,17 @@ function collectRunningPlanData() {
       const duration =
         document
           .getElementById(
-            `run_dur_${w}_${s}`
+            idFor(prefix, "run_dur", w, s)
           )
           .value;
 
-      const effortEl = document.getElementById(`run_effort_${w}_${s}`);
+      const effortEl = document.getElementById(idFor(prefix, "run_effort", w, s));
       const effort = effortEl?.value === "" ? "" : Number(effortEl.value);
 
       const fast =
         document
           .getElementById(
-            `run_fast_${w}_${s}`
+            idFor(prefix, "run_fast", w, s)
           )
           .value
           .trim();
@@ -7301,7 +7299,7 @@ function collectRunningPlanData() {
       const slow =
         document
           .getElementById(
-            `run_slow_${w}_${s}`
+            idFor(prefix, "run_slow", w, s)
           )
           .value
           .trim();
@@ -7310,7 +7308,7 @@ function collectRunningPlanData() {
       const notes =
         document
           .getElementById(
-            `run_notes_${w}_${s}`
+            idFor(prefix, "run_notes", w, s)
           )
           .value
           .trim();
@@ -7380,7 +7378,7 @@ function collectRunningPlanData() {
 
 
 /* =========================================================
-   SALVA / MODIFICA CORSA
+   SALVA NUOVO PROGRAMMA DI CORSA (form in alto)
 ========================================================= */
 
 document
@@ -7400,252 +7398,57 @@ async function saveRunningProgram() {
     return;
   }
 
-  const data = collectRunningPlanData();
+  const weeksValue = document.getElementById("runningWeeks").value;
+  const sessionsValue = document.getElementById("runningSessionsPerWeek").value;
+  const data = collectRunningPlanData("", weeksValue, sessionsValue);
   if(!data.weeks || !data.sessions || !Array.isArray(data.planData)) {
     showMessage("runningMessage","La scheda corsa non contiene dati validi.","error");
     return;
   }
 
-  const patientId = currentPatient.id;
-  const rawPlanId = editingRunningPlanId;
-  const isEditing = rawPlanId !== null && rawPlanId !== undefined && String(rawPlanId).trim() !== "";
+  const insertResult = await db
+    .from("running_plans")
+    .insert([{
+      patient_id:currentPatient.id,
+      weeks_count:Number(data.weeks),
+      sessions_per_week:Number(data.sessions),
+      plan_data:data.planData,
+      updated_at:new Date().toISOString()
+    }])
+    .select("id, patient_id, weeks_count, sessions_per_week, plan_data, created_at")
+    .single();
 
-  console.log("RUNNING SAVE START", { rawPlanId, patientId, isEditing, data });
-
-  if(isEditing) {
-    // Recuperiamo la riga esatta prima di aggiornare: così evitiamo qualsiasi
-    // problema dovuto a ID convertiti o a un paziente diverso.
-    const existing = await db
-      .from("running_plans")
-      .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
-      .eq("id", rawPlanId)
-      .maybeSingle();
-
-    console.log("RUNNING EXISTING ROW", existing);
-
-    if(existing.error) {
-      showMessage("runningMessage", "Errore nel recupero del programma: " + existing.error.message, "error");
-      return;
-    }
-    if(!existing.data) {
-      showMessage("runningMessage", "Programma corsa non trovato. ID: " + String(rawPlanId), "error");
-      return;
-    }
-    if(String(existing.data.patient_id) !== String(patientId)) {
-      showMessage("runningMessage", "Il programma selezionato appartiene a un altro paziente. Modifica annullata.", "error");
-      return;
-    }
-
-    const updatePayload = {
-      weeks_count: Number(data.weeks),
-      sessions_per_week: Number(data.sessions),
-      plan_data: data.planData,
-      updated_at: new Date().toISOString()
-    };
-
-    // UPDATE separato dal SELECT: prima chiediamo a Supabase di eseguire
-    // realmente la modifica, poi rileggiamo la riga dal database.
-    const updateResult = await db
-      .from("running_plans")
-      .update(updatePayload)
-      .eq("id", existing.data.id);
-
-    console.log("RUNNING UPDATE RESULT", {
-      id: existing.data.id,
-      patientId,
-      payload: updatePayload,
-      result: updateResult
-    });
-
-    if(updateResult.error) {
-      console.error("Errore UPDATE running_plans:", updateResult.error);
-      showMessage("runningMessage", "ERRORE SALVATAGGIO: " + updateResult.error.message, "error");
-      return;
-    }
-
-    // Verifica reale dopo UPDATE.
-    const verify = await db
-      .from("running_plans")
-      .select("id, patient_id, weeks_count, sessions_per_week, plan_data")
-      .eq("id", existing.data.id)
-      .maybeSingle();
-
-    console.log("RUNNING VERIFY AFTER UPDATE", verify);
-
-    if(verify.error) {
-      showMessage("runningMessage", "UPDATE eseguito ma verifica fallita: " + verify.error.message, "error");
-      return;
-    }
-    if(!verify.data) {
-      showMessage("runningMessage", "Dopo il salvataggio il programma non è più leggibile dal database. Controlla RLS.", "error");
-      return;
-    }
-
-    // Confronto esplicito: se la durata/tipologia ecc. inviate non coincidono
-    // con ciò che abbiamo appena riletto, NON dichiariamo il salvataggio riuscito.
-    const savedJson = JSON.stringify(verify.data.plan_data);
-    const sentJson = JSON.stringify(data.planData);
-    if(savedJson !== sentJson || Number(verify.data.weeks_count) !== Number(data.weeks) || Number(verify.data.sessions_per_week) !== Number(data.sessions)) {
-      console.error("RUNNING DATA MISMATCH", {
-        sent: {weeks:data.weeks, sessions:data.sessions, planData:data.planData},
-        saved: verify.data
-      });
-      showMessage("runningMessage", "Il database ha risposto, ma i dati salvati non coincidono con quelli inseriti. Controlla la console.", "error");
-      return;
-    }
-
-  } else {
-
-    // NUOVA SCHEDA: non sovrascriviamo quella precedente.
-    // Ogni nuovo salvataggio crea una nuova riga: in questo modo
-    // resta la cronologia e il nuovo programma compare anche nelle
-    // Attività recenti e nella timeline grazie al nuovo created_at.
-    const insertResult = await db
-      .from("running_plans")
-      .insert([{
-        patient_id:patientId,
-        weeks_count:Number(data.weeks),
-        sessions_per_week:Number(data.sessions),
-        plan_data:data.planData,
-        updated_at:new Date().toISOString()
-      }])
-      .select("id, patient_id, weeks_count, sessions_per_week, plan_data, created_at")
-      .single();
-
-    console.log("RUNNING INSERT RESULT", insertResult);
-
-    if(insertResult.error) {
-      console.error("Errore INSERT running_plans:", insertResult.error);
-      showMessage("runningMessage", "Errore nel salvataggio: " + insertResult.error.message, "error");
-      return;
-    }
+  if(insertResult.error) {
+    console.error("Errore INSERT running_plans:", insertResult.error);
+    showMessage("runningMessage", "Errore nel salvataggio: " + insertResult.error.message, "error");
+    return;
   }
 
-  editingRunningPlanId = null;
-  document.getElementById("cancelRunningEditButton").classList.add("hidden");
-  document.getElementById("saveRunningProgramButton").innerText = "💾 Salva Scheda Corsa";
+  document.getElementById("runningPlanner").innerHTML = "";
+  document.getElementById("saveRunningProgramButton").classList.add("hidden");
 
-  showMessage("runningMessage", isEditing ? "Programma modificato con successo!" : "Programma di corsa salvato con successo!", "success");
+  showMessage("runningMessage", "Programma di corsa salvato con successo!", "success");
+
+  const newPlanId = insertResult.data.id;
 
   await loadRunningPlans();
   await loadPatientTimeline();
   await loadDashboardActivity();
   await loadDashboardStats();
 
-  // Dopo il salvataggio riportiamo la visuale direttamente alla tabella aggiornata.
+  // Dopo il salvataggio riportiamo la visuale direttamente sul programma appena creato.
   requestAnimationFrame(() => {
-    document.getElementById("runningPlansList")?.scrollIntoView({
+    const target = document.querySelector(`[data-running-plan-id="${CSS.escape(String(newPlanId))}"]`);
+    (target || document.getElementById("runningPlansList"))?.scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
   });
 }
 
-/* =========================================================
-   MODIFICA PROGRAMMA CORSA
-========================================================= */
-
-async function editRunningPlan(
-  id
-) {
-
-  const result =
-    await db
-      .from("running_plans")
-      .select("*")
-      .eq(
-        "id",
-        id
-      )
-      .eq("patient_id", currentPatient.id)
-      .single();
-
-
-  if(
-    result.error ||
-    !result.data
-  ) {
-
-    alert(
-      "Programma non trovato."
-    );
-
-    return;
-
-  }
-
-
-  const plan =
-    result.data;
-
-
-  editingRunningPlanId = id;
-
-
-  document
-    .getElementById(
-      "runningWeeks"
-    )
-    .value =
-      plan.weeks_count;
-
-
-  document
-    .getElementById(
-      "runningSessionsPerWeek"
-    )
-    .value =
-      plan.sessions_per_week;
-
-
-  generateRunningPlanner(
-    plan.plan_data
-  );
-
-
-  document
-    .getElementById(
-      "saveRunningProgramButton"
-    )
-    .innerText =
-      "💾 Salva Modifiche";
-
-
-  document
-    .getElementById(
-      "cancelRunningEditButton"
-    )
-    .classList.remove(
-      "hidden"
-    );
-
-
-  showMessage(
-    "runningMessage",
-    "Stai modificando il programma selezionato.",
-    "success"
-  );
-
-
-  document
-    .getElementById(
-      "runningPlanner"
-    )
-    .scrollIntoView({
-
-      behavior:
-        "smooth",
-
-      block:
-        "start"
-
-    });
-
-}
-
 
 /* =========================================================
-   ANNULLA MODIFICA CORSA
+   ANNULLA FORM NUOVO PROGRAMMA
 ========================================================= */
 
 document
@@ -7655,10 +7458,6 @@ document
   .addEventListener(
     "click",
     () => {
-
-      editingRunningPlanId =
-        null;
-
 
       document
         .getElementById(
@@ -7694,6 +7493,140 @@ document
 
     }
   );
+
+
+/* =========================================================
+   MODIFICA INLINE PROGRAMMA CORSA (dentro la card)
+========================================================= */
+
+function toggleRunningPlanEditor(planId, weeksCount, sessionsPerWeek, planData) {
+
+  const box = document.getElementById(`runningPlanEdit_${planId}`);
+  if(!box) return;
+
+  const isHidden = box.classList.contains("hidden");
+
+  if(isHidden) {
+
+    box.classList.remove("hidden");
+
+    box.innerHTML = `
+      <h3 style="margin-top:0;">✏️ Modifica programma</h3>
+      <div class="grid">
+        <div>
+          <label>Numero di settimane</label>
+          <input type="number" id="editRunWeeks_${planId}" min="1" max="52" value="${escapeAttribute(weeksCount)}">
+        </div>
+        <div>
+          <label>Frequenza settimanale</label>
+          <select id="editRunSessions_${planId}">
+            ${[2,3,4,5].map(n=>`<option value="${n}" ${n===Number(sessionsPerWeek)?"selected":""}>${n} sessioni / sett.</option>`).join("")}
+          </select>
+        </div>
+      </div>
+      <div class="actions" style="margin:10px 0;">
+        <button type="button" class="secondary" onclick="regenerateRunningPlanEditor('${planId}')">⚡ Rigenera griglia (nuove settimane/sessioni)</button>
+      </div>
+      <div id="runningPlanEditorGrid_${planId}"></div>
+      <div class="actions" style="margin-top:14px;">
+        <button type="button" class="primary" onclick="saveRunningPlanInline('${planId}')">💾 Salva Modifiche</button>
+        <button type="button" class="secondary" onclick="toggleRunningPlanEditor('${planId}')">Chiudi</button>
+      </div>
+    `;
+
+    generateRunningPlanner(`p${planId}`, `runningPlanEditorGrid_${planId}`, weeksCount, sessionsPerWeek, planData);
+
+  } else {
+
+    box.classList.add("hidden");
+    box.innerHTML = "";
+
+  }
+
+}
+
+function regenerateRunningPlanEditor(planId) {
+  const weeks = document.getElementById(`editRunWeeks_${planId}`).value;
+  const sessions = document.getElementById(`editRunSessions_${planId}`).value;
+  // Rigenerando con nuove settimane/sessioni non possiamo più garantire l'allineamento
+  // dei dati precedenti riga per riga, quindi ripartiamo da una griglia vuota.
+  generateRunningPlanner(`p${planId}`, `runningPlanEditorGrid_${planId}`, weeks, sessions, null);
+}
+
+async function saveRunningPlanInline(planId) {
+
+  if(!currentPatient) return;
+
+  const weeksValue = document.getElementById(`editRunWeeks_${planId}`).value;
+  const sessionsValue = document.getElementById(`editRunSessions_${planId}`).value;
+  const data = collectRunningPlanData(`p${planId}`, weeksValue, sessionsValue);
+
+  if(!data.weeks || !data.sessions || !Array.isArray(data.planData)) {
+    showMessage("runningMessage","La scheda corsa non contiene dati validi.","error");
+    return;
+  }
+
+  // Verifichiamo che il programma esista davvero e appartenga a questo paziente
+  // prima di aggiornarlo (evita di modificare per errore il piano di un altro paziente).
+  const existing = await db
+    .from("running_plans")
+    .select("id, patient_id")
+    .eq("id", planId)
+    .maybeSingle();
+
+  if(existing.error) {
+    showMessage("runningMessage", "Errore nel recupero del programma: " + existing.error.message, "error");
+    return;
+  }
+  if(!existing.data) {
+    showMessage("runningMessage", "Programma corsa non trovato.", "error");
+    return;
+  }
+  if(String(existing.data.patient_id) !== String(currentPatient.id)) {
+    showMessage("runningMessage", "Il programma selezionato appartiene a un altro paziente. Modifica annullata.", "error");
+    return;
+  }
+
+  // .select() dopo l'update: se le policy RLS bloccano la scrittura, Supabase
+  // non genera un errore ma aggiorna 0 righe. Controllandolo evitiamo falsi successi.
+  const updateResult = await db
+    .from("running_plans")
+    .update({
+      weeks_count: Number(data.weeks),
+      sessions_per_week: Number(data.sessions),
+      plan_data: data.planData,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", planId)
+    .eq("patient_id", currentPatient.id)
+    .select();
+
+  if(updateResult.error) {
+    console.error("Errore UPDATE running_plans:", updateResult.error);
+    showMessage("runningMessage", "ERRORE SALVATAGGIO: " + updateResult.error.message, "error");
+    return;
+  }
+
+  if(!updateResult.data?.length) {
+    showMessage("runningMessage", "Il salvataggio non ha modificato nessuna riga: controlla i permessi (RLS) sulla tabella running_plans.", "error");
+    return;
+  }
+
+  showMessage("runningMessage", "Programma modificato con successo!", "success");
+
+  await loadRunningPlans();
+  await loadPatientTimeline();
+  await loadDashboardActivity();
+  await loadDashboardStats();
+
+  // Torniamo esattamente sulla card del programma appena modificato.
+  requestAnimationFrame(() => {
+    document.querySelector(`[data-running-plan-id="${CSS.escape(String(planId))}"]`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  });
+}
 
 
 /* =========================================================
@@ -7780,6 +7713,8 @@ async function loadRunningPlans() {
 
       div.className =
         "card";
+
+      div.dataset.runningPlanId = plan.id;
 
 
       let tableHtml =
@@ -7995,11 +7930,7 @@ async function loadRunningPlans() {
 
           <button
             class="edit"
-            onclick="
-              editRunningPlan(
-                '${plan.id}'
-              )
-            "
+            data-action="toggle-edit"
           >
             ✏️ Modifica
           </button>
@@ -8030,7 +7961,18 @@ async function loadRunningPlans() {
 
         </div>
 
+
+        <div id="runningPlanEdit_${plan.id}" class="edit-box hidden no-print"></div>
+
       `;
+
+
+      const editButton = div.querySelector('[data-action="toggle-edit"]');
+      if(editButton) {
+        editButton.addEventListener("click", () => {
+          toggleRunningPlanEditor(plan.id, plan.weeks_count, plan.sessions_per_week, plan.plan_data);
+        });
+      }
 
 
       container.appendChild(
@@ -8857,10 +8799,14 @@ async function saveRunningDiaryComment(id){
   const input=document.getElementById(`runningComment_${CSS.escape(String(id))}`);
   if(!input) return;
   const comment=input.value.trim() || null;
-  const result=await db.from("patient_running_diary").update({therapist_comment:comment}).eq("id",id).eq("patient_id",currentPatient.id);
+  const result=await db.from("patient_running_diary").update({therapist_comment:comment}).eq("id",id).eq("patient_id",currentPatient.id).select();
   if(result.error){
     console.error("Errore salvataggio commento corsa:",result.error);
     alert("Impossibile salvare il commento: " + (result.error.message || "errore Supabase"));
+    return;
+  }
+  if(!result.data?.length){
+    alert("Il commento non è stato salvato: nessuna riga aggiornata. Controlla i permessi (RLS) sulla tabella patient_running_diary.");
     return;
   }
   await loadRunningSessions();
@@ -8986,9 +8932,6 @@ async function deleteDiaryEntry(id){
   await loadPatientTodo();
   await loadPatientTimeline();
   await loadDashboardActivity();
-  await loadPatientTodo();
-  await loadPatientTimeline();
-  await loadDashboardActivity();
 }
 
 /* =========================================================
@@ -9107,21 +9050,6 @@ async function loadPatientSharedProgress() {
     console.error("Errore caricamento progressi paziente:", err);
     list.innerHTML = '<div class="message error">Impossibile caricare i progressi condivisi.</div>';
   }
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function formatDateIT(value) {
-  if (!value) return "";
-  const d = new Date(value + "T00:00:00");
-  return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString("it-IT");
 }
 
 </script>

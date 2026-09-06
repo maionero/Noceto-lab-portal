@@ -1541,6 +1541,7 @@ html, body { max-width:100%; overflow-x:hidden; }
 .todo-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
 .todo-card { border:1px solid var(--border-color); border-radius:10px; padding:13px; background:#fff; }
 .running-session-card { border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:10px; background:#fff; }
+[data-running-plan-id] { scroll-margin-top:90px; }
 @media(max-width:700px){ .patient-search{position:sticky;top:64px;z-index:20;background:var(--bg-color);padding-top:6px;} .timeline{padding-left:10px;} .timeline-item{padding-left:15px;} }
 
 
@@ -3814,6 +3815,13 @@ function activateSectionTab(button){
   root.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.remove('active-panel'));
   const target=document.getElementById(targetId);
   if(target && root.contains(target)) target.classList.add('active-panel');
+
+  // Carica il contenuto del diario proprio quando viene aperta la scheda.
+  // In questo modo il diario del paziente non dipende dal caricamento iniziale
+  // della pagina e resta sempre aggiornato quando il terapista lo visualizza.
+  if(targetId === 'therapistTabDiary' && currentUser?.role === 'therapist' && currentPatient){
+    loadTherapistDiary();
+  }
 }
 
 function setupSectionTabs(containerId){
@@ -4124,7 +4132,7 @@ async function loadDashboardActivity(){
         "Misurazione":"therapistTabProgress",
         "Documento":"therapistTabDocuments",
         "Comunicazione al paziente":"therapistTabNotes",
-        "Diario paziente":"therapistTabNotes",
+        "Diario paziente":"therapistTabDiary",
         "Esercizio assegnato":"therapistTabProgram",
         "Programma corsa":"therapistTabRunning"
       };
@@ -4168,8 +4176,14 @@ async function loadPatientTimeline(){
   push(a.data,"assessment","🩺",x=>x.assessment_type||"Valutazione",x=>x.subjective||x.interpretation||x.plan||"", "assessment_date");
   push(m.data,"metric","📈",x=>x.metric_name||"Misurazione",x=>`${x.value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
   push(d.data,"document","📄",x=>x.file_name||"Documento",x=>`${x.category||"Altro"}${x.description?" · "+x.description:""}`,"document_date");
-  push(e.data,"exercise","🏋️",x=>x.exercises?.name||"Esercizio assegnato",x=>[x.phase_name,x.goal].filter(Boolean).join(" · "),"updated_at");
-  push(rp.data,"running","🏃",x=>x.title||"Programma corsa",x=>{
+  push(e.data,"exercise","🏋️",x=>{
+    const modified=x.updated_at && x.created_at && String(x.updated_at)!==String(x.created_at);
+    return modified ? "Esercizio modificato" : "Esercizio assegnato";
+  },x=>[x.exercises?.name||"Esercizio",x.phase_name,x.goal].filter(Boolean).join(" · "),"updated_at");
+  push(rp.data,"running","🏃",x=>{
+    const modified=x.updated_at && x.created_at && String(x.updated_at)!==String(x.created_at);
+    return modified ? "Programma corsa modificato" : (x.title||"Programma corsa");
+  },x=>{
     const weeks=Number(x.weeks_count)||0;
     const sessions=Number(x.sessions_per_week)||0;
     return weeks && sessions ? `${weeks} settimane · ${sessions} sessioni/settimana` : "Nuova scheda di programmazione corsa";
@@ -4811,7 +4825,6 @@ async function openPatient(
   await loadRunningPlans();
   await loadPatientTimeline();
   await loadRunningSessions();
-  await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).eq("patient_id",currentPatient.id).eq("author_id",patient.user_id).is("read_at",null);
   await db.from("patient_running_diary").update({read_at:new Date().toISOString()}).eq("patient_id",currentPatient.id).eq("created_by",patient.user_id).is("read_at",null);
   await loadClinicalTests();
   await loadPatients();
@@ -7438,7 +7451,7 @@ async function saveRunningProgram() {
 
   // Dopo il salvataggio riportiamo la visuale direttamente sul programma appena creato.
   requestAnimationFrame(() => {
-    const target = document.querySelector(`[data-running-plan-id="${CSS.escape(String(newPlanId))}"]`);
+    const target = document.getElementById(`runningPlanCard_${newPlanId}`);
     (target || document.getElementById("runningPlansList"))?.scrollIntoView({
       behavior: "smooth",
       block: "start"
@@ -7621,7 +7634,7 @@ async function saveRunningPlanInline(planId) {
 
   // Torniamo esattamente sulla card del programma appena modificato.
   requestAnimationFrame(() => {
-    document.querySelector(`[data-running-plan-id="${CSS.escape(String(planId))}"]`)?.scrollIntoView({
+    document.getElementById(`runningPlanCard_${planId}`)?.scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
@@ -7714,6 +7727,7 @@ async function loadRunningPlans() {
       div.className =
         "card";
 
+      div.id = `runningPlanCard_${plan.id}`;
       div.dataset.runningPlanId = plan.id;
 
 
@@ -8795,25 +8809,65 @@ async function markDiaryRead(id){
 }
 
 async function saveRunningDiaryComment(id){
-  if(!id || !currentPatient || currentUser?.role !== "therapist") return;
-  const input=document.getElementById(`runningComment_${CSS.escape(String(id))}`);
-  if(!input) return;
+  if(currentUser?.role !== "therapist"){
+    alert("Solo il terapista può commentare le sedute di corsa.");
+    return;
+  }
+  if(!id || !currentPatient){
+    alert("Impossibile salvare il commento: paziente non selezionato.");
+    return;
+  }
+
+  const input=document.getElementById(`runningComment_${id}`);
+  if(!input){
+    alert("Campo commento non trovato.");
+    return;
+  }
+
   const comment=input.value.trim() || null;
-  const result=await db.from("patient_running_diary").update({therapist_comment:comment}).eq("id",id).eq("patient_id",currentPatient.id).select();
-  if(result.error){
-    console.error("Errore salvataggio commento corsa:",result.error);
-    alert("Impossibile salvare il commento: " + (result.error.message || "errore Supabase"));
-    return;
+  const card=input.closest(".running-session-card");
+  const button=card?.querySelector('button[onclick*="saveRunningDiaryComment"]');
+
+  if(button){
+    button.disabled=true;
+    button.textContent="⏳ Salvataggio...";
   }
-  if(!result.data?.length){
-    alert("Il commento non è stato salvato: nessuna riga aggiornata. Controlla i permessi (RLS) sulla tabella patient_running_diary.");
-    return;
+
+  try{
+    const result=await db
+      .from("patient_running_diary")
+      .update({therapist_comment:comment})
+      .eq("id",id)
+      .eq("patient_id",currentPatient.id)
+      .select("id, therapist_comment")
+      .single();
+
+    if(result.error){
+      console.error("Errore salvataggio commento corsa:",result.error);
+      alert("Impossibile salvare il commento: " + (result.error.message || "errore Supabase"));
+      return;
+    }
+
+    if(!result.data){
+      alert("Il commento non è stato salvato: nessuna seduta aggiornata. Controlla i permessi RLS.");
+      return;
+    }
+
+    await loadRunningSessions();
+    await loadPatientTimeline();
+
+    requestAnimationFrame(() => {
+      document.getElementById("running-diary-anchor")?.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
+    });
+  } finally {
+    if(button){
+      button.disabled=false;
+      button.textContent="💾 Salva commento";
+    }
   }
-  await loadRunningSessions();
-  await loadPatientTimeline();
-  requestAnimationFrame(() => {
-    document.getElementById(`running-diary-anchor`)?.scrollIntoView({behavior:"smooth",block:"start"});
-  });
 }
 
 async function saveTherapistRunningSession(){

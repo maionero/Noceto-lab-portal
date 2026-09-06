@@ -4253,12 +4253,25 @@ async function loadRunningSessions(){
       ${s.notes?`<div style="margin-top:8px;white-space:pre-line;color:var(--text-muted);"><strong>📝 Nota:</strong><br>${escapeHtml(s.notes)}</div>`:`<div style="margin-top:7px;color:var(--text-muted);">Nessuna nota.</div>`}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
         <label style="font-size:13px;font-weight:700;">💬 Commento del terapista</label>
-        <textarea id="runningComment_${escapeHtml(s.id)}" rows="2" placeholder="Es. Buona risposta al carico, prossima volta aumenta leggermente il ritmo...">${escapeHtml(s.therapist_comment||"")}</textarea>
+        ${s.therapist_comment ? `
+          <div class="therapist-running-comment" style="margin-top:8px;padding:12px;border-left:3px solid var(--primary);background:var(--surface-2);border-radius:8px;white-space:pre-line;">${escapeHtml(s.therapist_comment)}</div>
+          <div class="actions no-print" style="margin-top:7px;">
+            <button type="button" class="secondary" onclick="toggleRunningCommentEditor('${escapeHtml(s.id)}')">✏️ Modifica commento</button>
+          </div>
+          <div id="runningCommentEditor_${escapeHtml(s.id)}" class="hidden" style="margin-top:8px;">
+            <textarea id="runningComment_${escapeHtml(s.id)}" rows="2" placeholder="Modifica il commento...">${escapeHtml(s.therapist_comment)}</textarea>
+            <div class="actions no-print" style="margin-top:7px;">
+              <button type="button" class="secondary" onclick="saveRunningDiaryComment('${escapeHtml(s.id)}')">💾 Salva modifica</button>
+            </div>
+          </div>` : `
+          <textarea id="runningComment_${escapeHtml(s.id)}" rows="2" placeholder="Es. Buona risposta al carico, prossima volta aumenta leggermente il ritmo..."></textarea>
+          <div class="actions no-print" style="margin-top:7px;">
+            <button type="button" class="secondary" onclick="saveRunningDiaryComment('${escapeHtml(s.id)}')">💾 Salva commento</button>
+          </div>`}
         <div class="actions no-print" style="margin-top:7px;">
-          <button type="button" class="secondary" onclick="saveRunningDiaryComment('${escapeHtml(s.id)}')">💾 Salva commento</button>
           <button type="button" class="danger" onclick="deleteRunningDiaryEntry('${escapeHtml(s.id)}')">🗑️ Elimina</button>
         </div>
-      </div>
+      </div>`
     </div>`;
   }).join(""):"Nessuna seduta di corsa registrata dal paziente.";
 }
@@ -8806,6 +8819,16 @@ async function markDiaryRead(id){
   const result=await db.from("patient_diary_entries").update({read_at:new Date().toISOString()}).eq("id",id);
   if(result.error){ alert(result.error.message); return; }
   await loadTherapistDiary();
+}
+
+function toggleRunningCommentEditor(id){
+  const editor=document.getElementById(`runningCommentEditor_${id}`);
+  if(!editor) return;
+  editor.classList.toggle("hidden");
+  if(!editor.classList.contains("hidden")){
+    const input=document.getElementById(`runningComment_${id}`);
+    input?.focus();
+  }
 }
 
 async function saveRunningDiaryComment(id){

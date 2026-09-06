@@ -2230,6 +2230,13 @@ html, body { max-width:100%; overflow-x:hidden; }
 
     <button
       class="section-tab"
+      data-target="therapistTabDiary"
+    >
+      📔 Diario paziente
+    </button>
+
+    <button
+      class="section-tab"
       data-target="therapistTabRunning"
     >
       🏃 Scheda Corsa
@@ -2596,12 +2603,21 @@ html, body { max-width:100%; overflow-x:hidden; }
       Caricamento...
     </div>
 
-    <hr>
-    <h3>📔 Diario scritto dal paziente</h3>
-    <p style="color:var(--text-muted);font-size:13px;">Le annotazioni sono visibili a te e al fisioterapista. Il fisioterapista può segnarle come lette.</p>
+  </div>
+
+  <!-- =====================================================
+       DIARIO PAZIENTE
+  ====================================================== -->
+
+  <div
+    class="card tab-panel"
+    id="therapistTabDiary"
+  >
+    <div class="section-title">
+      <h2>📔 Diario scritto dal paziente</h2>
+    </div>
+    <p style="color:var(--text-muted);font-size:13px;">Qui trovi le annotazioni scritte dal paziente. Puoi leggerle, segnarle come lette ed eliminarle.</p>
     <div id="therapistDiaryList">Caricamento...</div>
-
-
   </div>
 
   <!-- =====================================================
@@ -2761,6 +2777,7 @@ html, body { max-width:100%; overflow-x:hidden; }
     <hr>
     <h2>🏃 Diario corsa del paziente</h2>
     <p style="color:var(--text-muted);font-size:13px;">Qui visualizzi esclusivamente le note che il paziente ha scritto nel proprio diario della corsa.</p>
+    <div id="running-diary-anchor" style="scroll-margin-top:90px;"></div>
     <div id="therapistRunningSessions">Caricamento...</div>
 
   </div>
@@ -4151,12 +4168,12 @@ async function loadPatientTimeline(){
   push(a.data,"assessment","🩺",x=>x.assessment_type||"Valutazione",x=>x.subjective||x.interpretation||x.plan||"", "assessment_date");
   push(m.data,"metric","📈",x=>x.metric_name||"Misurazione",x=>`${x.value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
   push(d.data,"document","📄",x=>x.file_name||"Documento",x=>`${x.category||"Altro"}${x.description?" · "+x.description:""}`,"document_date");
-  push(e.data,"exercise","🏋️",x=>x.exercises?.name||"Esercizio assegnato",x=>[x.phase_name,x.goal].filter(Boolean).join(" · "));
+  push(e.data,"exercise","🏋️",x=>x.exercises?.name||"Esercizio assegnato",x=>[x.phase_name,x.goal].filter(Boolean).join(" · "),"updated_at");
   push(rp.data,"running","🏃",x=>x.title||"Programma corsa",x=>{
     const weeks=Number(x.weeks_count)||0;
     const sessions=Number(x.sessions_per_week)||0;
     return weeks && sessions ? `${weeks} settimane · ${sessions} sessioni/settimana` : "Nuova scheda di programmazione corsa";
-  }, "created_at");
+  }, "updated_at");
   push(di.data,"diary","📔",x=>x.title||"Diario",x=>x.content||"");
   push(rs.data,"running-session","🏃",x=>x.session_type||"Seduta di corsa",x=>[x.duration_min?x.duration_min+" min":null,x.distance_km?x.distance_km+" km":null,x.rpe!=null?"RPE "+x.rpe:null,x.pain_score!=null?"Dolore "+x.pain_score+"/10":null].filter(Boolean).join(" · "),"session_date");
   push(ct.data,"test","🧪",x=>x.test_name||"Test",x=>`${x.test_value} ${x.unit||""}${x.note?" · "+x.note:""}`,"recorded_at");
@@ -5807,7 +5824,8 @@ async function updateAssignedExercise(id) {
     frequency_per_week: numberOrNull(val("editFrequency_" + id)?.value || ""),
     goal: val("editGoal_" + id)?.value.trim() || null,
     notes: val("editNotes_" + id).value.trim() || null,
-    phase_name: val("editPhase_" + id)?.value || null
+    phase_name: val("editPhase_" + id)?.value || null,
+    updated_at: new Date().toISOString()
   };
 
   const result = await db
@@ -5956,7 +5974,10 @@ document
 
             notes:
               notes ||
-              null
+              null,
+
+            updated_at:
+              new Date().toISOString()
 
           }]);
 
@@ -7418,7 +7439,8 @@ async function saveRunningProgram() {
     const updatePayload = {
       weeks_count: Number(data.weeks),
       sessions_per_week: Number(data.sessions),
-      plan_data: data.planData
+      plan_data: data.planData,
+      updated_at: new Date().toISOString()
     };
 
     // UPDATE separato dal SELECT: prima chiediamo a Supabase di eseguire
@@ -7484,7 +7506,8 @@ async function saveRunningProgram() {
         patient_id:patientId,
         weeks_count:Number(data.weeks),
         sessions_per_week:Number(data.sessions),
-        plan_data:data.planData
+        plan_data:data.planData,
+        updated_at:new Date().toISOString()
       }])
       .select("id, patient_id, weeks_count, sessions_per_week, plan_data, created_at")
       .single();
@@ -7508,6 +7531,14 @@ async function saveRunningProgram() {
   await loadPatientTimeline();
   await loadDashboardActivity();
   await loadDashboardStats();
+
+  // Dopo il salvataggio riportiamo la visuale direttamente alla tabella aggiornata.
+  requestAnimationFrame(() => {
+    document.getElementById("runningPlansList")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  });
 }
 
 /* =========================================================
@@ -8834,6 +8865,9 @@ async function saveRunningDiaryComment(id){
   }
   await loadRunningSessions();
   await loadPatientTimeline();
+  requestAnimationFrame(() => {
+    document.getElementById(`running-diary-anchor`)?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
 }
 
 async function saveTherapistRunningSession(){

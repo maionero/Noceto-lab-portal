@@ -3591,7 +3591,13 @@ async function refreshPatientPortalNotes(){
   const r=await db.from("patient_notes").select("*").eq("patient_id",currentPatient.id).eq("is_private",false).order("created_at",{ascending:false});
   if(r.error){ container.innerHTML=`<div class="message error">${escapeHtml(r.error.message)}</div>`; return; }
   if(!r.data?.length){ container.innerText="Nessuna nota comunicata."; return; }
-  container.innerHTML=r.data.map(note=>`<div class="note-card public-note"><h3>📢 ${escapeHtml(note.title||"Nota")}</h3><small>${escapeHtml(formatDateIT(note.created_at))}</small><p style="white-space:pre-line;">${escapeHtml(note.content)}</p></div>`).join("");
+  container.innerHTML=r.data.map(note=>{
+    // Nel portale paziente mostriamo volutamente solo la data, senza orario/timezone.
+    // Prendiamo i primi 10 caratteri dell'ISO timestamp (YYYY-MM-DD) per evitare
+    // che su mobile vengano visualizzati dettagli aggiuntivi dell'ora.
+    const noteDate = String(note.created_at || "").slice(0,10);
+    return `<div class="note-card public-note"><h3>📢 ${escapeHtml(note.title||"Nota")}</h3><small>${escapeHtml(formatDateIT(noteDate))}</small><p style="white-space:pre-line;">${escapeHtml(note.content)}</p></div>`;
+  }).join("");
 }
 
 async function markPatientPortalNotesRead(){

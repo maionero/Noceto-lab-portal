@@ -6821,6 +6821,10 @@ function toggleIntervalInputs(
       idFor(prefix, "label_slow", w, s)
     );
 
+  const repetitionsWrap =
+    document.getElementById(
+      idFor(prefix, "run_repetitions", w, s) + "_wrap"
+    );
 
   if(!typeElement)
     return;
@@ -6847,6 +6851,8 @@ function toggleIntervalInputs(
     labelSlow.innerText =
       "Recupero";
 
+    repetitionsWrap?.classList.remove("hidden");
+
   }
   else if(
     typeVal ===
@@ -6865,12 +6871,15 @@ function toggleIntervalInputs(
     labelSlow.innerText =
       "Tempo Camminata";
 
+    repetitionsWrap?.classList.add("hidden");
+
   }
   else {
 
     intervalBox.classList.add(
       "hidden"
     );
+    repetitionsWrap?.classList.add("hidden");
 
   }
 
@@ -7021,8 +7030,9 @@ function generateRunningPlanner(
         existingSession?.slow ||
         "";
 
-
-
+      const repetitions =
+        existingSession?.repetitions ??
+        "";
 
       const notes =
         existingSession?.notes ||
@@ -7036,6 +7046,7 @@ function generateRunningPlanner(
       const labelSlowId = idFor(prefix, "label_slow", w, s);
       const fastId = idFor(prefix, "run_fast", w, s);
       const slowId = idFor(prefix, "run_slow", w, s);
+      const repetitionsId = idFor(prefix, "run_repetitions", w, s);
       const notesId = idFor(prefix, "run_notes", w, s);
 
 
@@ -7151,6 +7162,18 @@ function generateRunningPlanner(
                 }
               "
             >
+
+              <div id="${repetitionsId}_wrap" class="${type === "Ripetute" ? "" : "hidden"}">
+                <label>Numero di ripetizioni</label>
+                <input
+                  type="number"
+                  id="${repetitionsId}"
+                  min="1"
+                  step="1"
+                  value="${escapeAttribute(repetitions)}"
+                  placeholder="Es. 6"
+                >
+              </div>
 
               <label
                 id="${labelFastId}"
@@ -7330,6 +7353,9 @@ function collectRunningPlanData(prefix, weeksValue, sessionsValue) {
           .trim();
 
 
+      const repetitionsEl = document.getElementById(idFor(prefix, "run_repetitions", w, s));
+      const repetitions = repetitionsEl?.value === "" ? "" : Number(repetitionsEl.value);
+
       const notes =
         document
           .getElementById(
@@ -7347,6 +7373,8 @@ function collectRunningPlanData(prefix, weeksValue, sessionsValue) {
 
         effort,
 
+        repetitions:
+          type === "Ripetute" ? repetitions : "",
 
         fast:
           (
@@ -7828,6 +7856,10 @@ async function loadRunningPlans() {
                   "Ripetute"
                 ) {
 
+                  if(sess.repetitions)
+                    content +=
+                      `🔁 Ripetizioni: <strong>${escapeHtml(String(sess.repetitions))}×</strong><br>`;
+
                   if(sess.fast)
                     content +=
                       `⚡ Veloce:
@@ -8189,7 +8221,7 @@ async function loadPatientPortalRunningOnly(data){
         let content=`<strong>🏃 Sessione ${index+1}: ${escapeHtml(sess.type||"Corsa")}</strong><br>`;
         if(sess.duration) content+=`⏱️ ${escapeHtml(sess.duration)} min<br>`;
         if(sess.effort!==undefined && sess.effort!=="") content+=`💪 RPE ${escapeHtml(String(sess.effort))}/10<br>`;
-        if(sess.type==="Ripetute"){ if(sess.fast) content+=`⚡ ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🐢 ${escapeHtml(sess.slow)}<br>`; }
+        if(sess.type==="Ripetute"){ if(sess.repetitions) content+=`🔁 ${escapeHtml(String(sess.repetitions))}× ripetizioni<br>`; if(sess.fast) content+=`⚡ ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🐢 ${escapeHtml(sess.slow)}<br>`; }
         else if(sess.type==="Corsa + Camminata"){ if(sess.fast) content+=`🏃 ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🚶 ${escapeHtml(sess.slow)}<br>`; }
         if(sess.notes) content+=`<small>📝 ${escapeHtml(sess.notes)}</small>`;
         html+=`<td data-label="Sessione ${index+1}">${content}</td>`;

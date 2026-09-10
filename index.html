@@ -7128,11 +7128,10 @@ function generateRunningPlanner(
 
 
             <input
-              type="number"
+              type="text"
               id="${durId}"
-              min="1"
               value="${escapeAttribute(duration)}"
-              placeholder="Es. 30"
+              placeholder="Es. 30 min oppure 6 volte"
             >
 
             <label>Fatica percepita (RPE 0–10)</label>
@@ -7330,7 +7329,8 @@ function collectRunningPlanData(prefix, weeksValue, sessionsValue) {
           .getElementById(
             idFor(prefix, "run_dur", w, s)
           )
-          .value;
+          .value
+          .trim();
 
       const effortEl = document.getElementById(idFor(prefix, "run_effort", w, s));
       const effort = effortEl?.value === "" ? "" : Number(effortEl.value);
@@ -8219,7 +8219,7 @@ async function loadPatientPortalRunningOnly(data){
       html+=`<tr><td data-label="Settimana"><strong>Settimana ${week.week}</strong></td>`;
       (week.sessions||[]).forEach((sess,index)=>{
         let content=`<strong>🏃 Sessione ${index+1}: ${escapeHtml(sess.type||"Corsa")}</strong><br>`;
-        if(sess.duration) content+=`⏱️ ${escapeHtml(sess.duration)} min<br>`;
+        if(sess.duration) content+=`⏱️ ${escapeHtml(String(sess.duration))}<br>`;
         if(sess.effort!==undefined && sess.effort!=="") content+=`💪 RPE ${escapeHtml(String(sess.effort))}/10<br>`;
         if(sess.type==="Ripetute"){ if(sess.repetitions) content+=`🔁 ${escapeHtml(String(sess.repetitions))}× ripetizioni<br>`; if(sess.fast) content+=`⚡ ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🐢 ${escapeHtml(sess.slow)}<br>`; }
         else if(sess.type==="Corsa + Camminata"){ if(sess.fast) content+=`🏃 ${escapeHtml(sess.fast)}<br>`; if(sess.slow) content+=`🚶 ${escapeHtml(sess.slow)}<br>`; }

@@ -4546,6 +4546,7 @@ function ensureRlsAuditModal(){
       </div>
       <p style="font-size:13px;color:#667085;margin:8px 0 14px">
         Test di sola lettura. Non modifica, inserisce o cancella dati. Le verifiche usano la sessione Supabase attualmente autenticata.
+        <br><strong>Per verificare davvero l’isolamento tra pazienti, esegui il test anche accedendo come ciascun paziente:</strong> il proprio paziente deve risultare visibile, l’altro deve risultare non visibile.
       </p>
       <div id="rlsAuditSummary" style="margin:0 0 14px"></div>
       <div style="overflow:auto">
@@ -4615,7 +4616,7 @@ async function runRlsAudit(){
       else { add(label,"N/D","Nessun dato presente da verificare"); }
     }else{
       if(error || data.length===0) add(label,"PASS",error?`Accesso negato: ${error.message}`:"Nessuna riga visibile");
-      else add(label,"FAIL",`${data.length} righe visibili`);
+      else add(label,"FAIL",`POSSIBILE DATA LEAK: ${data.length} righe visibili`);
     }
   }
 
@@ -4627,14 +4628,27 @@ async function runRlsAudit(){
       else add(label,"N/D","Nessun dato con questa impostazione");
     }else{
       if(error || data.length===0) add(label,"PASS",error?`Accesso negato: ${error.message}`:"Nessuna riga visibile");
-      else add(label,"FAIL",`${data.length} righe visibili`);
+      else add(label,"FAIL",`POSSIBILE DATA LEAK: ${data.length} righe visibili`);
     }
   }
 
-  // Identità / patients
+  // Identità / patients: la colonna corretta è patients.id, non patients.patient_id.
   for(const p of [A,B]){
-    const shouldSee=isTherapist||currentUser.id===p.user_id;
-    await visibility("patients",`patients → ${p.name}`,p.patient_id,shouldSee);
+    try{
+      const {data,error}=await queryRows("patients",q=>q.eq("id",p.patient_id));
+      const shouldSee=isTherapist||currentUser.id===p.user_id;
+      if(shouldSee){
+        if(error) add(`patients → ${p.name}`,"FAIL",error.message);
+        else if(data.length===1) add(`patients → ${p.name}`,"PASS","Record paziente visibile correttamente");
+        else if(data.length===0) add(`patients → ${p.name}`,"N/D","Record non presente o non visibile");
+        else add(`patients → ${p.name}`,"FAIL",`${data.length} record restituiti per lo stesso id`);
+      }else{
+        if(error || data.length===0) add(`patients → ${p.name} (isolamento)`,"PASS",error?`Accesso negato: ${error.message}`:"Nessun record visibile");
+        else add(`patients → ${p.name} (isolamento)`,"FAIL",`ACCESSO A DATI DI ALTRO PAZIENTE: ${data.length} record visibili`);
+      }
+    }catch(error){
+      add(`patients → ${p.name}`,shouldSee?"FAIL":"PASS",error.message);
+    }
   }
 
   // Tabelle legate al paziente

@@ -1737,7 +1737,16 @@ html, body { max-width:100%; overflow-x:hidden; }
 ========================================================= */
 @media print {
   @page {
-    margin: 12mm;
+    margin: 10mm;
+  }
+
+  @page runningLandscape {
+    size: A4 landscape;
+    margin: 9mm;
+  }
+
+  #printSheet.print-running {
+    page: runningLandscape !important;
   }
 
   html, body {
@@ -1806,10 +1815,11 @@ html, body { max-width:100%; overflow-x:hidden; }
     min-width:0 !important;
     max-width:100% !important;
     table-layout:fixed !important;
-    font-size:9px !important;
+    font-size:11px !important;
     margin-top:8px !important;
   }
   #printSheet .running-table thead { display:table-header-group !important; }
+  #printSheet .running-table th { font-size:11px !important; font-weight:800 !important; }
   #printSheet .running-table tbody { display:table-row-group !important; }
   #printSheet .running-table tr {
     display:table-row !important;
@@ -1823,7 +1833,7 @@ html, body { max-width:100%; overflow-x:hidden; }
     width:auto !important;
     min-width:0 !important;
     max-width:none !important;
-    padding:5px !important;
+    padding:7px !important;
     vertical-align:top !important;
     white-space:normal !important;
     overflow-wrap:anywhere !important;
@@ -1840,10 +1850,10 @@ html, body { max-width:100%; overflow-x:hidden; }
     display:none !important;
   }
   #printSheet .running-table .session-box {
-    padding:5px !important;
+    padding:6px !important;
     margin:0 !important;
-    font-size:8.5px !important;
-    line-height:1.2 !important;
+    font-size:10.5px !important;
+    line-height:1.28 !important;
     border:0 !important;
     background:transparent !important;
   }
@@ -1851,7 +1861,7 @@ html, body { max-width:100%; overflow-x:hidden; }
   #printSheet .running-table .session-box input,
   #printSheet .running-table .session-box select,
   #printSheet .running-table .session-box textarea {
-    font-size:8px !important;
+    font-size:10px !important;
   }
 }
 
@@ -1895,14 +1905,7 @@ html, body { max-width:100%; overflow-x:hidden; }
 
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
 
-    <button
-      id="rlsAuditButton"
-      class="secondary hidden"
-      type="button"
-      title="Controlla le policy RLS usando la sessione attualmente autenticata"
-    >
-      🔐 Test sicurezza
-    </button>
+
 
     <button
       id="logoutButton"
@@ -3913,20 +3916,7 @@ async function login() {
     // e carica il profilo senza ripetere la richiesta di login.
     const result=await db.auth.signInWithPassword({email,password});
     if(result.error) {
-      // Supabase restituisce volutamente un errore generico per credenziali non valide.
-      // Chiediamo alla Edge Function di distinguere, senza esporre dati del paziente.
-      try {
-        const check=await db.functions.invoke("check-login-email", {
-          body:{ email }
-        });
-        if(check?.data?.exists === false) {
-          throw new Error("EMAIL_NOT_ASSOCIATED");
-        }
-      } catch(checkError) {
-        if(checkError?.message === "EMAIL_NOT_ASSOCIATED") throw checkError;
-        // Se il controllo email non è disponibile, manteniamo il messaggio sicuro di default.
-      }
-      throw new Error("PASSWORD_INCORRECT");
+      throw result.error;
     }
 
     currentUser=result.data.user;
@@ -3934,12 +3924,11 @@ async function login() {
   } catch(error){
     console.error("Errore login:",error);
     currentUser=null;
+    const raw=String(error?.message || "").toLowerCase();
     const message =
-      error?.message === "EMAIL_NOT_ASSOCIATED"
-        ? "Email non associata a nessun paziente."
-        : error?.message === "PASSWORD_INCORRECT"
-          ? "Password non corretta."
-          : (error?.message || "Impossibile effettuare l'accesso.");
+      raw.includes("invalid login credentials")
+        ? "Email o password non corrette."
+        : (error?.message || "Impossibile effettuare l'accesso.");
     showMessage("loginMessage",message,"error");
     setLoginLoading(false);
   }
@@ -4473,11 +4462,6 @@ async function startApp() {
 
   currentUser.role = role;
 
-  const rlsAuditButton = document.getElementById("rlsAuditButton");
-  if(rlsAuditButton){
-    rlsAuditButton.classList.toggle("hidden", role !== "therapist");
-  }
-
   // Mantiene aggiornata anche la dashboard (es. nuova voce nella libreria esercizi).
   startRealtimeSubscriptions();
 
@@ -4521,219 +4505,6 @@ async function startApp() {
 
 
 /* =========================================================
-   RLS SECURITY AUDIT — SOLO LETTURA / STORAGE
-   Non modifica, inserisce o cancella dati.
-========================================================= */
-
-function ensureRlsAuditModal(){
-  let modal=document.getElementById("rlsAuditModal");
-  if(modal) return modal;
-
-  modal=document.createElement("div");
-  modal.id="rlsAuditModal";
-  modal.style.cssText=`
-    position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.58);
-    display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;
-  `;
-  modal.innerHTML=`
-    <div style="width:min(980px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.25)">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
-        <div>
-          <h2 style="margin:0 0 4px">Test sicurezza RLS</h2>
-          <div id="rlsAuditIdentity" style="font-size:13px;color:#667085"></div>
-        </div>
-        <button type="button" id="rlsAuditClose" class="secondary">Chiudi</button>
-      </div>
-      <p style="font-size:13px;color:#667085;margin:8px 0 14px">
-        Test di sola lettura. Non modifica, inserisce o cancella dati. Le verifiche usano la sessione Supabase attualmente autenticata.
-        <br><strong>TEST COMPLETO:</strong> esegui questa verifica una volta come Terapista, una volta come Martina e una volta come Paziente B.<br>
-        <span style="display:block;margin-top:6px"><strong>Come paziente:</strong> il proprio paziente/dato deve risultare visibile; tutti i dati dell’altro paziente devono risultare <strong>PASS</strong> perché non visibili. Un <strong>FAIL</strong> su un dato dell’altro paziente indica una possibile violazione RLS.</span>
-      </p>
-      <div id="rlsAuditSummary" style="margin:0 0 14px"></div>
-      <div style="overflow:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead>
-            <tr>
-              <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Test</th>
-              <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Risultato</th>
-              <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Dettaglio</th>
-            </tr>
-          </thead>
-          <tbody id="rlsAuditBody"></tbody>
-        </table>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.querySelector("#rlsAuditClose").addEventListener("click",()=>{ modal.style.display="none"; });
-  modal.addEventListener("click",e=>{ if(e.target===modal) modal.style.display="none"; });
-  return modal;
-}
-
-function escapeRlsHtml(value){
-  return String(value ?? "").replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
-}
-
-async function runRlsAudit(){
-  if(!currentUser?.id){
-    alert("Nessun utente autenticato.");
-    return;
-  }
-
-  const modal=ensureRlsAuditModal();
-  const body=modal.querySelector("#rlsAuditBody");
-  const summary=modal.querySelector("#rlsAuditSummary");
-  const identity=modal.querySelector("#rlsAuditIdentity");
-  body.innerHTML=`<tr><td colspan="3" style="padding:14px">⏳ Esecuzione test...</td></tr>`;
-  summary.innerHTML="";
-  modal.style.display="flex";
-
-  const A={patient_id:7,user_id:"1655ea12-6b5f-4f2e-81e4-2f32586f4032",name:"Martina / Paziente A"};
-  const B={patient_id:8,user_id:"a7584e67-7810-4324-acd3-ef99097f7a22",name:"Paziente B"};
-  const therapist="f0e9a2ac-57f6-4c3f-b58d-b4bc3cdd6787";
-
-  const isTherapist=currentUser.id===therapist;
-  const myPatient=currentUser.id===A.user_id?A:currentUser.id===B.user_id?B:null;
-  const roleLabel=isTherapist?"Terapista":myPatient?.name||"Utente non riconosciuto";
-  identity.textContent=`Sessione: ${roleLabel} · ${currentUser.id}`;
-  const modeBox=document.createElement("div");
-  modeBox.style.cssText="margin-top:8px;padding:10px 12px;border-radius:10px;background:#eef6ff;color:#174ea6;font-size:13px";
-  modeBox.innerHTML=isTherapist
-    ? "🧑‍⚕️ <strong>Modalità terapista:</strong> entrambi i pazienti devono essere accessibili."
-    : myPatient
-      ? `👤 <strong>Modalità paziente:</strong> devi vedere solo <strong>${escapeRlsHtml(myPatient.name)}</strong>. L’altro paziente deve risultare non visibile.`
-      : "⚠️ Utente non riconosciuto dal test: verifica manualmente la sessione.";
-  summary.appendChild(modeBox);
-
-  const results=[];
-
-  function add(test,status,detail){ results.push({test,status,detail}); }
-
-  async function queryRows(table, builder){
-    try{
-      const q=builder(db.from(table).select("*"));
-      const {data,error}=await q;
-      return {data:data||[],error};
-    }catch(error){ return {data:[],error}; }
-  }
-
-  async function visibility(table,label,patientId,shouldSee){
-    const {data,error}=await queryRows(table,q=>q.eq("patient_id",patientId));
-    if(shouldSee){
-      if(error){ add(label,"FAIL",error.message); }
-      else if(data.length>0){ add(label,"PASS",`${data.length} righe visibili`); }
-      else { add(label,"N/D","Nessun dato presente da verificare"); }
-    }else{
-      if(error || data.length===0) add(label,"PASS",error?`Accesso negato: ${error.message}`:"Nessuna riga visibile");
-      else add(label,"FAIL",`POSSIBILE DATA LEAK: ${data.length} righe visibili`);
-    }
-  }
-
-  async function restrictedFlag(table,label,patientId,column,value,shouldSee){
-    const {data,error}=await queryRows(table,q=>q.eq("patient_id",patientId).eq(column,value));
-    if(shouldSee){
-      if(error) add(label,"FAIL",error.message);
-      else if(data.length>0) add(label,"PASS",`${data.length} righe visibili`);
-      else add(label,"N/D","Nessun dato con questa impostazione");
-    }else{
-      if(error || data.length===0) add(label,"PASS",error?`Accesso negato: ${error.message}`:"Nessuna riga visibile");
-      else add(label,"FAIL",`POSSIBILE DATA LEAK: ${data.length} righe visibili`);
-    }
-  }
-
-  // Identità / patients: la colonna corretta è patients.id, non patients.patient_id.
-  for(const p of [A,B]){
-    try{
-      const {data,error}=await queryRows("patients",q=>q.eq("id",p.patient_id));
-      const shouldSee=isTherapist||currentUser.id===p.user_id;
-      if(shouldSee){
-        if(error) add(`patients → ${p.name}`,"FAIL",error.message);
-        else if(data.length===1) add(`patients → ${p.name}`,"PASS","Record paziente visibile correttamente");
-        else if(data.length===0) add(`patients → ${p.name}`,"N/D","Record non presente o non visibile");
-        else add(`patients → ${p.name}`,"FAIL",`${data.length} record restituiti per lo stesso id`);
-      }else{
-        if(error || data.length===0) add(`patients → ${p.name} (isolamento)`,"PASS",error?`Accesso negato: ${error.message}`:"Nessun record visibile");
-        else add(`patients → ${p.name} (isolamento)`,"FAIL",`ACCESSO A DATI DI ALTRO PAZIENTE: ${data.length} record visibili`);
-      }
-    }catch(error){
-      add(`patients → ${p.name}`,shouldSee?"FAIL":"PASS",error.message);
-    }
-  }
-
-  // Tabelle legate al paziente
-  const tables=[
-    ["patient_exercises","Esercizi"],
-    ["patient_documents","Documenti"],
-    ["patient_running_diary","Running diary"],
-    ["patient_diary_entries","Diary entries"],
-    ["running_plans","Running plans"]
-  ];
-  for(const [table,label] of tables){
-    for(const p of [A,B]){
-      const shouldSee=isTherapist||currentUser.id===p.user_id;
-      await visibility(table,`${label} → ${p.name}`,p.patient_id,shouldSee);
-    }
-  }
-
-  // Metrics e test: i pazienti dovrebbero vedere solo quelli condivisi.
-  for(const p of [A,B]){
-    const shouldSee=isTherapist||currentUser.id===p.user_id;
-    await restrictedFlag("patient_metrics",`Metriche condivise → ${p.name}`,p.patient_id,"is_shared",true,shouldSee);
-    await restrictedFlag("patient_metrics",`Metriche NON condivise → ${p.name}`,p.patient_id,"is_shared",false,isTherapist);
-    await restrictedFlag("patient_test_results",`Test condivisi → ${p.name}`,p.patient_id,"is_shared",true,shouldSee);
-    await restrictedFlag("patient_test_results",`Test NON condivisi → ${p.name}`,p.patient_id,"is_shared",false,isTherapist);
-  }
-
-  // Note: il paziente può leggere solo note non private proprie.
-  for(const p of [A,B]){
-    const own=currentUser.id===p.user_id;
-    await restrictedFlag("patient_notes",`Note NON private → ${p.name}`,p.patient_id,"is_private",false,isTherapist||own);
-    await restrictedFlag("patient_notes",`Note PRIVATE → ${p.name}`,p.patient_id,"is_private",true,isTherapist);
-  }
-
-  // Storage: controlla la visibilità delle cartelle 7 e 8.
-  for(const p of [A,B]){
-    try{
-      const {data,error}=await db.storage.from(DOCUMENT_BUCKET).list(String(p.patient_id));
-      const shouldSee=isTherapist||currentUser.id===p.user_id;
-      if(shouldSee){
-        if(error) add(`PDF → ${p.name}`,"FAIL",error.message);
-        else if((data||[]).length>0) add(`PDF → ${p.name}`,"PASS",`${data.length} oggetti visibili`);
-        else add(`PDF → ${p.name}`,"N/D","Cartella vuota o nessun documento presente");
-      }else{
-        if(error || (data||[]).length===0) add(`PDF → ${p.name}`,"PASS",error?`Accesso negato: ${error.message}`:"Nessun oggetto visibile");
-        else add(`PDF → ${p.name}`,"FAIL",`${data.length} oggetti visibili`);
-      }
-    }catch(error){ add(`PDF → ${p.name}`,isTherapist||currentUser.id===p.user_id?"FAIL":"PASS",error.message); }
-  }
-
-  const pass=results.filter(x=>x.status==="PASS").length;
-  const fail=results.filter(x=>x.status==="FAIL").length;
-  const nd=results.filter(x=>x.status==="N/D").length;
-
-  const modeText=isTherapist
-    ? "🧑‍⚕️ <strong>Modalità terapista:</strong> entrambi i pazienti devono essere accessibili."
-    : myPatient
-      ? `👤 <strong>Modalità paziente:</strong> devi vedere solo <strong>${escapeRlsHtml(myPatient.name)}</strong>. L’altro paziente deve risultare non visibile.`
-      : "⚠️ Utente non riconosciuto dal test.";
-  summary.innerHTML=`<div style="padding:10px 12px;border-radius:10px;background:#eef6ff;color:#174ea6;font-size:13px;margin-bottom:8px">${modeText}</div><div style="display:flex;gap:8px;flex-wrap:wrap">\n    <span style="padding:7px 10px;border-radius:8px;background:#eaf7ee">✅ PASS: <strong>${pass}</strong></span>\n    <span style="padding:7px 10px;border-radius:8px;background:#fff0f0">❌ FAIL: <strong>${fail}</strong></span>\n    <span style="padding:7px 10px;border-radius:8px;background:#f3f4f6">ℹ️ N/D: <strong>${nd}</strong></span>\n  </div>`;
-
-  body.innerHTML=results.map(r=>{
-    const bg=r.status==="PASS"?"#eaf7ee":r.status==="FAIL"?"#fff0f0":"#f3f4f6";
-    return `<tr>\n      <td style="padding:8px;border-bottom:1px solid #eee">${escapeRlsHtml(r.test)}</td>\n      <td style="padding:8px;border-bottom:1px solid #eee"><span style="background:${bg};padding:4px 7px;border-radius:6px">${escapeRlsHtml(r.status)}</span></td>\n      <td style="padding:8px;border-bottom:1px solid #eee;color:#667085">${escapeRlsHtml(r.detail)}</td>\n    </tr>`;
-  }).join("");
-
-  console.table(results);
-}
-
-/* =========================================================
-   RLS AUDIT BUTTON
-========================================================= */
-
-document.getElementById("rlsAuditButton")?.addEventListener("click",runRlsAudit);
-
-
-/* =========================================================
    LOGOUT
 ========================================================= */
 
@@ -4756,10 +4527,6 @@ document
 
       document
         .getElementById("logoutButton")
-        ?.classList.add("hidden");
-
-      document
-        .getElementById("rlsAuditButton")
         ?.classList.add("hidden");
 
       document.querySelectorAll("#therapistPage, #patientPage, #patientPortal, #newPatientPage, #newExercisePage, #setPasswordPage")
@@ -4829,13 +4596,18 @@ async function startPatient() {
     result.error ||
     !result.data
   ) {
-
-    alert(
-      "Profilo paziente non trovato."
+    console.error("Errore caricamento paziente:", result.error);
+    showMessage(
+      "loginMessage",
+      result.error
+        ? "Accesso riuscito, ma non riesco a caricare il profilo paziente. Controlla la policy RLS della tabella patients."
+        : "Account autenticato, ma nessun profilo paziente è associato a questo utente.",
+      "error"
     );
-
+    await db.auth.signOut();
+    currentUser=null;
+    showPage("loginPage");
     return;
-
   }
 
 
@@ -8811,6 +8583,10 @@ async function triggerPrint(
     });
 
 
+  const isRunningPrint = documentTitle === "Programma di Corsa";
+  printSheet.classList.toggle("print-running", isRunningPrint);
+  printSheet.classList.toggle("print-exercises", !isRunningPrint);
+
   printSheet.innerHTML = `
 
     <div
@@ -8927,7 +8703,10 @@ async function triggerPrint(
 
 window.addEventListener("afterprint",()=>{
   const printSheet=document.getElementById("printSheet");
-  if(printSheet) printSheet.innerHTML="";
+  if(printSheet){
+    printSheet.innerHTML="";
+    printSheet.classList.remove("print-running","print-exercises");
+  }
 });
 
 

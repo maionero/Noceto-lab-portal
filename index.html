@@ -4546,7 +4546,8 @@ function ensureRlsAuditModal(){
       </div>
       <p style="font-size:13px;color:#667085;margin:8px 0 14px">
         Test di sola lettura. Non modifica, inserisce o cancella dati. Le verifiche usano la sessione Supabase attualmente autenticata.
-        <br><strong>Per verificare davvero l’isolamento tra pazienti, esegui il test anche accedendo come ciascun paziente:</strong> il proprio paziente deve risultare visibile, l’altro deve risultare non visibile.
+        <br><strong>TEST COMPLETO:</strong> esegui questa verifica una volta come Terapista, una volta come Martina e una volta come Paziente B.<br>
+        <span style="display:block;margin-top:6px"><strong>Come paziente:</strong> il proprio paziente/dato deve risultare visibile; tutti i dati dell’altro paziente devono risultare <strong>PASS</strong> perché non visibili. Un <strong>FAIL</strong> su un dato dell’altro paziente indica una possibile violazione RLS.</span>
       </p>
       <div id="rlsAuditSummary" style="margin:0 0 14px"></div>
       <div style="overflow:auto">
@@ -4595,6 +4596,14 @@ async function runRlsAudit(){
   const myPatient=currentUser.id===A.user_id?A:currentUser.id===B.user_id?B:null;
   const roleLabel=isTherapist?"Terapista":myPatient?.name||"Utente non riconosciuto";
   identity.textContent=`Sessione: ${roleLabel} · ${currentUser.id}`;
+  const modeBox=document.createElement("div");
+  modeBox.style.cssText="margin-top:8px;padding:10px 12px;border-radius:10px;background:#eef6ff;color:#174ea6;font-size:13px";
+  modeBox.innerHTML=isTherapist
+    ? "🧑‍⚕️ <strong>Modalità terapista:</strong> entrambi i pazienti devono essere accessibili."
+    : myPatient
+      ? `👤 <strong>Modalità paziente:</strong> devi vedere solo <strong>${escapeRlsHtml(myPatient.name)}</strong>. L’altro paziente deve risultare non visibile.`
+      : "⚠️ Utente non riconosciuto dal test: verifica manualmente la sessione.";
+  summary.appendChild(modeBox);
 
   const results=[];
 
@@ -4702,7 +4711,12 @@ async function runRlsAudit(){
   const fail=results.filter(x=>x.status==="FAIL").length;
   const nd=results.filter(x=>x.status==="N/D").length;
 
-  summary.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap">\n    <span style="padding:7px 10px;border-radius:8px;background:#eaf7ee">✅ PASS: <strong>${pass}</strong></span>\n    <span style="padding:7px 10px;border-radius:8px;background:#fff0f0">❌ FAIL: <strong>${fail}</strong></span>\n    <span style="padding:7px 10px;border-radius:8px;background:#f3f4f6">ℹ️ N/D: <strong>${nd}</strong></span>\n  </div>`;
+  const modeText=isTherapist
+    ? "🧑‍⚕️ <strong>Modalità terapista:</strong> entrambi i pazienti devono essere accessibili."
+    : myPatient
+      ? `👤 <strong>Modalità paziente:</strong> devi vedere solo <strong>${escapeRlsHtml(myPatient.name)}</strong>. L’altro paziente deve risultare non visibile.`
+      : "⚠️ Utente non riconosciuto dal test.";
+  summary.innerHTML=`<div style="padding:10px 12px;border-radius:10px;background:#eef6ff;color:#174ea6;font-size:13px;margin-bottom:8px">${modeText}</div><div style="display:flex;gap:8px;flex-wrap:wrap">\n    <span style="padding:7px 10px;border-radius:8px;background:#eaf7ee">✅ PASS: <strong>${pass}</strong></span>\n    <span style="padding:7px 10px;border-radius:8px;background:#fff0f0">❌ FAIL: <strong>${fail}</strong></span>\n    <span style="padding:7px 10px;border-radius:8px;background:#f3f4f6">ℹ️ N/D: <strong>${nd}</strong></span>\n  </div>`;
 
   body.innerHTML=results.map(r=>{
     const bg=r.status==="PASS"?"#eaf7ee":r.status==="FAIL"?"#fff0f0":"#f3f4f6";

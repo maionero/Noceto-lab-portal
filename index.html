@@ -1889,6 +1889,29 @@ html, body { max-width:100%; overflow-x:hidden; }
   }
 }
 
+
+/* =========================================================
+   V61 — PULIZIA UI + DASHBOARD PAZIENTE + NOTIFICHE
+========================================================= */
+.patient-dashboard-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px;}
+.patient-dashboard-card{border:1px solid var(--border-color);border-radius:14px;padding:16px;background:var(--surface,#fff);min-width:0;}
+.patient-dashboard-card h3{margin:0 0 6px;font-size:15px;}
+.patient-dashboard-card .pd-value{font-size:25px;font-weight:800;line-height:1.15;}
+.patient-dashboard-card .pd-meta{font-size:12px;color:var(--text-muted);margin-top:5px;line-height:1.45;}
+.patient-dashboard-updates{margin-top:14px;}
+.patient-update{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-color);cursor:pointer;}
+.patient-update:last-child{border-bottom:0;}
+.patient-update:hover{background:#f8fafc;border-radius:10px;padding-left:8px;padding-right:8px;}
+.patient-update-icon{width:32px;height:32px;border-radius:10px;background:var(--surface-2,#f1f5f9);display:flex;align-items:center;justify-content:center;flex:0 0 32px;}
+.patient-update-main{flex:1;min-width:0;}
+.patient-update-title{font-weight:750;font-size:14px;}
+.patient-update-meta{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.patient-dashboard-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.patient-dashboard-actions button{font-size:13px;}
+.empty-soft{padding:13px;border:1px dashed var(--border-color);border-radius:11px;color:var(--text-muted);font-size:13px;}
+.clean-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.clean-section-title h2{margin:0;}
+@media(max-width:700px){.patient-dashboard-grid{grid-template-columns:1fr;gap:10px}.patient-dashboard-card{padding:14px}.patient-dashboard-actions button{flex:1 1 auto}}
 </style>
 
 </head>
@@ -3333,8 +3356,23 @@ html, body { max-width:100%; overflow-x:hidden; }
 
   </div>
   <div class="card">
-    <div class="section-title"><h2>✅ Da fare</h2></div>
+    <div class="clean-section-title">
+      <h2>👋 In breve</h2>
+      <span style="font-size:12px;color:var(--text-muted);">La tua area Noceto Lab</span>
+    </div>
     <div id="patientTodo" class="todo-grid"><div class="todo-card">Caricamento...</div></div>
+    <div id="patientDashboardSummary" class="patient-dashboard-grid">
+      <div class="patient-dashboard-card">Caricamento...</div>
+    </div>
+    <div class="patient-dashboard-card patient-dashboard-updates">
+      <div class="clean-section-title"><h3>🔔 Aggiornamenti</h3></div>
+      <div id="patientDashboardUpdates">Caricamento...</div>
+    </div>
+    <div class="patient-dashboard-actions">
+      <button type="button" class="secondary" data-patient-tab="portalExercises">🏋️ Vai agli esercizi</button>
+      <button type="button" class="secondary" data-patient-tab="portalRunning">🏃 Programma corsa</button>
+      <button type="button" class="secondary" data-patient-tab="portalDiary">📔 Il mio diario</button>
+    </div>
   </div>
   </div>
 
@@ -4156,6 +4194,8 @@ async function loadDashboardOverview(){
   }));
 
   const needs= enriched.filter(p=>p.unread>0).sort((a,b)=>b.unread-a.unread).slice(0,6);
+  const therapistBadge=document.getElementById("therapistNotificationBadge");
+  if(therapistBadge){ const total=enriched.reduce((sum,p)=>sum+p.unread,0); therapistBadge.textContent=total>99?"99+":String(total); therapistBadge.style.display=total?"inline-flex":"none"; }
   if(attention){
     attention.innerHTML=needs.length?`<div class="dashboard-overview-list">${needs.map(p=>`<div class="dashboard-overview-row" data-dashboard-patient="${p.id}"><div class="row-main"><div class="row-title">👤 ${escapeHtml(p.name)}</div><div class="row-meta">${p.unreadDiary?`📔 ${p.unreadDiary} diario`:""}${p.unreadDiary&&p.unreadRunning?" · ":""}${p.unreadRunning?`🏃 ${p.unreadRunning} corse`:""}</div></div><span class="dashboard-badge">${p.unread}</span></div>`).join("")}</div>`:`<div class="dashboard-empty">Tutto sotto controllo: nessuna novità da leggere.</div>`;
     attention.querySelectorAll("[data-dashboard-patient]").forEach(el=>el.addEventListener("click",async()=>{
@@ -4288,39 +4328,70 @@ async function loadPatientTimeline(){
 }
 
 async function loadPatientTodo(){
-  const box=document.getElementById("patientTodo"); if(!box||!currentPatient) return;
-  const [ex,doc,run,di]=await Promise.all([
+  const box=document.getElementById("patientTodo");
+  if(!box||!currentPatient) return;
+
+  const [ex,doc,run,di,notes,progress,runningDiary]=await Promise.all([
     db.from("patient_exercises").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
     db.from("patient_documents").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
     db.from("running_plans").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
-    db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id)
+    db.from("patient_diary_entries").select("id",{count:"exact",head:true}).eq("patient_id",currentPatient.id),
+    db.from("patient_notes").select("id,title,content,created_at,read_at,is_private").eq("patient_id",currentPatient.id).eq("is_private",false).order("created_at",{ascending:false}).limit(5),
+    db.from("patient_metrics").select("id,metric_name,value,unit,recorded_at").eq("patient_id",currentPatient.id).eq("is_shared",true).order("recorded_at",{ascending:false}).limit(1),
+    db.from("patient_running_diary").select("id,session_date,session_type,distance_km,duration_min,rpe,pain_score,therapist_comment,read_at").eq("patient_id",currentPatient.id).order("session_date",{ascending:false}).order("created_at",{ascending:false}).limit(1)
   ]);
-  // Nel portale paziente la notifica riguarda ESCLUSIVAMENTE le comunicazioni
-  // pubbliche scritte dal terapista. Le voci scritte dal paziente non contano.
-  let unreadCount=0;
-  if(currentUser?.role === "patient") {
-    const unreadNotes=await db.from("patient_notes")
-      .select("id",{count:"exact",head:true})
-      .eq("patient_id",currentPatient.id)
-      .eq("is_private",false)
-      .is("read_at",null);
-    unreadCount=unreadNotes.count||0;
-  }
+
+  const unreadNotes=(notes.data||[]).filter(n=>!n.read_at);
   const badge=document.getElementById("patientDiaryUnreadBadge");
-  if(badge){
-    // Le notifiche numeriche appartengono ESCLUSIVAMENTE all'area terapista.
-    // Nel portale paziente il badge non deve mai essere visibile.
-    badge.textContent="";
-    badge.classList.add("hidden");
-    badge.style.display="none";
+  if(badge){ badge.textContent=""; badge.classList.add("hidden"); badge.style.display="none"; }
+
+  box.innerHTML=`
+    <div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div>
+    <div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div>
+    <div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div>
+    <div class="todo-card"><strong>💬 Aggiornamenti</strong><div>${unreadNotes.length?`${unreadNotes.length} da leggere`:`Nessun nuovo messaggio`}</div></div>`;
+
+  const summary=document.getElementById("patientDashboardSummary");
+  if(summary){
+    const latestRun=runningDiary.data?.[0];
+    const latestMetric=progress.data?.[0];
+    summary.innerHTML=`
+      <div class="patient-dashboard-card">
+        <h3>🏃 Ultima corsa</h3>
+        <div class="pd-value">${latestRun?escapeHtml(formatDateIT(latestRun.session_date)):"—"}</div>
+        <div class="pd-meta">${latestRun?escapeHtml([latestRun.session_type,latestRun.distance_km!=null?latestRun.distance_km+" km":null,latestRun.duration_min!=null?latestRun.duration_min+" min":null].filter(Boolean).join(" · ")):"Nessuna corsa registrata"}</div>
+      </div>
+      <div class="patient-dashboard-card">
+        <h3>📈 Ultimo progresso</h3>
+        <div class="pd-value">${latestMetric?escapeHtml(String(latestMetric.value)+(latestMetric.unit?" "+latestMetric.unit:"")):"—"}</div>
+        <div class="pd-meta">${latestMetric?escapeHtml(latestMetric.metric_name||"Misurazione condivisa"):"Nessuna misurazione condivisa"}</div>
+      </div>`;
   }
-  box.innerHTML=`<div class="todo-card"><strong>🏋️ Esercizi</strong><div>${ex.count||0} assegnati</div></div><div class="todo-card"><strong>📄 Documenti</strong><div>${doc.count||0} disponibili</div></div><div class="todo-card"><strong>🏃 Corsa</strong><div>${run.count||0} programmi</div></div><div class="todo-card"><strong>📔 Diario</strong><div>${
-    unreadCount === 0
-      ? "Non c'è nulla da leggere"
-      : unreadCount === 1
-        ? "1 comunicazione da leggere"
-        : `${unreadCount} comunicazioni da leggere`
-  }</div></div>`;
+
+  const updates=document.getElementById("patientDashboardUpdates");
+  if(updates){
+    const rows=[];
+    unreadNotes.slice(0,3).forEach(n=>rows.push({icon:"💬",title:n.title||"Nuova comunicazione",meta:`${formatDateIT(n.created_at)} · Dal fisioterapista`,target:"portalNotes"}));
+    if(runningDiary.data?.[0]){ const r=runningDiary.data[0]; rows.push({icon:"🏃",title:"Ultima attività di corsa",meta:`${formatDateIT(r.session_date)}${r.therapist_comment?" · Commento del fisioterapista disponibile":""}`,target:"portalRunningDiary"}); }
+    if(!rows.length){ updates.innerHTML=`<div class="empty-soft">Nessun nuovo aggiornamento. Quando ci sarà qualcosa da vedere, lo troverai qui.</div>`; }
+    else {
+      updates.innerHTML=rows.slice(0,4).map(r=>`<div class="patient-update" data-patient-tab="${r.target}"><div class="patient-update-icon">${r.icon}</div><div class="patient-update-main"><div class="patient-update-title">${escapeHtml(r.title)}</div><div class="patient-update-meta">${escapeHtml(r.meta)}</div></div><span style="color:var(--text-muted);">›</span></div>`).join("");
+      updates.querySelectorAll("[data-patient-tab]").forEach(el=>el.addEventListener("click",()=>openPatientPortalTab(el.dataset.patientTab)));
+    }
+  }
+
+  document.querySelectorAll("[data-patient-tab]").forEach(el=>{
+    if(el.dataset.boundPatientTab) return;
+    el.dataset.boundPatientTab="1";
+    el.addEventListener("click",()=>openPatientPortalTab(el.dataset.patientTab));
+  });
+}
+
+function openPatientPortalTab(targetId){
+  const btn=document.querySelector(`#patientPortalTabs [data-target="${CSS.escape(targetId)}"]`);
+  if(btn) btn.click();
+  const panel=document.getElementById(targetId);
+  if(panel) panel.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 async function loadRunningSessions(){
